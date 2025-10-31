@@ -12,6 +12,26 @@ const resolveRestaurantId = async () => {
   return byName ? byName.id : null;
 };
 
+function normalizeOptions(options) {
+  const out = { accompagnements: [], boisson: null };
+  try {
+    if (!options || typeof options !== 'object') return out;
+    const acc = options.accompagnements || options.accompaniments || options['accompagnements'] || [];
+    out.accompagnements = Array.isArray(acc) ? acc.map((v) => String(v)) : [];
+    const boisson = options.boisson ?? options.drink ?? null;
+    if (Array.isArray(boisson)) {
+      out.boisson = boisson.includes('Bissap') ? 'Bissap' : (boisson[0] ? String(boisson[0]) : null);
+    } else if (boisson === true || (typeof boisson === 'string' && boisson.toLowerCase() === 'bissap')) {
+      out.boisson = 'Bissap';
+    } else if (typeof boisson === 'string') {
+      out.boisson = boisson;
+    } else {
+      out.boisson = null;
+    }
+  } catch (_) {}
+  return out;
+}
+
 // POST /api/orders
 exports.create = async (req, res) => {
   try {
@@ -38,15 +58,30 @@ exports.create = async (req, res) => {
       return res.status(400).json({ success: false, error: 'Restaurant indisponible' });
     }
 
+    // Normaliser et sécuriser les items
+    const safeItems = items.map((it, idx) => {
+      const quantity = Math.max(1, parseInt(it.quantity || 1, 10));
+      const unitPrice = Number(it.price || it.unitPrice || 0);
+      const name = String(it.name || it.title || `Article ${idx + 1}`);
+      const id = it.id || it.menuItemId || null;
+      return {
+        id,
+        name,
+        quantity,
+        price: +unitPrice.toFixed(2),
+        options: normalizeOptions(it.options || {}),
+      };
+    });
+
     // Sécurisation minimale: forcer paiement en cash et statut initial
     const payload = {
       customerId,
       restaurantId,
-      items,
-      subtotal: Number(subtotal || 0),
+      items: safeItems,
+      subtotal: Number.isFinite(Number(subtotal)) ? +Number(subtotal).toFixed(2) : 0,
       deliveryFee: Number(deliveryFee || 0),
       tax: Number(tax || 0),
-      total: Number(total || 0),
+      total: Number.isFinite(Number(total)) ? +Number(total).toFixed(2) : 0,
       orderType: orderType === 'delivery' ? 'delivery' : 'pickup',
       deliveryStreet: address.street || null,
       deliveryCity: address.city || null,
@@ -63,8 +98,10 @@ exports.create = async (req, res) => {
     const created = await Order.create(payload);
     return res.status(201).json({ success: true, data: { id: created.id, orderNumber: created.orderNumber } });
   } catch (error) {
-    console.error('Create order error:', error);
-    res.status(500).json({ success: false, error: 'Erreur création commande' });
+    console.error('Create order error:', error?.message || error);
+    const msg = error?.errors?.[0]?.message || error?.message || 'Erreur création commande';
+    const status = (error?.name || '').includes('Validation') ? 400 : 500;
+    res.status(status).json({ success: false, error: msg });
   }
 };
 

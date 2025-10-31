@@ -10,7 +10,13 @@ const Order = sequelize.define('Order', {
   orderNumber: {
     type: DataTypes.STRING(50),
     allowNull: false,
-    unique: true
+    unique: true,
+    // Generate a sane default so validation passes before hooks run
+    defaultValue: () => {
+      const ts = Date.now().toString().slice(-8);
+      const rand = Math.floor(1000 + Math.random() * 9000); // 4 digits
+      return `CC${ts}-${rand}`;
+    }
   },
   customerId: {
     type: DataTypes.INTEGER,
@@ -121,11 +127,20 @@ const Order = sequelize.define('Order', {
   tableName: 'orders',
   timestamps: true,
   hooks: {
+    // Ensure orderNumber exists prior to validation to avoid notNull violation
+    beforeValidate: async (order) => {
+      if (!order.orderNumber) {
+        const ts = Date.now().toString().slice(-8);
+        const rand = Math.floor(1000 + Math.random() * 9000);
+        order.orderNumber = `CC${ts}-${rand}`;
+      }
+    },
+    // Keep a safety net on create as well
     beforeCreate: async (order) => {
       if (!order.orderNumber) {
-        const timestamp = Date.now();
-        const randomNum = Math.floor(Math.random() * 1000);
-        order.orderNumber = `CC${timestamp}-${randomNum}`;
+        const ts = Date.now().toString().slice(-8);
+        const rand = Math.floor(1000 + Math.random() * 9000);
+        order.orderNumber = `CC${ts}-${rand}`;
       }
     }
   }
