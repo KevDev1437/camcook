@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx react-native@latest init:*)",
+      "Bash(npx @react-native-community/cli@latest init:*)",
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(del App.tsx)",
+      "Bash(npm uninstall:*)",
+      "Bash(npx create-expo-app:*)",
+      "Bash(npx expo install:*)",
+      "Bash(ipconfig:*)",
+      "Bash(findstr:*)",
+      "Bash(npm start)",
+      "Bash(taskkill:*)",
+      "Bash(npx expo start --clear --port 8082)",
+      "Bash(node scripts/seed-menu.js:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
