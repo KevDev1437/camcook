@@ -46,8 +46,14 @@ const User = sequelize.define('User', {
     defaultValue: 'customer'
   },
   avatar: {
-    type: DataTypes.STRING(255),
-    allowNull: true
+    type: DataTypes.TEXT,
+    allowNull: true,
+    comment: 'Avatar utilisateur (URL ou base64)'
+  },
+  backgroundImage: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+    comment: 'Photo de fond du profil utilisateur (URL ou base64)'
   },
   isActive: {
     type: DataTypes.BOOLEAN,

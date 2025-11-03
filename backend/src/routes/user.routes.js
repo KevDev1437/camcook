@@ -1,19 +1,20 @@
 const express = require('express');
 const { protect } = require('../middleware/auth');
+const userController = require('../controllers/user.controller');
+const addressController = require('../controllers/address.controller');
 
 const router = express.Router();
 
-// Placeholder routes - to be implemented
-router.get('/profile', protect, (req, res) => {
-  res.json({ message: 'Get user profile' });
-});
+// User profile routes
+router.get('/profile', protect, userController.getProfile);
+router.put('/profile', protect, userController.updateProfile);
 
-router.put('/profile', protect, (req, res) => {
-  res.json({ message: 'Update user profile' });
-});
-
-router.post('/addresses', protect, (req, res) => {
-  res.json({ message: 'Add address' });
-});
+// Address routes
+router.get('/addresses', protect, addressController.getAddresses);
+router.get('/addresses/:id', protect, addressController.getAddressById);
+router.post('/addresses', protect, addressController.createAddress);
+router.put('/addresses/:id', protect, addressController.updateAddress);
+router.delete('/addresses/:id', protect, addressController.deleteAddress);
+router.patch('/addresses/:id/default', protect, addressController.setDefaultAddress);
 
 module.exports = router;

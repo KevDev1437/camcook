@@ -1,14 +1,71 @@
-const { MenuItem } = require('../models');
-const { Restaurant } = require('../models');
+const { MenuItem, Restaurant, Accompaniment, Drink } = require('../models');
 
-// Helpers: compléter/contraindre les groupes d'options côté réponse API
-const DEFAULT_ACCOMPAGNEMENTS = [
-  'Plantain Frit',
-  'Baton de manioc',
-  'Wete Fufu',
-  'Frite de pomme',
-];
-const DEFAULT_BOISSONS = ['Bissap'];
+// Helper pour normaliser les accompagnements (supporte ancien format string et nouveau format objet)
+function normalizeAccomp(acc) {
+  if (typeof acc === 'string') {
+    return { name: acc, price: 0 };
+  }
+  if (typeof acc === 'object' && acc !== null) {
+    return {
+      name: acc.name || acc.label || String(acc),
+      price: typeof acc.price === 'number' ? acc.price : 0
+    };
+  }
+  return { name: String(acc), price: 0 };
+}
+
+// Helper pour normaliser les boissons
+function normalizeDrink(drink) {
+  if (typeof drink === 'string') {
+    return { name: drink, price: 0 };
+  }
+  if (typeof drink === 'object' && drink !== null) {
+    return {
+      name: drink.name || drink.label || String(drink),
+      price: typeof drink.price === 'number' ? drink.price : 0
+    };
+  }
+  return { name: String(drink), price: 0 };
+}
+
+// Récupérer les accompagnements depuis la table Accompaniment
+async function getDefaultAccompaniments() {
+  try {
+    const accompaniments = await Accompaniment.findAll({
+      order: [['name', 'ASC']]
+    });
+    return accompaniments.map(acc => ({
+      name: acc.name,
+      price: parseFloat(acc.price) || 0
+    }));
+  } catch (error) {
+    console.error('Error fetching default accompaniments:', error);
+  }
+  // Fallback vers les valeurs par défaut
+  return [
+    { name: 'Plantain Frit', price: 0 },
+    { name: 'Baton de manioc', price: 0 },
+    { name: 'Wete Fufu', price: 0 },
+    { name: 'Frite de pomme', price: 0 }
+  ];
+}
+
+// Récupérer les boissons depuis la table Drink
+async function getDefaultDrinks() {
+  try {
+    const drinks = await Drink.findAll({
+      order: [['name', 'ASC']]
+    });
+    return drinks.map(drink => ({
+      name: drink.name,
+      price: parseFloat(drink.price) || 0
+    }));
+  } catch (error) {
+    console.error('Error fetching default drinks:', error);
+  }
+  // Fallback vers les valeurs par défaut
+  return [{ name: 'Bissap', price: 0 }];
+}
 
 function getChoiceLabel(choice) {
   if (choice && typeof choice === 'object') {
@@ -17,38 +74,69 @@ function getChoiceLabel(choice) {
   return String(choice ?? '');
 }
 
-function ensureAccompagnements(options) {
+async function ensureAccompagnements(options) {
   const hasAccomp = options.some((opt) => (opt?.name || '').toLowerCase().includes('accomp'));
   if (!hasAccomp) {
+    const defaultAccomp = await getDefaultAccompaniments();
+    // Envoyer les objets avec name et price pour que le frontend puisse utiliser les prix
+    const choices = defaultAccomp.map(acc => ({
+      name: acc.name || String(acc),
+      price: typeof acc.price === 'number' ? acc.price : 0
+    }));
     options.push({
       id: 'accompagnements',
       name: 'Accompagnements',
       type: 'checkbox',
-      choices: DEFAULT_ACCOMPAGNEMENTS,
+      choices: choices,
     });
+  } else {
+    // Remplacer les choix existants par ceux de SiteInfo pour avoir les nouveaux accompagnements
+    const accompIndex = options.findIndex((opt) => (opt?.name || '').toLowerCase().includes('accomp'));
+    if (accompIndex >= 0) {
+      const defaultAccomp = await getDefaultAccompaniments();
+      // Remplacer complètement les choix par ceux de SiteInfo (inclut les nouveaux accompagnements)
+      const updatedChoices = defaultAccomp.map(acc => ({
+        name: acc.name || String(acc),
+        price: typeof acc.price === 'number' ? acc.price : 0
+      }));
+      
+      options[accompIndex] = {
+        ...options[accompIndex],
+        choices: updatedChoices,
+      };
+    }
   }
 }
 
-function ensureBoissonOnlyBissap(options) {
+async function ensureBoissons(options) {
   const idx = options.findIndex((opt) => (opt?.name || '').toLowerCase().includes('boisson'));
+  const defaultDrinks = await getDefaultDrinks();
   if (idx === -1) {
-    options.push({ id: 'boisson', name: 'Boisson', type: 'checkbox', choices: DEFAULT_BOISSONS });
+    // Envoyer les objets avec name et price pour que le frontend puisse utiliser les prix
+    const choices = defaultDrinks.map(drink => ({
+      name: drink.name || String(drink),
+      price: typeof drink.price === 'number' ? drink.price : 0
+    }));
+    options.push({ id: 'boisson', name: 'Boisson', type: 'checkbox', choices: choices });
     return;
   }
+  // Remplacer les choix existants par ceux de SiteInfo pour avoir les nouvelles boissons
+  const updatedChoices = defaultDrinks.map(drink => ({
+    name: drink.name || String(drink),
+    price: typeof drink.price === 'number' ? drink.price : 0
+  }));
+  
   const group = options[idx] || {};
-  const rawChoices = Array.isArray(group.choices) ? group.choices : [];
-  const filtered = rawChoices.filter(
-    (c) => getChoiceLabel(c).toLowerCase() === 'bissap'
-  );
   options[idx] = {
     id: group.id ?? 'boisson',
     name: group.name ?? 'Boisson',
     type: group.type ?? 'checkbox',
-    choices: filtered.length > 0 ? filtered : DEFAULT_BOISSONS,
+    choices: updatedChoices,
   };
 }
 
-function augmentOptions(data) {
+// Fonction pour enrichir les options avec les accompagnements et boissons depuis SiteInfo
+exports.augmentOptions = async function augmentOptions(data) {
   try {
     let options = [];
     if (Array.isArray(data.options)) options = data.options;
@@ -60,16 +148,43 @@ function augmentOptions(data) {
         options = [];
       }
     }
-    // Compléter/contraindre
-    ensureAccompagnements(options);
-    ensureBoissonOnlyBissap(options);
+    // Compléter/contraindre avec les valeurs globales depuis SiteInfo (toujours à jour)
+    await ensureAccompagnements(options);
+    await ensureBoissons(options);
     data.options = options;
-  } catch (_) {
-    // En cas de problème, force au moins les défauts
-    data.options = [
-      { id: 'accompagnements', name: 'Accompagnements', type: 'checkbox', choices: DEFAULT_ACCOMPAGNEMENTS },
-      { id: 'boisson', name: 'Boisson', type: 'checkbox', choices: DEFAULT_BOISSONS },
-    ];
+  } catch (error) {
+    console.error('Error augmenting options:', error);
+      // En cas de problème, force au moins les défauts
+    try {
+      const [acc, dr] = await Promise.all([getDefaultAccompaniments(), getDefaultDrinks()]);
+      const accChoices = acc.map(a => ({ name: a.name || String(a), price: a.price || 0 }));
+      const drChoices = dr.map(d => ({ name: d.name || String(d), price: d.price || 0 }));
+      data.options = [
+        { id: 'accompagnements', name: 'Accompagnements', type: 'checkbox', choices: accChoices },
+        { id: 'boisson', name: 'Boisson', type: 'checkbox', choices: drChoices },
+      ];
+    } catch (fallbackError) {
+      // Fallback ultime
+      data.options = [
+        { 
+          id: 'accompagnements', 
+          name: 'Accompagnements', 
+          type: 'checkbox', 
+          choices: [
+            { name: 'Plantain Frit', price: 0 },
+            { name: 'Baton de manioc', price: 0 },
+            { name: 'Wete Fufu', price: 0 },
+            { name: 'Frite de pomme', price: 0 }
+          ]
+        },
+        { 
+          id: 'boisson', 
+          name: 'Boisson', 
+          type: 'checkbox', 
+          choices: [{ name: 'Bissap', price: 0 }]
+        },
+      ];
+    }
   }
   return data;
 }
@@ -96,10 +211,10 @@ exports.getMenuByRestaurant = async (req, res) => {
     });
 
     // Enrichir options dans la réponse (sans modifier la BDD)
-    menuItems = menuItems.map((it) => {
+    menuItems = await Promise.all(menuItems.map(async (it) => {
       const json = it.toJSON ? it.toJSON() : it;
-      return augmentOptions(json);
-    });
+      return await exports.augmentOptions(json);
+    }));
 
     res.status(200).json({
       success: true,
@@ -137,7 +252,8 @@ exports.getMenuItemById = async (req, res) => {
     }
 
     console.log('✅ Plat trouvé:', menuItem.name);
-    const data = augmentOptions(menuItem.toJSON ? menuItem.toJSON() : menuItem);
+    const json = menuItem.toJSON ? menuItem.toJSON() : menuItem;
+    const data = await exports.augmentOptions(json);
     res.status(200).json({
       success: true,
       data
@@ -163,9 +279,13 @@ exports.createMenuItem = async (req, res) => {
       restaurantId: req.user.restaurantId || req.body.restaurantId
     });
 
+    // Enrichir les options avec les accompagnements et boissons depuis SiteInfo
+    const json = menuItem.toJSON ? menuItem.toJSON() : menuItem;
+    const data = await exports.augmentOptions(json);
+
     res.status(201).json({
       success: true,
-      data: menuItem
+      data
     });
   } catch (error) {
     console.error('Error creating menu item:', error);
@@ -196,9 +316,16 @@ exports.updateMenuItem = async (req, res) => {
 
     await menuItem.update(req.body);
 
+    // Recharger le menu pour avoir les dernières données
+    await menuItem.reload();
+
+    // Enrichir les options avec les accompagnements et boissons depuis SiteInfo
+    const json = menuItem.toJSON ? menuItem.toJSON() : menuItem;
+    const data = await exports.augmentOptions(json);
+
     res.status(200).json({
       success: true,
-      data: menuItem
+      data
     });
   } catch (error) {
     console.error('Error updating menu item:', error);

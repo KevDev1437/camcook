@@ -8,6 +8,8 @@ const Review = require('./Review');
 const Question = require('./Question');
 const SiteInfo = require('./SiteInfo');
 const ContactMessage = require('./ContactMessage');
+const Accompaniment = require('./Accompaniment');
+const Drink = require('./Drink');
 
 // Define associations
 
@@ -125,5 +127,7 @@ module.exports = {
   Review,
   Question,
   SiteInfo,
-  ContactMessage
+  ContactMessage,
+  Accompaniment,
+  Drink
 };

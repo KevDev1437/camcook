@@ -33,6 +33,8 @@ const initDatabase = async () => {
     console.log('   - restaurants');
     console.log('   - menu_items');
     console.log('   - orders');
+    console.log('   - accompaniments');
+    console.log('   - drinks');
 
     console.log('\n✅ Database initialization completed!');
     console.log('\n💡 Usage:');

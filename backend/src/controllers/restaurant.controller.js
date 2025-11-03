@@ -1,4 +1,5 @@
 const { Restaurant, MenuItem } = require('../models');
+const { augmentOptions } = require('./menu.controller');
 
 // Resolve CamCook restaurant by ENV id or by name fallback
 const resolveCamcook = async () => {
@@ -76,7 +77,7 @@ exports.getCamCookMenu = async (req, res) => {
     if (!base) {
       return res.status(404).json({ success: false, message: 'Restaurant CamCook non trouvé' });
     }
-    const menuItems = await MenuItem.findAll({
+    let menuItems = await MenuItem.findAll({
       where: {
         restaurantId: base.id,
         isAvailable: true
@@ -99,6 +100,12 @@ exports.getCamCookMenu = async (req, res) => {
       ],
       order: [['isPopular', 'DESC'], ['name', 'ASC']]
     });
+
+    // Enrichir les options avec les accompagnements et boissons depuis les tables Accompaniment et Drink (toujours à jour)
+    menuItems = await Promise.all(menuItems.map(async (it) => {
+      const json = it.toJSON ? it.toJSON() : it;
+      return await augmentOptions(json);
+    }));
 
     res.status(200).json({
       success: true,

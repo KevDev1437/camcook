@@ -14,12 +14,18 @@ exports.getSiteInfo = async (req, res) => {
 // PUT /api/site-info
 exports.upsertSiteInfo = async (req, res) => {
   try {
-    const { phone, email, address } = req.body;
+    const { phone, email, address, settings } = req.body;
     let info = await SiteInfo.findOne({ order: [['id', 'ASC']] });
+    const updateData = {};
+    if (phone !== undefined) updateData.phone = phone;
+    if (email !== undefined) updateData.email = email;
+    if (address !== undefined) updateData.address = address;
+    if (settings !== undefined) updateData.settings = settings;
+    
     if (!info) {
-      info = await SiteInfo.create({ phone, email, address });
+      info = await SiteInfo.create(updateData);
     } else {
-      await info.update({ phone, email, address });
+      await info.update(updateData);
     }
     res.status(200).json({ success: true, data: info });
   } catch (error) {
