@@ -108,3 +108,5 @@ const id = setInterval(fetchNotifications, 5000);
 - Vérifier que les notifications filtrées sont bien utilisées
 - Ajouter un indicateur visuel pour les notifications prioritaires
 
+
+

@@ -112,3 +112,5 @@ Plus d'informations : [https://stripe.com/docs/testing](https://stripe.com/docs/
 - [Google Pay Setup](https://stripe.com/docs/google-pay)
 
 
+
+

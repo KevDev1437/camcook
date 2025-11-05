@@ -15,3 +15,5 @@ console.log('JWT_REFRESH_SECRET=' + jwtRefreshSecret);
 console.log('\n📝 Copiez ces valeurs dans votre fichier .env\n');
 console.log('⚠️  IMPORTANT: Ne partagez jamais ces secrets publiquement!\n');
 
+
+

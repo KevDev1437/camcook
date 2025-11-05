@@ -138,3 +138,5 @@ ORDER BY createdAt DESC;
 - ✅ **Conformité** : Stripe est conforme PCI-DSS (sécurité des paiements)
 
 
+
+
