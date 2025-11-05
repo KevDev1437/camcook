@@ -111,6 +111,49 @@ const Restaurant = sequelize.define('Restaurant', {
   isVerified: {
     type: DataTypes.BOOLEAN,
     defaultValue: false
+  },
+  // ============================================
+  // CHAMPS MULTI-TENANT / SAAS (ajoutés par migration)
+  // ============================================
+  slug: {
+    type: DataTypes.STRING(100),
+    allowNull: true,
+    unique: true,
+    comment: 'URL-friendly identifier for the restaurant (e.g., "camcook")'
+  },
+  subdomain: {
+    type: DataTypes.STRING(100),
+    allowNull: true,
+    unique: true,
+    comment: 'Subdomain for white-label apps (e.g., "camcook" for camcook.yourdomain.com)'
+  },
+  settings: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: {},
+    comment: 'Custom settings for white-label (colors, fonts, etc.)'
+  },
+  subscriptionPlan: {
+    type: DataTypes.ENUM('free', 'starter', 'pro', 'enterprise'),
+    allowNull: true,
+    defaultValue: 'free',
+    comment: 'Subscription plan for the restaurant'
+  },
+  subscriptionStatus: {
+    type: DataTypes.ENUM('active', 'inactive', 'trial', 'cancelled'),
+    allowNull: true,
+    defaultValue: 'trial',
+    comment: 'Current subscription status'
+  },
+  subscriptionStartDate: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    comment: 'Date when the subscription started'
+  },
+  subscriptionEndDate: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    comment: 'Date when the subscription ends'
   }
 }, {
   tableName: 'restaurants',

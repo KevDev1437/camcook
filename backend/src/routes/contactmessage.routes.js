@@ -1,13 +1,22 @@
 const express = require('express');
 const router = express.Router();
+const restaurantContext = require('../middleware/restaurantContext');
 const ctrl = require('../controllers/contactmessage.controller');
 const { protect, authorize } = require('../middleware/auth');
 
-// Admin protected routes for managing contact messages
-router.use(protect, authorize('admin'));
+// Liste des messages (owner/admin) - restaurantContext requis pour filtrer par restaurant
+router.get('/', restaurantContext.required, protect, authorize('restaurant', 'admin'), ctrl.list);
 
-router.get('/', ctrl.list);
-router.get('/:id', ctrl.getById);
-router.patch('/:id/status', ctrl.updateStatus);
+// Get message by ID (owner/admin) - restaurantContext requis
+router.get('/:id', restaurantContext.required, protect, authorize('restaurant', 'admin'), ctrl.getById);
+
+// Créer un message (public) - restaurantContext requis pour associer au restaurant
+router.post('/', restaurantContext.required, ctrl.create);
+
+// Modifier statut (owner/admin) - restaurantContext requis
+router.patch('/:id/status', restaurantContext.required, protect, authorize('restaurant', 'admin'), ctrl.updateStatus);
+
+// Supprimer message (owner/admin) - restaurantContext requis
+router.delete('/:id', restaurantContext.required, protect, authorize('restaurant', 'admin'), ctrl.delete);
 
 module.exports = router;

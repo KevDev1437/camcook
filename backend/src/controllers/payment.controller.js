@@ -1,3 +1,13 @@
+/**
+ * Payment Controller - Multi-Tenant
+ * 
+ * Ce controller gère les paiements dans un contexte multi-tenant.
+ * Les descriptions Stripe utilisent req.restaurant.name au lieu de "CamCook" hard-codé.
+ * 
+ * IMPORTANT : Le middleware restaurantContext doit être appliqué avant
+ * d'appeler ces fonctions pour charger req.restaurant et req.restaurantId.
+ */
+
 const stripe = require('../config/stripe');
 const { Order } = require('../models/index');
 
@@ -17,6 +27,14 @@ exports.createPaymentIntent = async (req, res) => {
     const userId = req.user?.id;
     if (!userId) {
       return res.status(401).json({ success: false, error: 'Non autorisé' });
+    }
+
+    // Vérifier que req.restaurant existe (chargé par le middleware restaurantContext)
+    if (!req.restaurant || !req.restaurantId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Restaurant context not loaded. Ensure restaurantContext middleware is applied.'
+      });
     }
 
     const { amount, currency = 'eur', orderId, orderGroupId, paymentMethodType = 'card' } = req.body;
@@ -44,8 +62,12 @@ exports.createPaymentIntent = async (req, res) => {
         userId: userId.toString(),
         orderId: orderId ? orderId.toString() : null,
         orderGroupId: orderGroupId ? orderGroupId.toString() : null,
+        restaurantId: req.restaurantId.toString(),
+        restaurantName: req.restaurant.name,
+        customerId: userId.toString()
       },
-      description: `Commande CamCook - ${orderGroupId || orderId || 'Nouvelle commande'}`,
+      // Utiliser req.restaurant.name au lieu de "CamCook" hard-codé
+      description: `Commande ${req.restaurant.name} - Order #${orderGroupId || orderId || 'Nouvelle commande'}`,
     });
 
     // Si orderGroupId est fourni, mettre à jour toutes les commandes du groupe
@@ -55,7 +77,7 @@ exports.createPaymentIntent = async (req, res) => {
           stripePaymentIntentId: paymentIntent.id,
           paymentMethod: 'stripe_card',
         },
-        { where: { orderGroupId, customerId: userId } }
+        { where: { orderGroupId, customerId: userId, restaurantId: req.restaurantId } }
       );
     } else if (orderId) {
       // Sinon, mettre à jour une seule commande (compatibilité)
@@ -64,7 +86,7 @@ exports.createPaymentIntent = async (req, res) => {
           stripePaymentIntentId: paymentIntent.id,
           paymentMethod: 'stripe_card',
         },
-        { where: { id: orderId, customerId: userId } }
+        { where: { id: orderId, customerId: userId, restaurantId: req.restaurantId } }
       );
     }
 
@@ -95,7 +117,7 @@ exports.confirmPayment = async (req, res) => {
       return res.status(401).json({ success: false, error: 'Non autorisé' });
     }
 
-    const { paymentIntentId, orderId } = req.body;
+    const { paymentIntentId, orderId, orderGroupId } = req.body;
 
     if (!paymentIntentId) {
       return res.status(400).json({ success: false, error: 'Payment Intent ID requis' });
@@ -111,6 +133,9 @@ exports.confirmPayment = async (req, res) => {
 
     // Vérifier le statut du paiement
     if (paymentIntent.status === 'succeeded') {
+      // Récupérer le restaurantId depuis les metadata Stripe
+      const restaurantId = paymentIntent.metadata.restaurantId ? parseInt(paymentIntent.metadata.restaurantId, 10) : null;
+
       // Mettre à jour toutes les commandes du groupe si orderGroupId est fourni
       if (orderGroupId) {
         await Order.update(
@@ -118,7 +143,7 @@ exports.confirmPayment = async (req, res) => {
             paymentStatus: 'paid',
             stripePaymentIntentId: paymentIntentId,
           },
-          { where: { orderGroupId, customerId: userId } }
+          { where: { orderGroupId, customerId: userId, ...(restaurantId ? { restaurantId } : {}) } }
         );
       } else if (orderId) {
         // Sinon, mettre à jour une seule commande (compatibilité)
@@ -127,7 +152,7 @@ exports.confirmPayment = async (req, res) => {
             paymentStatus: 'paid',
             stripePaymentIntentId: paymentIntentId,
           },
-          { where: { id: orderId, customerId: userId } }
+          { where: { id: orderId, customerId: userId, ...(restaurantId ? { restaurantId } : {}) } }
         );
       }
 
@@ -176,6 +201,14 @@ exports.createMobilePayIntent = async (req, res) => {
       return res.status(401).json({ success: false, error: 'Non autorisé' });
     }
 
+    // Vérifier que req.restaurant existe (chargé par le middleware restaurantContext)
+    if (!req.restaurant || !req.restaurantId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Restaurant context not loaded. Ensure restaurantContext middleware is applied.'
+      });
+    }
+
     const { amount, currency = 'eur', orderId, orderGroupId, paymentMethodType = 'apple_pay' } = req.body;
 
     // Validation
@@ -204,9 +237,13 @@ exports.createMobilePayIntent = async (req, res) => {
         userId: userId.toString(),
         orderId: orderId ? orderId.toString() : null,
         orderGroupId: orderGroupId ? orderGroupId.toString() : null,
+        restaurantId: req.restaurantId.toString(),
+        restaurantName: req.restaurant.name,
+        customerId: userId.toString(),
         mobilePayType: paymentType,
       },
-      description: `Commande CamCook - ${orderGroupId || orderId || 'Nouvelle commande'} (${paymentType})`,
+      // Utiliser req.restaurant.name au lieu de "CamCook" hard-codé
+      description: `Commande ${req.restaurant.name} - ${orderGroupId || orderId || 'Nouvelle commande'} (${paymentType})`,
     });
 
     // Si orderGroupId est fourni, mettre à jour toutes les commandes du groupe
@@ -217,7 +254,7 @@ exports.createMobilePayIntent = async (req, res) => {
           stripePaymentIntentId: paymentIntent.id,
           paymentMethod: paymentMethod,
         },
-        { where: { orderGroupId, customerId: userId } }
+        { where: { orderGroupId, customerId: userId, restaurantId: req.restaurantId } }
       );
     } else if (orderId) {
       // Sinon, mettre à jour une seule commande (compatibilité)
@@ -226,7 +263,7 @@ exports.createMobilePayIntent = async (req, res) => {
           stripePaymentIntentId: paymentIntent.id,
           paymentMethod: paymentMethod,
         },
-        { where: { id: orderId, customerId: userId } }
+        { where: { id: orderId, customerId: userId, restaurantId: req.restaurantId } }
       );
     }
 
@@ -260,7 +297,7 @@ exports.listPayments = async (req, res) => {
       });
     }
 
-    const { status, paymentMethod, page = 1, limit = 20, startDate, endDate } = req.query;
+    const { status, paymentMethod, page = 1, limit = 20, startDate, endDate, restaurantId } = req.query;
 
     // Construire les paramètres de recherche Stripe
     const listParams = {
@@ -293,13 +330,26 @@ exports.listPayments = async (req, res) => {
       filteredPayments = filteredPayments.filter(p => p.status === status);
     }
 
+    // Filtrer par restaurantId si fourni (depuis les metadata Stripe)
+    if (restaurantId) {
+      filteredPayments = filteredPayments.filter(p => 
+        p.metadata && p.metadata.restaurantId && p.metadata.restaurantId === restaurantId.toString()
+      );
+    }
+
     // Récupérer les commandes correspondantes depuis la base de données
     const paymentIntentIds = filteredPayments.map(p => p.id);
     const { Op } = require('sequelize');
     const { Order, User } = require('../models');
     
+    const where = {};
+    if (restaurantId) {
+      where.restaurantId = restaurantId;
+    }
+    
     const orders = await Order.findAll({
       where: {
+        ...where,
         stripePaymentIntentId: { [Op.in]: paymentIntentIds },
       },
       include: [
@@ -331,6 +381,8 @@ exports.listPayments = async (req, res) => {
         createdAt: new Date(paymentIntent.created * 1000),
         description: paymentIntent.description,
         metadata: paymentIntent.metadata,
+        restaurantId: paymentIntent.metadata.restaurantId || null,
+        restaurantName: paymentIntent.metadata.restaurantName || null,
         order: order ? {
           id: order.id,
           orderNumber: order.orderNumber,
@@ -427,4 +479,3 @@ exports.refundPayment = async (req, res) => {
     });
   }
 };
-

@@ -1,4 +1,6 @@
 const express = require('express');
+const router = express.Router();
+const restaurantContext = require('../middleware/restaurantContext');
 const { protect, authorize } = require('../middleware/auth');
 const { validateImageUpload, uploadLimiter } = require('../middleware/uploadValidator');
 const {
@@ -9,15 +11,34 @@ const {
   deleteMenuItem
 } = require('../controllers/menu.controller');
 
-const router = express.Router();
+// Routes publiques (lecture) - restaurantContext requis pour filtrer par restaurant
+router.get('/restaurant/:restaurantId', restaurantContext.required, getMenuByRestaurant);
+router.get('/:id', restaurantContext.required, getMenuItemById);
 
-// Public routes
-router.get('/restaurant/:restaurantId', getMenuByRestaurant);
-router.get('/:id', getMenuItemById);
+// Routes protégées (restaurant owner) - restaurantContext requis + auth + validation uploads
+router.post('/', 
+  restaurantContext.required, 
+  protect, 
+  authorize('restaurant', 'admin'), 
+  uploadLimiter, 
+  validateImageUpload, 
+  createMenuItem
+);
 
-// Protected routes (restaurant owner) avec validation des uploads
-router.post('/', protect, authorize('restaurant', 'admin'), uploadLimiter, validateImageUpload, createMenuItem);
-router.put('/:id', protect, authorize('restaurant', 'admin'), uploadLimiter, validateImageUpload, updateMenuItem);
-router.delete('/:id', protect, authorize('restaurant', 'admin'), deleteMenuItem);
+router.put('/:id', 
+  restaurantContext.required, 
+  protect, 
+  authorize('restaurant', 'admin'), 
+  uploadLimiter, 
+  validateImageUpload, 
+  updateMenuItem
+);
+
+router.delete('/:id', 
+  restaurantContext.required, 
+  protect, 
+  authorize('restaurant', 'admin'), 
+  deleteMenuItem
+);
 
 module.exports = router;

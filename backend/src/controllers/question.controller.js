@@ -1,20 +1,45 @@
+/**
+ * Question Controller - Multi-Tenant
+ * 
+ * Ce controller gère les questions dans un contexte multi-tenant.
+ * Toutes les fonctions vérifient que le menuItem appartient au restaurant actuel.
+ * 
+ * IMPORTANT : Le middleware restaurantContext doit être appliqué avant
+ * d'appeler ces fonctions pour charger req.restaurantId (optionnel).
+ * 
+ * SÉCURITÉ :
+ * - Vérifie que menuItem.restaurantId === req.restaurantId si req.restaurantId existe
+ * - Empêche l'accès aux questions d'autres restaurants
+ */
+
 const { Question, MenuItem, User } = require('../models');
 
 /**
  * Créer une nouvelle question sur un plat
- * Un utilisateur ne peut poser qu'une seule question par plat
+ * Multi-Tenant : Vérifie que le menuItem appartient au restaurant actuel
  */
 exports.createQuestion = async (req, res) => {
   try {
     const { menuItemId, text } = req.body;
     const userId = req.user.id;
 
-    // Vérifier que le plat existe
-    const menuItem = await MenuItem.findByPk(menuItemId);
+    // Vérifier que le plat existe et récupérer ses informations
+    const menuItem = await MenuItem.findByPk(menuItemId, {
+      attributes: ['id', 'name', 'restaurantId']
+    });
+    
     if (!menuItem) {
       return res.status(404).json({
         success: false,
         message: 'Plat non trouvé'
+      });
+    }
+
+    // Vérification multi-tenant : vérifier que le menuItem appartient au restaurant actuel
+    if (req.restaurantId && menuItem.restaurantId !== req.restaurantId) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. This menu item belongs to another restaurant.'
       });
     }
 
@@ -58,18 +83,30 @@ exports.createQuestion = async (req, res) => {
 
 /**
  * Récupérer toutes les questions pour un plat
+ * Multi-Tenant : Vérifie que le menuItem appartient au restaurant actuel
  */
 exports.getMenuItemQuestions = async (req, res) => {
   try {
     const { menuItemId } = req.params;
     const { limit = 10, offset = 0, showUnanswered = false } = req.query;
 
-    // Vérifier que le plat existe
-    const menuItem = await MenuItem.findByPk(menuItemId);
+    // Vérifier que le plat existe et récupérer ses informations
+    const menuItem = await MenuItem.findByPk(menuItemId, {
+      attributes: ['id', 'name', 'restaurantId']
+    });
+    
     if (!menuItem) {
       return res.status(404).json({
         success: false,
         message: 'Plat non trouvé'
+      });
+    }
+
+    // Vérification multi-tenant : vérifier que le menuItem appartient au restaurant actuel
+    if (req.restaurantId && menuItem.restaurantId !== req.restaurantId) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. This menu item belongs to another restaurant.'
       });
     }
 
@@ -120,6 +157,7 @@ exports.getMenuItemQuestions = async (req, res) => {
 
 /**
  * Récupérer une question spécifique
+ * Multi-Tenant : Vérifie que la question appartient au restaurant actuel
  */
 exports.getQuestion = async (req, res) => {
   try {
@@ -140,7 +178,7 @@ exports.getQuestion = async (req, res) => {
         {
           model: MenuItem,
           as: 'menuItem',
-          attributes: ['id', 'name']
+          attributes: ['id', 'name', 'restaurantId']
         }
       ]
     });
@@ -149,6 +187,14 @@ exports.getQuestion = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: 'Question non trouvée'
+      });
+    }
+
+    // Vérification multi-tenant : vérifier que le menuItem de la question appartient au restaurant actuel
+    if (req.restaurantId && question.menuItem && question.menuItem.restaurantId !== req.restaurantId) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. This question belongs to another restaurant.'
       });
     }
 
@@ -168,6 +214,7 @@ exports.getQuestion = async (req, res) => {
 
 /**
  * Mettre à jour une question (par l'auteur)
+ * Multi-Tenant : Vérifie que la question appartient au restaurant actuel
  */
 exports.updateQuestion = async (req, res) => {
   try {
@@ -175,12 +222,28 @@ exports.updateQuestion = async (req, res) => {
     const { text } = req.body;
     const userId = req.user.id;
 
-    const question = await Question.findByPk(questionId);
+    const question = await Question.findByPk(questionId, {
+      include: [
+        {
+          model: MenuItem,
+          as: 'menuItem',
+          attributes: ['id', 'restaurantId']
+        }
+      ]
+    });
 
     if (!question) {
       return res.status(404).json({
         success: false,
         message: 'Question non trouvée'
+      });
+    }
+
+    // Vérification multi-tenant : vérifier que le menuItem de la question appartient au restaurant actuel
+    if (req.restaurantId && question.menuItem && question.menuItem.restaurantId !== req.restaurantId) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. This question belongs to another restaurant.'
       });
     }
 
@@ -213,13 +276,23 @@ exports.updateQuestion = async (req, res) => {
 
 /**
  * Supprimer une question
+ * Multi-Tenant : Vérifie que la question appartient au restaurant actuel
  */
 exports.deleteQuestion = async (req, res) => {
   try {
     const { questionId } = req.params;
     const userId = req.user.id;
+    const userRole = req.user.role;
 
-    const question = await Question.findByPk(questionId);
+    const question = await Question.findByPk(questionId, {
+      include: [
+        {
+          model: MenuItem,
+          as: 'menuItem',
+          attributes: ['id', 'restaurantId']
+        }
+      ]
+    });
 
     if (!question) {
       return res.status(404).json({
@@ -228,8 +301,16 @@ exports.deleteQuestion = async (req, res) => {
       });
     }
 
-    // Vérifier que l'utilisateur est l'auteur
-    if (question.userId !== userId) {
+    // Vérification multi-tenant : vérifier que le menuItem de la question appartient au restaurant actuel
+    if (req.restaurantId && question.menuItem && question.menuItem.restaurantId !== req.restaurantId) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. This question belongs to another restaurant.'
+      });
+    }
+
+    // Vérifier que l'utilisateur est l'auteur ou un admin
+    if (question.userId !== userId && userRole !== 'admin') {
       return res.status(403).json({
         success: false,
         message: 'Vous n\'avez pas la permission de supprimer cette question'
@@ -254,27 +335,46 @@ exports.deleteQuestion = async (req, res) => {
 
 /**
  * Répondre à une question (Admin/Staff uniquement)
+ * Multi-Tenant : Vérifie que la question appartient au restaurant actuel
  */
 exports.answerQuestion = async (req, res) => {
   try {
     const { questionId } = req.params;
     const { answer } = req.body;
     const staffId = req.user.id;
+    const userRole = req.user.role;
 
-    // Vérifier que l'utilisateur est staff/admin
-    if (req.user.role !== 'admin' && req.user.role !== 'staff') {
+    // Vérifier que l'utilisateur est staff/admin ou restaurant owner
+    if (userRole !== 'admin' && userRole !== 'staff' && userRole !== 'restaurant') {
       return res.status(403).json({
         success: false,
         message: 'Seul le personnel peut répondre aux questions'
       });
     }
 
-    const question = await Question.findByPk(questionId);
+    const question = await Question.findByPk(questionId, {
+      include: [
+        {
+          model: MenuItem,
+          as: 'menuItem',
+          attributes: ['id', 'restaurantId']
+        }
+      ]
+    });
 
     if (!question) {
       return res.status(404).json({
         success: false,
         message: 'Question non trouvée'
+      });
+    }
+
+    // Vérification multi-tenant : vérifier que le menuItem de la question appartient au restaurant actuel
+    // Un restaurant owner ne peut répondre qu'aux questions de SON restaurant
+    if (userRole === 'restaurant' && req.restaurantId && question.menuItem && question.menuItem.restaurantId !== req.restaurantId) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. This question belongs to another restaurant.'
       });
     }
 
@@ -302,17 +402,29 @@ exports.answerQuestion = async (req, res) => {
 
 /**
  * Obtenir les stats des questions pour un plat
+ * Multi-Tenant : Vérifie que le menuItem appartient au restaurant actuel
  */
 exports.getQuestionStats = async (req, res) => {
   try {
     const { menuItemId } = req.params;
 
-    // Vérifier que le plat existe
-    const menuItem = await MenuItem.findByPk(menuItemId);
+    // Vérifier que le plat existe et récupérer ses informations
+    const menuItem = await MenuItem.findByPk(menuItemId, {
+      attributes: ['id', 'name', 'restaurantId']
+    });
+    
     if (!menuItem) {
       return res.status(404).json({
         success: false,
         message: 'Plat non trouvé'
+      });
+    }
+
+    // Vérification multi-tenant : vérifier que le menuItem appartient au restaurant actuel
+    if (req.restaurantId && menuItem.restaurantId !== req.restaurantId) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. This menu item belongs to another restaurant.'
       });
     }
 

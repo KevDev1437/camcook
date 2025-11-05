@@ -28,10 +28,24 @@ function normalizeDrink(drink) {
   return { name: String(drink), price: 0 };
 }
 
-// Récupérer les accompagnements depuis la table Accompaniment
-async function getDefaultAccompaniments() {
+/**
+ * Récupérer les accompagnements depuis la table Accompaniment
+ * Multi-Tenant : Filtre par restaurantId si fourni
+ * 
+ * @param {number|null} restaurantId - ID du restaurant pour filtrer (optionnel)
+ * @returns {Promise<Array>} Liste des accompagnements avec name et price
+ */
+async function getDefaultAccompaniments(restaurantId = null) {
   try {
+    const where = {};
+    
+    // Filtrer par restaurantId si fourni (multi-tenant)
+    if (restaurantId) {
+      where.restaurantId = restaurantId;
+    }
+    
     const accompaniments = await Accompaniment.findAll({
+      where,
       order: [['name', 'ASC']]
     });
     return accompaniments.map(acc => ({
@@ -50,10 +64,24 @@ async function getDefaultAccompaniments() {
   ];
 }
 
-// Récupérer les boissons depuis la table Drink
-async function getDefaultDrinks() {
+/**
+ * Récupérer les boissons depuis la table Drink
+ * Multi-Tenant : Filtre par restaurantId si fourni
+ * 
+ * @param {number|null} restaurantId - ID du restaurant pour filtrer (optionnel)
+ * @returns {Promise<Array>} Liste des boissons avec name et price
+ */
+async function getDefaultDrinks(restaurantId = null) {
   try {
+    const where = {};
+    
+    // Filtrer par restaurantId si fourni (multi-tenant)
+    if (restaurantId) {
+      where.restaurantId = restaurantId;
+    }
+    
     const drinks = await Drink.findAll({
+      where,
       order: [['name', 'ASC']]
     });
     return drinks.map(drink => ({
@@ -74,10 +102,17 @@ function getChoiceLabel(choice) {
   return String(choice ?? '');
 }
 
-async function ensureAccompagnements(options) {
+/**
+ * Assurer que les accompagnements sont présents dans les options
+ * Multi-Tenant : Filtre par restaurantId si fourni
+ * 
+ * @param {Array} options - Options du menu item
+ * @param {number|null} restaurantId - ID du restaurant pour filtrer (optionnel)
+ */
+async function ensureAccompagnements(options, restaurantId = null) {
   const hasAccomp = options.some((opt) => (opt?.name || '').toLowerCase().includes('accomp'));
   if (!hasAccomp) {
-    const defaultAccomp = await getDefaultAccompaniments();
+    const defaultAccomp = await getDefaultAccompaniments(restaurantId);
     // Envoyer les objets avec name et price pour que le frontend puisse utiliser les prix
     const choices = defaultAccomp.map(acc => ({
       name: acc.name || String(acc),
@@ -90,11 +125,11 @@ async function ensureAccompagnements(options) {
       choices: choices,
     });
   } else {
-    // Remplacer les choix existants par ceux de SiteInfo pour avoir les nouveaux accompagnements
+    // Remplacer les choix existants par ceux de la table Accompaniment pour avoir les nouveaux accompagnements
     const accompIndex = options.findIndex((opt) => (opt?.name || '').toLowerCase().includes('accomp'));
     if (accompIndex >= 0) {
-      const defaultAccomp = await getDefaultAccompaniments();
-      // Remplacer complètement les choix par ceux de SiteInfo (inclut les nouveaux accompagnements)
+      const defaultAccomp = await getDefaultAccompaniments(restaurantId);
+      // Remplacer complètement les choix par ceux de la table (inclut les nouveaux accompagnements)
       const updatedChoices = defaultAccomp.map(acc => ({
         name: acc.name || String(acc),
         price: typeof acc.price === 'number' ? acc.price : 0
@@ -108,9 +143,16 @@ async function ensureAccompagnements(options) {
   }
 }
 
-async function ensureBoissons(options) {
+/**
+ * Assurer que les boissons sont présentes dans les options
+ * Multi-Tenant : Filtre par restaurantId si fourni
+ * 
+ * @param {Array} options - Options du menu item
+ * @param {number|null} restaurantId - ID du restaurant pour filtrer (optionnel)
+ */
+async function ensureBoissons(options, restaurantId = null) {
   const idx = options.findIndex((opt) => (opt?.name || '').toLowerCase().includes('boisson'));
-  const defaultDrinks = await getDefaultDrinks();
+  const defaultDrinks = await getDefaultDrinks(restaurantId);
   if (idx === -1) {
     // Envoyer les objets avec name et price pour que le frontend puisse utiliser les prix
     const choices = defaultDrinks.map(drink => ({
@@ -120,7 +162,7 @@ async function ensureBoissons(options) {
     options.push({ id: 'boisson', name: 'Boisson', type: 'checkbox', choices: choices });
     return;
   }
-  // Remplacer les choix existants par ceux de SiteInfo pour avoir les nouvelles boissons
+  // Remplacer les choix existants par ceux de la table Drink pour avoir les nouvelles boissons
   const updatedChoices = defaultDrinks.map(drink => ({
     name: drink.name || String(drink),
     price: typeof drink.price === 'number' ? drink.price : 0
@@ -135,9 +177,24 @@ async function ensureBoissons(options) {
   };
 }
 
-// Fonction pour enrichir les options avec les accompagnements et boissons depuis SiteInfo
-exports.augmentOptions = async function augmentOptions(data) {
+/**
+ * Fonction pour enrichir les options avec les accompagnements et boissons depuis les tables Accompaniment et Drink
+ * Multi-Tenant : Filtre par restaurantId si fourni
+ * 
+ * @param {Object} data - Données du menu item (doit contenir restaurantId ou menuItemId pour récupérer restaurantId)
+ * @param {number|null} restaurantId - ID du restaurant pour filtrer (optionnel, peut être extrait de data)
+ * @returns {Promise<Object>} Données enrichies avec les options
+ */
+exports.augmentOptions = async function augmentOptions(data, restaurantId = null) {
   try {
+    // Extraire restaurantId depuis data si non fourni
+    let effectiveRestaurantId = restaurantId;
+    if (!effectiveRestaurantId && data.restaurantId) {
+      effectiveRestaurantId = data.restaurantId;
+    }
+    // Si menuItemId est fourni, on pourrait récupérer le restaurantId depuis la base
+    // mais pour l'instant, on utilise celui fourni en paramètre
+    
     let options = [];
     if (Array.isArray(data.options)) options = data.options;
     else if (typeof data.options === 'string') {
@@ -148,15 +205,24 @@ exports.augmentOptions = async function augmentOptions(data) {
         options = [];
       }
     }
-    // Compléter/contraindre avec les valeurs globales depuis SiteInfo (toujours à jour)
-    await ensureAccompagnements(options);
-    await ensureBoissons(options);
+    // Compléter/contraindre avec les valeurs depuis les tables Accompaniment et Drink (filtrées par restaurantId)
+    await ensureAccompagnements(options, effectiveRestaurantId);
+    await ensureBoissons(options, effectiveRestaurantId);
     data.options = options;
   } catch (error) {
     console.error('Error augmenting options:', error);
       // En cas de problème, force au moins les défauts
     try {
-      const [acc, dr] = await Promise.all([getDefaultAccompaniments(), getDefaultDrinks()]);
+      // Extraire restaurantId depuis data si non fourni
+      let effectiveRestaurantId = restaurantId;
+      if (!effectiveRestaurantId && data.restaurantId) {
+        effectiveRestaurantId = data.restaurantId;
+      }
+      
+      const [acc, dr] = await Promise.all([
+        getDefaultAccompaniments(effectiveRestaurantId),
+        getDefaultDrinks(effectiveRestaurantId)
+      ]);
       const accChoices = acc.map(a => ({ name: a.name || String(a), price: a.price || 0 }));
       const drChoices = dr.map(d => ({ name: d.name || String(d), price: d.price || 0 }));
       data.options = [
@@ -211,9 +277,10 @@ exports.getMenuByRestaurant = async (req, res) => {
     });
 
     // Enrichir options dans la réponse (sans modifier la BDD)
+    // Passer restaurantId pour filtrer les accompagnements et boissons par restaurant
     menuItems = await Promise.all(menuItems.map(async (it) => {
       const json = it.toJSON ? it.toJSON() : it;
-      return await exports.augmentOptions(json);
+      return await exports.augmentOptions(json, restaurantId);
     }));
 
     res.status(200).json({
@@ -253,7 +320,8 @@ exports.getMenuItemById = async (req, res) => {
 
     console.log('✅ Plat trouvé:', menuItem.name);
     const json = menuItem.toJSON ? menuItem.toJSON() : menuItem;
-    const data = await exports.augmentOptions(json);
+    // Passer restaurantId pour filtrer les accompagnements et boissons par restaurant
+    const data = await exports.augmentOptions(json, menuItem.restaurantId);
     res.status(200).json({
       success: true,
       data
@@ -274,14 +342,18 @@ exports.getMenuItemById = async (req, res) => {
  */
 exports.createMenuItem = async (req, res) => {
   try {
+    // Utiliser req.restaurantId si disponible (chargé par restaurantContext)
+    const restaurantId = req.restaurantId || req.user?.restaurantId || req.body.restaurantId;
+    
     const menuItem = await MenuItem.create({
       ...req.body,
-      restaurantId: req.user.restaurantId || req.body.restaurantId
+      restaurantId: restaurantId
     });
 
-    // Enrichir les options avec les accompagnements et boissons depuis SiteInfo
+    // Enrichir les options avec les accompagnements et boissons depuis les tables Accompaniment et Drink
+    // Passer restaurantId pour filtrer par restaurant
     const json = menuItem.toJSON ? menuItem.toJSON() : menuItem;
-    const data = await exports.augmentOptions(json);
+    const data = await exports.augmentOptions(json, restaurantId);
 
     res.status(201).json({
       success: true,
@@ -319,9 +391,10 @@ exports.updateMenuItem = async (req, res) => {
     // Recharger le menu pour avoir les dernières données
     await menuItem.reload();
 
-    // Enrichir les options avec les accompagnements et boissons depuis SiteInfo
+    // Enrichir les options avec les accompagnements et boissons depuis les tables Accompaniment et Drink
+    // Passer restaurantId pour filtrer par restaurant
     const json = menuItem.toJSON ? menuItem.toJSON() : menuItem;
-    const data = await exports.augmentOptions(json);
+    const data = await exports.augmentOptions(json, menuItem.restaurantId);
 
     res.status(200).json({
       success: true,

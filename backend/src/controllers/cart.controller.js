@@ -2,21 +2,34 @@ const { MenuItem, Accompaniment, Drink } = require('../models');
 const { Op } = require('sequelize');
 const { sequelize } = require('../config/database');
 
-// Helper pour récupérer les prix depuis la table Accompaniment
-async function getAccompPrice(accompName) {
+/**
+ * Helper pour récupérer les prix depuis la table Accompaniment
+ * Multi-Tenant : Filtre par restaurantId si fourni
+ * 
+ * @param {string} accompName - Nom de l'accompagnement
+ * @param {number|null} restaurantId - ID du restaurant pour filtrer (optionnel)
+ * @returns {Promise<number>} Prix de l'accompagnement ou 0 si non trouvé
+ */
+async function getAccompPrice(accompName, restaurantId = null) {
   try {
     const nameToSearch = String(accompName);
     
+    // Construire les conditions de recherche
+    const where = {
+      name: sequelize.where(
+        sequelize.fn('LOWER', sequelize.col('name')),
+        '=',
+        nameToSearch.toLowerCase()
+      )
+    };
+    
+    // Filtrer par restaurantId si fourni (multi-tenant)
+    if (restaurantId) {
+      where.restaurantId = restaurantId;
+    }
+    
     // MySQL n supporte pas ILIKE, utiliser LOWER() pour comparaison insensible à la casse
-    const accompaniment = await Accompaniment.findOne({
-      where: {
-        name: sequelize.where(
-          sequelize.fn('LOWER', sequelize.col('name')),
-          '=',
-          nameToSearch.toLowerCase()
-        )
-      }
-    });
+    const accompaniment = await Accompaniment.findOne({ where });
     
     if (accompaniment) {
       return parseFloat(accompaniment.price) || 0;
@@ -27,21 +40,34 @@ async function getAccompPrice(accompName) {
   return 0; // Prix par défaut si non trouvé
 }
 
-// Helper pour récupérer les prix depuis la table Drink
-async function getDrinkPrice(drinkName) {
+/**
+ * Helper pour récupérer les prix depuis la table Drink
+ * Multi-Tenant : Filtre par restaurantId si fourni
+ * 
+ * @param {string} drinkName - Nom de la boisson
+ * @param {number|null} restaurantId - ID du restaurant pour filtrer (optionnel)
+ * @returns {Promise<number>} Prix de la boisson ou 0 si non trouvé
+ */
+async function getDrinkPrice(drinkName, restaurantId = null) {
   try {
     const nameToSearch = String(drinkName);
     
+    // Construire les conditions de recherche
+    const where = {
+      name: sequelize.where(
+        sequelize.fn('LOWER', sequelize.col('name')),
+        '=',
+        nameToSearch.toLowerCase()
+      )
+    };
+    
+    // Filtrer par restaurantId si fourni (multi-tenant)
+    if (restaurantId) {
+      where.restaurantId = restaurantId;
+    }
+    
     // MySQL ne supporte pas ILIKE, utiliser LOWER() pour comparaison insensible à la casse
-    const drink = await Drink.findOne({
-      where: {
-        name: sequelize.where(
-          sequelize.fn('LOWER', sequelize.col('name')),
-          '=',
-          nameToSearch.toLowerCase()
-        )
-      }
-    });
+    const drink = await Drink.findOne({ where });
     
     if (drink) {
       return parseFloat(drink.price) || 0;
@@ -78,6 +104,11 @@ function normalizeOptions(options) {
   return out;
 }
 
+/**
+ * @desc    Calculer le prix d'un article du panier avec accompagnements et boissons
+ * @route   POST /api/cart/price
+ * @access  Public (mais restaurantContext.required doit être appliqué)
+ */
 exports.priceCartItem = async (req, res) => {
   try {
     const { menuItemId, quantity: rawQty, options } = req.body || {};
@@ -91,24 +122,29 @@ exports.priceCartItem = async (req, res) => {
       return res.status(404).json({ success: false, error: 'Plat non trouvé' });
     }
 
+    // Utiliser restaurantId depuis menuItem ou req.restaurantId (chargé par restaurantContext)
+    const restaurantId = menuItem.restaurantId || req.restaurantId;
+
     const basePrice = parseFloat(menuItem.price) || 0;
     const normalized = normalizeOptions(options || {});
     
-    // Calculer le prix total des accompagnements en utilisant les prix depuis SiteInfo
+    // Calculer le prix total des accompagnements en utilisant les prix depuis la table Accompaniment
+    // Filtrer par restaurantId pour le multi-tenant
     let accompTotal = 0;
     if (Array.isArray(normalized.accompagnements) && normalized.accompagnements.length > 0) {
       const accompPrices = await Promise.all(
-        normalized.accompagnements.map(acc => getAccompPrice(acc))
+        normalized.accompagnements.map(acc => getAccompPrice(acc, restaurantId))
       );
       accompTotal = accompPrices.reduce((sum, price) => sum + price, 0);
     }
     
-    // Calculer le prix total des boissons en utilisant les prix depuis SiteInfo
+    // Calculer le prix total des boissons en utilisant les prix depuis la table Drink
+    // Filtrer par restaurantId pour le multi-tenant
     let drinkPrice = 0;
     const drinks = normalized.boissons || (normalized.boisson ? [normalized.boisson] : []);
     if (drinks.length > 0) {
       const drinkPrices = await Promise.all(
-        drinks.map(drink => getDrinkPrice(drink))
+        drinks.map(drink => getDrinkPrice(drink, restaurantId))
       );
       drinkPrice = drinkPrices.reduce((sum, price) => sum + price, 0);
     }

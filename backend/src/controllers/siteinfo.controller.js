@@ -34,7 +34,10 @@ exports.upsertSiteInfo = async (req, res) => {
   }
 };
 
-// POST /api/site-info/contact
+/**
+ * POST /api/site-info/contact
+ * Multi-Tenant : Ajoute automatiquement restaurantId si disponible
+ */
 exports.sendContactMessage = async (req, res) => {
   try {
     const { name, email, type = 'restaurant', message } = req.body || {};
@@ -51,12 +54,20 @@ exports.sendContactMessage = async (req, res) => {
       return res.status(400).json({ success: false, error: errors.join(', ') });
     }
 
-    const created = await ContactMessage.create({
+    // Ajouter restaurantId si disponible (chargé par restaurantContext)
+    const createData = {
       name: String(name).trim(),
       email: emailTrimmed,
       type: allowedTypes.includes(type) ? type : 'restaurant',
       message: String(message).trim(),
-    });
+    };
+
+    // Ajouter restaurantId si restaurantContext est appliqué
+    if (req.restaurantId) {
+      createData.restaurantId = req.restaurantId;
+    }
+
+    const created = await ContactMessage.create(createData);
 
     return res.status(201).json({ success: true, data: { id: created.id } });
   } catch (error) {

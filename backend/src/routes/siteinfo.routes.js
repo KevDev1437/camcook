@@ -1,15 +1,16 @@
 const express = require('express');
 const router = express.Router();
+const restaurantContext = require('../middleware/restaurantContext');
 const { getSiteInfo, upsertSiteInfo, sendContactMessage } = require('../controllers/siteinfo.controller');
 const { protect, authorize } = require('../middleware/auth');
 
-// Public get
-router.get('/', getSiteInfo);
+// Routes publiques - restaurantContext optionnel (peut être utilisé pour personnaliser le site info)
+router.get('/', restaurantContext.optional, getSiteInfo);
 
-// Protected upsert - admin only
-router.put('/', protect, authorize('admin'), upsertSiteInfo);
+// Contact form endpoint (public) - restaurantContext optionnel (ajoute restaurantId si disponible)
+router.post('/contact', restaurantContext.optional, sendContactMessage);
 
-// Contact form endpoint (public)
-router.post('/contact', sendContactMessage);
+// Routes protégées (admin) - restaurantContext optionnel
+router.put('/', restaurantContext.optional, protect, authorize('admin'), upsertSiteInfo);
 
 module.exports = router;

@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const restaurantContext = require('../middleware/restaurantContext');
 const {
   getAllAccompaniments,
   getAccompanimentById,
@@ -9,19 +10,13 @@ const {
 } = require('../controllers/accompaniment.controller');
 const { protect, authorize } = require('../middleware/auth');
 
-// Public routes
-router.get('/', getAllAccompaniments);
-router.get('/:id', getAccompanimentById);
+// Routes publiques (lecture) - restaurantContext requis pour filtrer par restaurant
+router.get('/', restaurantContext.required, getAllAccompaniments);
+router.get('/:id', restaurantContext.required, getAccompanimentById);
 
-// Protected routes (Admin only)
-router.post('/', protect, authorize('admin'), createAccompaniment);
-router.put('/:id', protect, authorize('admin'), updateAccompaniment);
-router.delete('/:id', protect, authorize('admin'), deleteAccompaniment);
+// Routes protégées (admin/owner) - restaurantContext requis + auth
+router.post('/', restaurantContext.required, protect, authorize('restaurant', 'admin'), createAccompaniment);
+router.put('/:id', restaurantContext.required, protect, authorize('restaurant', 'admin'), updateAccompaniment);
+router.delete('/:id', restaurantContext.required, protect, authorize('restaurant', 'admin'), deleteAccompaniment);
 
 module.exports = router;
-
-
-
-
-
-
