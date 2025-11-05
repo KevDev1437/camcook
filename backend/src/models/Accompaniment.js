@@ -27,3 +27,5 @@ const Accompaniment = sequelize.define('Accompaniment', {
 module.exports = Accompaniment;
 
 
+
+

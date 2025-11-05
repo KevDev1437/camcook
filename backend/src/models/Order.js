@@ -18,6 +18,11 @@ const Order = sequelize.define('Order', {
       return `CC${ts}-${rand}`;
     }
   },
+  orderGroupId: {
+    type: DataTypes.STRING(50),
+    allowNull: true,
+    comment: 'ID de groupe pour relier les commandes du même panier (même client, même session)'
+  },
   customerId: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -37,7 +42,7 @@ const Order = sequelize.define('Order', {
   items: {
     type: DataTypes.JSON,
     allowNull: false,
-    comment: 'Array of order items with details'
+    comment: 'Array of order items with details (maintenant contient un seul article par commande)'
   },
   subtotal: {
     type: DataTypes.DECIMAL(10, 2),
@@ -84,7 +89,7 @@ const Order = sequelize.define('Order', {
     allowNull: true
   },
   status: {
-    type: DataTypes.ENUM('pending', 'confirmed', 'preparing', 'ready', 'on_delivery', 'completed', 'cancelled'),
+    type: DataTypes.ENUM('pending', 'confirmed', 'preparing', 'ready', 'on_delivery', 'completed', 'cancelled', 'rejected'),
     defaultValue: 'pending'
   },
   paymentStatus: {
@@ -92,8 +97,13 @@ const Order = sequelize.define('Order', {
     defaultValue: 'pending'
   },
   paymentMethod: {
-    type: DataTypes.ENUM('cash', 'card', 'mobile_money'),
+    type: DataTypes.ENUM('cash', 'card', 'mobile_money', 'stripe_card', 'stripe_apple_pay', 'stripe_google_pay'),
     allowNull: false
+  },
+  stripePaymentIntentId: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+    comment: 'ID du Payment Intent Stripe pour le suivi du paiement'
   },
   scheduledFor: {
     type: DataTypes.DATE,

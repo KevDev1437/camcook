@@ -58,6 +58,9 @@ exports.create = async (req, res) => {
       return res.status(400).json({ success: false, error: 'Restaurant indisponible' });
     }
 
+    // Générer un orderGroupId pour grouper les commandes du même panier
+    const orderGroupId = `GRP${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
     // Normaliser et sécuriser les items
     const safeItems = items.map((it, idx) => {
       const quantity = Math.max(1, parseInt(it.quantity || 1, 10));
@@ -73,30 +76,54 @@ exports.create = async (req, res) => {
       };
     });
 
-    // Sécurisation minimale: forcer paiement en cash et statut initial
-    const payload = {
-      customerId,
-      restaurantId,
-      items: safeItems,
-      subtotal: Number.isFinite(Number(subtotal)) ? +Number(subtotal).toFixed(2) : 0,
-      deliveryFee: Number(deliveryFee || 0),
-      tax: Number(tax || 0),
-      total: Number.isFinite(Number(total)) ? +Number(total).toFixed(2) : 0,
-      orderType: orderType === 'delivery' ? 'delivery' : 'pickup',
-      deliveryStreet: address.street || null,
-      deliveryCity: address.city || null,
-      deliveryPostalCode: address.postalCode || null,
-      deliveryLatitude: address.latitude || null,
-      deliveryLongitude: address.longitude || null,
-      deliveryInstructions: address.instructions || null,
-      status: 'pending',
-      paymentStatus: 'pending',
-      paymentMethod: 'cash',
-      notes: notes || null,
-    };
+    // Créer une commande séparée pour chaque article
+    const createdOrders = [];
+    const deliveryFeePerOrder = safeItems.length > 0 ? Number(deliveryFee || 0) / safeItems.length : 0;
+    const taxPerOrder = safeItems.length > 0 ? Number(tax || 0) / safeItems.length : 0;
 
-    const created = await Order.create(payload);
-    return res.status(201).json({ success: true, data: { id: created.id, orderNumber: created.orderNumber } });
+    for (const item of safeItems) {
+      // Calculer le total pour cet article (prix × quantité)
+      const itemSubtotal = item.price * item.quantity;
+      const itemTotal = itemSubtotal + deliveryFeePerOrder + taxPerOrder;
+
+      const payload = {
+        customerId,
+        restaurantId,
+        orderGroupId, // Même orderGroupId pour toutes les commandes du panier
+        items: [item], // Un seul article par commande
+        subtotal: +itemSubtotal.toFixed(2),
+        deliveryFee: +deliveryFeePerOrder.toFixed(2),
+        tax: +taxPerOrder.toFixed(2),
+        total: +itemTotal.toFixed(2),
+        orderType: orderType === 'delivery' ? 'delivery' : 'pickup',
+        deliveryStreet: address.street || null,
+        deliveryCity: address.city || null,
+        deliveryPostalCode: address.postalCode || null,
+        deliveryLatitude: address.latitude || null,
+        deliveryLongitude: address.longitude || null,
+        deliveryInstructions: address.instructions || null,
+        status: 'pending',
+        paymentStatus: 'pending',
+        paymentMethod: 'cash',
+        notes: notes || null,
+      };
+
+      const created = await Order.create(payload);
+      createdOrders.push({
+        id: created.id,
+        orderNumber: created.orderNumber,
+        itemName: item.name,
+      });
+    }
+
+    return res.status(201).json({
+      success: true,
+      data: {
+        orderGroupId,
+        orders: createdOrders,
+        totalOrders: createdOrders.length,
+      },
+    });
   } catch (error) {
     console.error('Create order error:', error?.message || error);
     const msg = error?.errors?.[0]?.message || error?.message || 'Erreur création commande';

@@ -1,13 +1,14 @@
 const express = require('express');
 const { protect } = require('../middleware/auth');
+const { validateImageUpload, uploadLimiter } = require('../middleware/uploadValidator');
 const userController = require('../controllers/user.controller');
 const addressController = require('../controllers/address.controller');
 
 const router = express.Router();
 
-// User profile routes
+// User profile routes avec validation des uploads
 router.get('/profile', protect, userController.getProfile);
-router.put('/profile', protect, userController.updateProfile);
+router.put('/profile', protect, uploadLimiter, validateImageUpload, userController.updateProfile);
 
 // Address routes
 router.get('/addresses', protect, addressController.getAddresses);

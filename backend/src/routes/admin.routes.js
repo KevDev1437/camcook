@@ -1,6 +1,7 @@
 const express = require('express');
 const { protect, authorize } = require('../middleware/auth');
 const ctrl = require('../controllers/admin.controller');
+const paymentCtrl = require('../controllers/payment.controller');
 
 const router = express.Router();
 
@@ -19,6 +20,12 @@ router.patch('/reviews/:id/status', ctrl.updateReviewStatus);
 router.get('/users', ctrl.listUsers);
 router.patch('/users/:id', ctrl.updateUser);
 router.delete('/users/:id', ctrl.deleteUser);
+
+// Payments
+router.get('/payments', paymentCtrl.listPayments);
+
+// Stats
+router.get('/stats/active-customers', ctrl.getActiveCustomersCount);
 
 // Settings (per-admin preferences)
 router.get('/settings', ctrl.getSettings);

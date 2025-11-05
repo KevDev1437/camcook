@@ -1,12 +1,49 @@
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
+const { generateRefreshToken } = require('../utils/generateToken');
+const { logFailedLogin, logSuccessfulLogin } = require('../middleware/securityLogger');
+const { sanitizeEmail, sanitizeName, sanitizePhone } = require('../middleware/sanitizer');
 
 // @desc    Register new user
 // @route   POST /api/auth/register
 // @access  Public
 exports.register = async (req, res) => {
   try {
-    const { name, email, phone, password, role } = req.body;
+    let { name, email, phone, password, role } = req.body;
+
+    // Sanitizer les entrées
+    name = sanitizeName(name);
+    email = sanitizeEmail(email);
+    phone = sanitizePhone(phone);
+
+    // Validation
+    if (!name || name.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Le nom est requis'
+      });
+    }
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email invalide'
+      });
+    }
+
+    if (!phone || phone.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Le téléphone est requis'
+      });
+    }
+
+    if (!password || password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Le mot de passe doit contenir au moins 6 caractères'
+      });
+    }
 
     // Check if user exists
     const userExists = await User.findOne({ where: { email } });
@@ -26,8 +63,9 @@ exports.register = async (req, res) => {
       role: role || 'customer'
     });
 
-    // Generate token
+    // Generate tokens
     const token = generateToken(user.id);
+    const refreshToken = generateRefreshToken(user.id);
 
     res.status(201).json({
       success: true,
@@ -39,7 +77,8 @@ exports.register = async (req, res) => {
           phone: user.phone,
           role: user.role
         },
-        token
+        token,
+        refreshToken
       }
     });
   } catch (error) {
@@ -55,7 +94,10 @@ exports.register = async (req, res) => {
 // @access  Public
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    let { email, password } = req.body;
+
+    // Sanitizer l'email
+    email = sanitizeEmail(email);
 
     // Validate email & password
     if (!email || !password) {
@@ -72,6 +114,8 @@ exports.login = async (req, res) => {
     });
 
     if (!user) {
+      // Logger la tentative de login échouée
+      logFailedLogin(req, 'Utilisateur non trouvé');
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
@@ -81,14 +125,20 @@ exports.login = async (req, res) => {
     // Check if password matches
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
+      // Logger la tentative de login échouée
+      logFailedLogin(req, 'Mot de passe incorrect');
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
       });
     }
 
-    // Generate token
+    // Logger la connexion réussie
+    logSuccessfulLogin(req, user.id);
+
+    // Generate tokens
     const token = generateToken(user.id);
+    const refreshToken = generateRefreshToken(user.id);
 
     res.status(200).json({
       success: true,
@@ -100,9 +150,62 @@ exports.login = async (req, res) => {
           phone: user.phone,
           role: user.role
         },
-        token
+        token,
+        refreshToken
       }
     });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// @desc    Refresh access token using refresh token
+// @route   POST /api/auth/refresh
+// @access  Public
+exports.refreshToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(400).json({
+        success: false,
+        message: 'Refresh token requis'
+      });
+    }
+
+    const { verifyRefreshToken } = require('../utils/generateToken');
+    
+    try {
+      // Vérifier le refresh token
+      const decoded = verifyRefreshToken(refreshToken);
+      
+      // Vérifier que l'utilisateur existe toujours
+      const user = await User.findByPk(decoded.id);
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: 'Utilisateur non trouvé'
+        });
+      }
+
+      // Générer un nouveau access token
+      const newToken = generateToken(user.id);
+
+      res.status(200).json({
+        success: true,
+        data: {
+          token: newToken
+        }
+      });
+    } catch (error) {
+      return res.status(401).json({
+        success: false,
+        message: 'Refresh token invalide ou expiré'
+      });
+    }
   } catch (error) {
     res.status(500).json({
       success: false,
