@@ -15,31 +15,78 @@ import { getRestaurantConfig } from './restaurant.config';
  * Priorité : restaurant.settings > restaurant.config.js > valeurs par défaut
  * 
  * @param {Object} restaurant - Objet restaurant depuis RestaurantContext (optionnel)
- * @returns {Object} - { primary, secondary }
+ * @returns {Object} - { primary, secondary, error, success, warning, text, background }
  */
 export const getThemeColors = (restaurant = null) => {
+  // Valeurs par défaut complètes
+  const defaultTheme = {
+    primary: '#FF6B6B',
+    secondary: '#4ECDC4',
+    error: '#ef4444',
+    success: '#10b981',
+    warning: '#f59e0b',
+    text: {
+      primary: '#333',
+      secondary: '#666',
+      tertiary: '#999',
+    },
+    background: {
+      light: '#f5f5f5',
+      lighter: '#fafafa',
+      border: '#eee',
+      white: '#fff',
+    },
+  };
+
   // 1. Priorité : couleurs depuis restaurant.settings (si restaurant est chargé depuis l'API)
   if (restaurant?.settings?.theme) {
+    const theme = restaurant.settings.theme;
     return {
-      primary: restaurant.settings.theme.primary || '#FF6B6B',
-      secondary: restaurant.settings.theme.secondary || '#4ECDC4',
+      primary: theme.primary || defaultTheme.primary,
+      secondary: theme.secondary || defaultTheme.secondary,
+      error: theme.error || defaultTheme.error,
+      success: theme.success || defaultTheme.success,
+      warning: theme.warning || defaultTheme.warning,
+      text: {
+        primary: (theme.text?.primary && typeof theme.text.primary === 'string') ? theme.text.primary : defaultTheme.text.primary,
+        secondary: (theme.text?.secondary && typeof theme.text.secondary === 'string') ? theme.text.secondary : defaultTheme.text.secondary,
+        tertiary: (theme.text?.tertiary && typeof theme.text.tertiary === 'string') ? theme.text.tertiary : defaultTheme.text.tertiary,
+      },
+      background: {
+        light: (theme.background?.light && typeof theme.background.light === 'string') ? theme.background.light : defaultTheme.background.light,
+        lighter: (theme.background?.lighter && typeof theme.background.lighter === 'string') ? theme.background.lighter : defaultTheme.background.lighter,
+        border: (theme.background?.border && typeof theme.background.border === 'string') ? theme.background.border : defaultTheme.background.border,
+        white: (theme.background?.white && typeof theme.background.white === 'string') ? theme.background.white : defaultTheme.background.white,
+      },
     };
   }
 
   // 2. Fallback : couleurs depuis restaurant.config.js
   const config = getRestaurantConfig();
   if (config?.theme) {
+    const theme = config.theme;
     return {
-      primary: config.theme.primary || '#FF6B6B',
-      secondary: config.theme.secondary || '#4ECDC4',
+      primary: theme.primary || defaultTheme.primary,
+      secondary: theme.secondary || defaultTheme.secondary,
+      error: theme.error || defaultTheme.error,
+      success: theme.success || defaultTheme.success,
+      warning: theme.warning || defaultTheme.warning,
+      text: {
+        primary: (theme.text?.primary && typeof theme.text.primary === 'string') ? theme.text.primary : defaultTheme.text.primary,
+        secondary: (theme.text?.secondary && typeof theme.text.secondary === 'string') ? theme.text.secondary : defaultTheme.text.secondary,
+        tertiary: (theme.text?.tertiary && typeof theme.text.tertiary === 'string') ? theme.text.tertiary : defaultTheme.text.tertiary,
+      },
+      background: {
+        light: (theme.background?.light && typeof theme.background.light === 'string') ? theme.background.light : defaultTheme.background.light,
+        lighter: (theme.background?.lighter && typeof theme.background.lighter === 'string') ? theme.background.lighter : defaultTheme.background.lighter,
+        border: (theme.background?.border && typeof theme.background.border === 'string') ? theme.background.border : defaultTheme.background.border,
+        white: (theme.background?.white && typeof theme.background.white === 'string') ? theme.background.white : defaultTheme.background.white,
+      },
     };
   }
 
   // 3. Valeurs par défaut
-  return {
-    primary: '#FF6B6B',
-    secondary: '#4ECDC4',
-  };
+  return defaultTheme;
 };
 
 /**
@@ -47,10 +94,10 @@ export const getThemeColors = (restaurant = null) => {
  * 
  * @example
  * import { useTheme } from '../config/theme';
- * const { primary, secondary } = useTheme();
+ * const { primary, secondary, error, success, warning, text, background } = useTheme();
  * 
  * @param {Object} restaurant - Objet restaurant depuis RestaurantContext (optionnel)
- * @returns {Object} - { primary, secondary }
+ * @returns {Object} - { primary, secondary, error, success, warning, text, background }
  */
 export const useTheme = (restaurant = null) => {
   return getThemeColors(restaurant);
@@ -62,5 +109,19 @@ export const useTheme = (restaurant = null) => {
 export const DEFAULT_THEME = {
   primary: '#FF6B6B',
   secondary: '#4ECDC4',
+  error: '#ef4444',
+  success: '#10b981',
+  warning: '#f59e0b',
+  text: {
+    primary: '#333',
+    secondary: '#666',
+    tertiary: '#999',
+  },
+  background: {
+    light: '#f5f5f5',
+    lighter: '#fafafa',
+    border: '#eee',
+    white: '#fff',
+  },
 };
 

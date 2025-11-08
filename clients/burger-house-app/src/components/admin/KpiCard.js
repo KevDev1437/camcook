@@ -9,8 +9,8 @@ const KpiCard = ({ title, value, icon, color = '#22c55e', onPress, subtitle, tre
   };
 
   const getTrendColor = () => {
-    if (!trend || trend.percentage === 0) return '#999';
-    return trend.percentage > 0 ? '#22c55e' : '#ef4444';
+    if (!trend || trend.percentage === 0) return 'theme.text.tertiary';
+    return trend.percentage > 0 ? '#22c55e' : 'theme.error';
   };
 
   const formatTrend = () => {
@@ -49,11 +49,11 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     borderRadius: 12,
     padding: 12,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: 'theme.background.border',
     gap: 12,
   },
   iconWrap: {
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   content: { flex: 1 },
-  title: { color: '#666', fontSize: 12 },
+  title: { color: 'theme.text.secondary', fontSize: 12 },
   valueRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 2 },
   value: { fontSize: 20, fontWeight: '800' },
   trendBadge: {
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   trendText: { fontSize: 11, fontWeight: '700' },
-  subtitle: { color: '#999', fontSize: 12, marginTop: 2 },
+  subtitle: { color: 'theme.text.tertiary', fontSize: 12, marginTop: 2 },
 });
 
 export default KpiCard;

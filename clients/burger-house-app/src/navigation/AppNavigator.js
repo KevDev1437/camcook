@@ -7,10 +7,10 @@ import { useEffect } from 'react';
 // Screens
 import { useAuth } from '../context/AuthContext';
 import CartScreen from '../screens/CartScreen';
+import ContactScreen from '../screens/ContactScreen';
 import HomeScreen from '../screens/HomeScreen';
 import LoginScreen from '../screens/LoginScreen';
 import MenuItemDetailScreen from '../screens/MenuItemDetailScreen';
-import ContactScreen from '../screens/ContactScreen';
 import OrderDetailScreen from '../screens/OrderDetailScreen';
 import OrdersScreen from '../screens/OrdersScreen';
 import PaymentScreen from '../screens/PaymentScreen';
@@ -56,7 +56,7 @@ const TabNavigator = () => {
     <Tab.Navigator
       screenOptions={{
         tabBarActiveTintColor: '#22c55e',
-        tabBarInactiveTintColor: '#999',
+        tabBarInactiveTintColor: 'theme.text.tertiary',
         tabBarStyle: {
           paddingBottom: 5,
           height: 60,

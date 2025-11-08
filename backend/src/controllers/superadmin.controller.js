@@ -713,7 +713,20 @@ exports.updateRestaurantLogo = async (req, res) => {
 exports.updateRestaurantTheme = async (req, res) => {
   try {
     const { restaurantId } = req.params;
-    const { primaryColor, secondaryColor } = req.body;
+    const { 
+      primaryColor, 
+      secondaryColor, 
+      errorColor,
+      successColor,
+      warningColor,
+      textPrimaryColor,
+      textSecondaryColor,
+      textTertiaryColor,
+      backgroundLightColor,
+      backgroundLighterColor,
+      backgroundBorderColor,
+      backgroundWhiteColor
+    } = req.body;
 
     console.log(`[SUPERADMIN] updateRestaurantTheme - Restaurant ID: ${restaurantId}`);
 
@@ -737,28 +750,60 @@ exports.updateRestaurantTheme = async (req, res) => {
 
     // Validation des couleurs (format hexadécimal)
     const hexColorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
-    if (primaryColor && !hexColorRegex.test(primaryColor)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Couleur primaire invalide. Format attendu: #RRGGBB (ex: #FF6B6B)'
-      });
-    }
-    if (secondaryColor && !hexColorRegex.test(secondaryColor)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Couleur secondaire invalide. Format attendu: #RRGGBB (ex: #4ECDC4)'
-      });
+    const colorsToValidate = {
+      primaryColor,
+      secondaryColor,
+      errorColor,
+      successColor,
+      warningColor,
+      textPrimaryColor,
+      textSecondaryColor,
+      textTertiaryColor,
+      backgroundLightColor,
+      backgroundLighterColor,
+      backgroundBorderColor,
+      backgroundWhiteColor,
+    };
+
+    for (const [key, value] of Object.entries(colorsToValidate)) {
+      if (value && !hexColorRegex.test(value)) {
+        return res.status(400).json({
+          success: false,
+          error: `${key} invalide. Format attendu: #RRGGBB (ex: #FF6B6B)`
+        });
+      }
     }
 
     // Récupérer les settings actuels
     const currentSettings = restaurant.settings || {};
+    const currentTheme = currentSettings.theme || {};
+    
+    // Construire le thème mis à jour
+    const updatedTheme = {
+      ...currentTheme,
+      ...(primaryColor && { primary: primaryColor.toUpperCase() }),
+      ...(secondaryColor && { secondary: secondaryColor.toUpperCase() }),
+      ...(errorColor && { error: errorColor.toUpperCase() }),
+      ...(successColor && { success: successColor.toUpperCase() }),
+      ...(warningColor && { warning: warningColor.toUpperCase() }),
+      text: {
+        ...(currentTheme.text || {}),
+        ...(textPrimaryColor && { primary: textPrimaryColor.toUpperCase() }),
+        ...(textSecondaryColor && { secondary: textSecondaryColor.toUpperCase() }),
+        ...(textTertiaryColor && { tertiary: textTertiaryColor.toUpperCase() }),
+      },
+      background: {
+        ...(currentTheme.background || {}),
+        ...(backgroundLightColor && { light: backgroundLightColor.toUpperCase() }),
+        ...(backgroundLighterColor && { lighter: backgroundLighterColor.toUpperCase() }),
+        ...(backgroundBorderColor && { border: backgroundBorderColor.toUpperCase() }),
+        ...(backgroundWhiteColor && { white: backgroundWhiteColor.toUpperCase() }),
+      },
+    };
+
     const updatedSettings = {
       ...currentSettings,
-      theme: {
-        ...(currentSettings.theme || {}),
-        ...(primaryColor && { primary: primaryColor }),
-        ...(secondaryColor && { secondary: secondaryColor }),
-      }
+      theme: updatedTheme,
     };
 
     // Mettre à jour les couleurs dans restaurant.settings
@@ -775,7 +820,7 @@ exports.updateRestaurantTheme = async (req, res) => {
       ]
     });
 
-    console.log(`[SUPERADMIN] updateRestaurantTheme - Couleurs mises à jour pour restaurant ${restaurantId}: primary=${primaryColor || 'non modifiée'}, secondary=${secondaryColor || 'non modifiée'}`);
+    console.log(`[SUPERADMIN] updateRestaurantTheme - Couleurs mises à jour pour restaurant ${restaurantId}`);
 
     res.status(200).json({
       success: true,

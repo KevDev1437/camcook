@@ -23,8 +23,8 @@ export const RESTAURANT_CONFIG = {
   
   // Couleurs du thème (optionnel, sera remplacé par restaurant.settings)
   theme: {
-    primary: process.env.PRIMARY_COLOR || '#c11a1a',
-    secondary: process.env.SECONDARY_COLOR || '#17e8da',
+    primary: process.env.PRIMARY_COLOR || '#f31212',
+    secondary: process.env.SECONDARY_COLOR || '#1dd7cb',
   },
   
   // Bundle ID (pour identifier l'app)

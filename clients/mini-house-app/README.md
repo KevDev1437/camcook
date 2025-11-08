@@ -70,8 +70,8 @@ export const RESTAURANT_ID = 4;
 ### Couleurs du thème
 
 Les couleurs peuvent être configurées dans `src/config/restaurant.config.js` ou via les variables d'environnement:
-- `PRIMARY_COLOR`: #c11a1a
-- `SECONDARY_COLOR`: #17e8da
+- `PRIMARY_COLOR`: #f31212
+- `SECONDARY_COLOR`: #1dd7cb
 
 ## 🔧 Développement
 
@@ -101,4 +101,4 @@ Application propriétaire - Mini house
 
 ---
 
-**Généré automatiquement le:** 2025-11-08 10:23:36
+**Généré automatiquement le:** 2025-11-08 13:35:38

@@ -72,7 +72,7 @@ const Tabs = () => {
     <Tab.Navigator
       screenOptions={{
         tabBarActiveTintColor: '#22c55e',
-        tabBarInactiveTintColor: '#999',
+        tabBarInactiveTintColor: 'theme.text.tertiary',
         tabBarHideOnKeyboard: false,
         tabBarStyle: {
           paddingBottom: 5,

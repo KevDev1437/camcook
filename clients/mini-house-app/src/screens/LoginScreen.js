@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Alert, Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { useRestaurant } from '../contexts/RestaurantContext';
@@ -30,7 +30,7 @@ const LoginScreen = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={[styles.container, { backgroundColor: theme.background.light }]} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={styles.logoContainer}>
         {restaurant?.logo ? (
           <Image
@@ -46,9 +46,9 @@ const LoginScreen = ({ navigation }) => {
           />
         )}
       </View>
-      <View style={styles.card}>
-        <Text style={styles.title}>Connexion</Text>
-        <Text style={styles.subtitle}>Admin ou Client</Text>
+      <View style={[styles.card, { backgroundColor: (theme.background.white || '#fff') }]}>
+        <Text style={[styles.title, { color: theme.text.primary }]}>Connexion</Text>
+        <Text style={[styles.subtitle, { color: (theme.text.secondary || '#666') }]}>Admin ou Client</Text>
 
         <TextInput
           placeholder="Email (ou nom d'utilisateur)"
@@ -67,7 +67,7 @@ const LoginScreen = ({ navigation }) => {
         />
 
         <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }, loading && { opacity: 0.7 }]} disabled={loading} onPress={onSubmit}>
-          <Text style={styles.buttonText}>{loading ? 'Connexion…' : 'Se connecter'}</Text>
+          <Text style={[styles.buttonText, { color: (theme.background.white || '#fff') }]}>{loading ? 'Connexion…' : 'Se connecter'}</Text>
         </TouchableOpacity>
 
         <View style={styles.registerRow}>
@@ -84,7 +84,6 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
@@ -100,7 +99,6 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     maxWidth: 420,
-    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 20,
     elevation: 2,
@@ -109,11 +107,9 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '700',
     marginBottom: 4,
-    color: '#333',
   },
   subtitle: {
     fontSize: 14,
-    color: '#666',
     marginBottom: 16,
   },
   input: {
@@ -124,7 +120,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     marginBottom: 12,
     fontSize: 16,
-    backgroundColor: '#fff',
   },
   button: {
     paddingVertical: 14,
@@ -132,7 +127,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonText: {
-    color: '#fff',
     fontWeight: '700',
     fontSize: 16,
   },
@@ -143,7 +137,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   registerText: {
-    color: '#666',
   },
   registerLink: {
     fontWeight: '700',

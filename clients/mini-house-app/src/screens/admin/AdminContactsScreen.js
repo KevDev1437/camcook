@@ -1,14 +1,18 @@
-import { useCallback, useEffect, useState } from 'react';
+﻿import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Modal, RefreshControl, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import StatusBadge from '../../components/admin/StatusBadge';
 import Header from '../../components/Header';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import { useRestaurant } from '../../contexts/RestaurantContext';
+import { getThemeColors } from '../../config/theme';
 import { adminService } from '../../services/adminService';
 
 const AdminContactsScreen = ({ navigation }) => {
   const { count } = useCart();
   const { logout } = useAuth();
+  const { restaurant } = useRestaurant();
+  const theme = getThemeColors(restaurant);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -69,13 +73,13 @@ const AdminContactsScreen = ({ navigation }) => {
   };
 
   const FilterButton = ({ active, label, onPress }) => (
-    <TouchableOpacity onPress={onPress} style={[styles.filterBtn, active && styles.filterBtnActive]}>
-      <Text style={[styles.filterText, active && styles.filterTextActive]}>{label}</Text>
+    <TouchableOpacity onPress={onPress} style={[styles.filterBtn, { backgroundColor: (theme.background.white || '#fff') }, active && { borderColor: theme.primary, backgroundColor: theme.primary + '15' }]}>
+      <Text style={[styles.filterText, { color: theme.text.primary }, active && { color: theme.primary }]}>{label}</Text>
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background.light }]}>
   <Header 
     onNotifications={() => navigation.navigate('AdminOrders')} 
     notificationCount={0} 
@@ -89,7 +93,7 @@ const AdminContactsScreen = ({ navigation }) => {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.headerRow}>
-          <Text style={styles.title}>Messages de contact</Text>
+          <Text style={[styles.title, { color: theme.text.primary }]}>Messages de contact</Text>
           <View style={styles.filtersRow}>
             <FilterButton label="Nouveaux" active={statusFilter==='new'} onPress={() => setStatusFilter('new')} />
             <FilterButton label="Lus" active={statusFilter==='read'} onPress={() => setStatusFilter('read')} />
@@ -102,7 +106,7 @@ const AdminContactsScreen = ({ navigation }) => {
             <FilterButton label="Problème" active={typeFilter==='problem'} onPress={() => setTypeFilter('problem')} />
           </View>
           <TextInput
-            style={styles.searchInput}
+            style={[styles.searchInput, { backgroundColor: (theme.background.white || '#fff'), borderColor: '#e0e0e0', color: theme.text.primary }]}
             value={search}
             onChangeText={setSearch}
             placeholder="Rechercher nom, email ou contenu..."
@@ -111,32 +115,32 @@ const AdminContactsScreen = ({ navigation }) => {
           />
         </View>
         {loading ? (
-          <ActivityIndicator color="#22c55e" />
+          <ActivityIndicator color={theme.primary} />
         ) : (
           messages.map((m) => (
-            <TouchableOpacity key={m.id} style={styles.card} onPress={() => { setSelected(m); setModalVisible(true); }}>
+            <TouchableOpacity key={m.id} style={[styles.card, { backgroundColor: (theme.background.white || '#fff'), borderColor: theme.background.border }]} onPress={() => { setSelected(m); setModalVisible(true); }}>
               <View style={styles.cardHeader}>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.nameEmail}>{m.name} • {m.email}</Text>
-                  <Text style={styles.typeText}>{m.type === 'problem' ? 'Problème signalé' : 'Contacter le restaurant'}</Text>
+                  <Text style={[styles.typeText, { color: (theme.text.secondary || '#666') }]}>{m.type === 'problem' ? 'Problème signalé' : 'Contacter le restaurant'}</Text>
                 </View>
                 <StatusBadge status={m.status} />
               </View>
-              <Text style={styles.messageText}>{m.message}</Text>
+              <Text style={[styles.messageText, { color: theme.text.primary }]}>{m.message}</Text>
               <View style={styles.actionsRow}>
                 {m.status !== 'read' && (
-                  <TouchableOpacity style={[styles.actionBtn, styles.markReadBtn]} onPress={() => updateStatusOptimistic(m.id, 'read')}>
-                    <Text style={styles.actionText}>Marquer lu</Text>
+                  <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#3b82f6' }]} onPress={() => updateStatusOptimistic(m.id, 'read')}>
+                    <Text style={[styles.actionText, { color: (theme.background.white || '#fff') }]}>Marquer lu</Text>
                   </TouchableOpacity>
                 )}
                 {m.status !== 'archived' && (
-                  <TouchableOpacity style={[styles.actionBtn, styles.archiveBtn]} onPress={() => updateStatusOptimistic(m.id, 'archived')}>
-                    <Text style={styles.actionText}>Archiver</Text>
+                  <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#6b7280' }]} onPress={() => updateStatusOptimistic(m.id, 'archived')}>
+                    <Text style={[styles.actionText, { color: (theme.background.white || '#fff') }]}>Archiver</Text>
                   </TouchableOpacity>
                 )}
                 {m.status !== 'new' && (
-                  <TouchableOpacity style={[styles.actionBtn, styles.resetBtn]} onPress={() => updateStatusOptimistic(m.id, 'new')}>
-                    <Text style={styles.actionText}>Marquer nouveau</Text>
+                  <TouchableOpacity style={[styles.actionBtn, { backgroundColor: theme.warning }]} onPress={() => updateStatusOptimistic(m.id, 'new')}>
+                    <Text style={[styles.actionText, { color: (theme.background.white || '#fff') }]}>Marquer nouveau</Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -187,7 +191,7 @@ const AdminContactsScreen = ({ navigation }) => {
                   </View>
                 </>
               ) : (
-                <Text style={{ color: '#333' }}>Aucun message sélectionné.</Text>
+                <Text style={{ color: theme.text.primary }}>Aucun message sélectionné.</Text>
               )}
             </View>
           </View>
@@ -198,28 +202,23 @@ const AdminContactsScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: { flex: 1 },
   content: { flex: 1 },
   contentContainer: { padding: 16, paddingBottom: 80 },
   headerRow: { marginBottom: 8 },
-  title: { fontSize: 22, fontWeight: '700', marginBottom: 10, color: '#333' },
+  title: { fontSize: 22, fontWeight: '700', marginBottom: 10 },
   filtersRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap', marginBottom: 8 },
-  filterBtn: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, borderWidth: 1, borderColor: '#ddd', backgroundColor: '#fff', marginRight: 8, marginBottom: 4 },
-  filterBtnActive: { borderColor: '#22c55e', backgroundColor: '#22c55e15' },
-  filterText: { color: '#333', fontWeight: '600' },
-  filterTextActive: { color: '#22c55e' },
-  searchInput: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e0e0e0', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: '#333' },
-  card: { backgroundColor: '#fff', borderRadius: 12, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: '#eee' },
+  filterBtn: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, borderWidth: 1, borderColor: '#ddd', marginRight: 8, marginBottom: 4 },
+  filterText: { fontWeight: '600' },
+  searchInput: { borderWidth: 1, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14 },
+  card: { borderRadius: 12, padding: 12, marginBottom: 12, borderWidth: 1 },
   cardHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 8, gap: 8 },
   nameEmail: { fontSize: 15, fontWeight: '700', color: '#111' },
-  typeText: { fontSize: 12, color: '#666' },
-  messageText: { color: '#333', lineHeight: 20 },
+  typeText: { fontSize: 12 },
+  messageText: { lineHeight: 20 },
   actionsRow: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10, gap: 10 },
   actionBtn: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 },
-  actionText: { color: '#fff', fontWeight: '700' },
-  markReadBtn: { backgroundColor: '#3b82f6' },
-  archiveBtn: { backgroundColor: '#6b7280' },
-  resetBtn: { backgroundColor: '#f59e0b' },
+  actionText: { fontWeight: '700' },
 });
 
 export default AdminContactsScreen;

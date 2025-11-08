@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Footer from '../components/Footer';
@@ -7,6 +7,8 @@ import Hero from '../components/Hero';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useNotifications } from '../context/NotificationContext';
+import { useRestaurant } from '../contexts/RestaurantContext';
+import { getThemeColors } from '../config/theme';
 import { orderService } from '../services/orderService';
 import api from '../config/api';
 
@@ -14,6 +16,8 @@ const CartScreen = ({navigation}) => {
   const { items, count, total, increment, decrement, remove, clear } = useCart();
   const { logout } = useAuth();
   const { notifications, notificationCount, onNotificationPress, markAsRead, clearNotification } = useNotifications();
+  const { restaurant } = useRestaurant();
+  const theme = getThemeColors(restaurant);
   const [creating, setCreating] = useState(false);
   const [pricesCache, setPricesCache] = useState({ accompaniments: {}, drinks: {} });
 
@@ -116,7 +120,7 @@ const CartScreen = ({navigation}) => {
     navigation.navigate('Payment', { orderData });
   };
   return (
-    <View style={styles.mainContainer}>
+    <View style={[styles.mainContainer, { backgroundColor: theme.background.light }]}>
       <Header
         onCart={() => navigation.navigate('Cart')}
         cartCount={count}
@@ -147,7 +151,7 @@ const CartScreen = ({navigation}) => {
         showCart={true}
       />
 
-      <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView style={[styles.scrollContainer, { backgroundColor: theme.background.light }]} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <Hero 
           title="Votre panier" 
           subtitle="Vérifiez vos articles avant de commander"
@@ -158,17 +162,17 @@ const CartScreen = ({navigation}) => {
           {/* Items du panier */}
           {items.length === 0 ? (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyTitle}>Votre panier est vide</Text>
-              <Text style={styles.emptySubtitle}>Découvrez nos plats et ajoutez vos envies.</Text>
+              <Text style={[styles.emptyTitle, { color: theme.text.primary }]}>Votre panier est vide</Text>
+              <Text style={[styles.emptySubtitle, { color: (theme.text.secondary || '#666') }]}>Découvrez nos plats et ajoutez vos envies.</Text>
               <TouchableOpacity 
-                style={styles.exploreBtn} 
+                style={[styles.exploreBtn, { backgroundColor: theme.primary }]} 
                 onPress={() => {
                   // Naviguer vers HomeScreen (HomeMain dans HomeStack)
                   // CartScreen est dans HomeStack, donc on peut naviguer directement vers HomeMain
                   navigation.navigate('HomeMain');
                 }}
               >
-                <Text style={styles.exploreBtnText}>Voir le menu</Text>
+                <Text style={[styles.exploreBtnText, { color: (theme.background.white || '#fff') }]}>Voir le menu</Text>
               </TouchableOpacity>
             </View>
           ) : (
@@ -265,7 +269,7 @@ const CartScreen = ({navigation}) => {
               const basePrice = it.pricing?.basePrice || (unitPrice - accompTotal - drinkPrice);
               
               return (
-                <View key={it.key} style={styles.cartItemCard}>
+                <View key={it.key} style={[styles.cartItemCard, { backgroundColor: (theme.background.white || '#fff') }]}>
                   {/* Image et infos principales */}
                   <View style={styles.itemHeader}>
                     {it.image ? (
@@ -276,15 +280,15 @@ const CartScreen = ({navigation}) => {
                       />
                     ) : (
                       <View style={[styles.itemImage, styles.placeholderImage]}>
-                        <MaterialIcons name="restaurant" size={32} color="#ccc" />
+                        <MaterialIcons name="restaurant" size={32} color={theme.text.tertiary} />
                       </View>
                     )}
                     <View style={styles.itemMainInfo}>
-                      <Text style={styles.itemName}>{it.name}</Text>
+                      <Text style={[styles.itemName, { color: theme.text.primary }]}>{it.name}</Text>
                       <View style={styles.priceRow}>
-                        <Text style={styles.itemUnitPrice}>{unitPrice.toFixed(2)} €</Text>
+                        <Text style={[styles.itemUnitPrice, { color: (theme.text.secondary || '#666') }]}>{unitPrice.toFixed(2)} €</Text>
                         {it.quantity > 1 && (
-                          <Text style={styles.itemQuantityMultiplier}>
+                          <Text style={[styles.itemQuantityMultiplier, { color: theme.text.tertiary }]}>
                             × {it.quantity}
                           </Text>
                         )}
@@ -293,24 +297,24 @@ const CartScreen = ({navigation}) => {
                   </View>
                   
                   {/* Détails des options et décomposition du prix */}
-                  <View style={styles.optionsSection}>
-                    <Text style={styles.optionsSectionTitle}>Détails de la commande</Text>
+                  <View style={[styles.optionsSection, { borderTopColor: theme.background.border }]}>
+                    <Text style={[styles.optionsSectionTitle, { color: theme.text.primary }]}>Détails de la commande</Text>
                     
                     {/* Décomposition du prix */}
-                    <View style={styles.priceBreakdown}>
+                    <View style={[styles.priceBreakdown, { borderTopColor: theme.background.border }]}>
                       <View style={styles.priceBreakdownRow}>
-                        <Text style={styles.priceBreakdownLabel}>MENU :</Text>
-                        <Text style={styles.priceBreakdownValue}>{basePrice.toFixed(2)} €</Text>
+                        <Text style={[styles.priceBreakdownLabel, { color: (theme.text.secondary || '#666') }]}>MENU :</Text>
+                        <Text style={[styles.priceBreakdownValue, { color: theme.text.primary }]}>{basePrice.toFixed(2)} €</Text>
                       </View>
                       {accList.length > 0 && (
                         <View style={styles.priceBreakdownSection}>
-                          <Text style={styles.priceBreakdownSectionTitle}>ACCOMPAGNEMENT</Text>
+                          <Text style={[styles.priceBreakdownSectionTitle, { color: (theme.text.secondary || '#666') }]}>ACCOMPAGNEMENT</Text>
                           {accList.map((acc, accIdx) => (
                             <View key={`acc-${accIdx}`} style={styles.priceBreakdownSubItem}>
-                              <Text style={styles.priceBreakdownSubItemText}>
+                              <Text style={[styles.priceBreakdownSubItemText, { color: theme.text.primary }]}>
                                 - {acc.name}
                               </Text>
-                              <Text style={styles.priceBreakdownSubItemPrice}>
+                              <Text style={[styles.priceBreakdownSubItemPrice, { color: (theme.text.secondary || '#666') }]}>
                                 {acc.price > 0 ? `${acc.price.toFixed(2)} €` : 'Gratuit'}
                               </Text>
                             </View>
@@ -319,7 +323,7 @@ const CartScreen = ({navigation}) => {
                       )}
                       {boissonArray.length > 0 && (
                         <View style={styles.priceBreakdownSection}>
-                          <Text style={styles.priceBreakdownSectionTitle}>
+                          <Text style={[styles.priceBreakdownSectionTitle, { color: (theme.text.secondary || '#666') }]}>
                             {boissonArray.length > 1 ? 'Boissons' : 'Boisson'}
                           </Text>
                           {boissonArray.map((drink, idx) => {
@@ -335,10 +339,10 @@ const CartScreen = ({navigation}) => {
                             const individualPrice = drinkPriceDisplay || (it.pricing?.drinkPrice && boissonArray.length === 1 ? it.pricing.drinkPrice : 0);
                             return (
                               <View key={`drink-${idx}`} style={styles.priceBreakdownSubItem}>
-                                <Text style={styles.priceBreakdownSubItemText}>
+                                <Text style={[styles.priceBreakdownSubItemText, { color: theme.text.primary }]}>
                                   - {drinkName}
                                 </Text>
-                                <Text style={styles.priceBreakdownSubItemPrice}>
+                                <Text style={[styles.priceBreakdownSubItemPrice, { color: (theme.text.secondary || '#666') }]}>
                                   {individualPrice > 0 ? `${individualPrice.toFixed(2)} €` : 'Gratuit'}
                                 </Text>
                               </View>
@@ -350,20 +354,20 @@ const CartScreen = ({navigation}) => {
                   </View>
                   
                   {/* Contrôles de quantité et suppression */}
-                  <View style={styles.itemActions}>
+                  <View style={[styles.itemActions, { borderTopColor: theme.background.border }]}>
                     <View style={styles.quantityContainer}>
                       <TouchableOpacity 
-                        style={styles.quantityButton} 
+                        style={[styles.quantityButton, { backgroundColor: theme.primary }]} 
                         onPress={() => decrement(it.key)}
                       >
-                        <Text style={styles.quantityButtonText}>-</Text>
+                        <Text style={[styles.quantityButtonText, { color: (theme.background.white || '#fff') }]}>-</Text>
                       </TouchableOpacity>
                       <Text style={styles.quantity}>{it.quantity}</Text>
                       <TouchableOpacity 
-                        style={styles.quantityButton} 
+                        style={[styles.quantityButton, { backgroundColor: theme.primary }]} 
                         onPress={() => increment(it.key)}
                       >
-                        <Text style={styles.quantityButtonText}>+</Text>
+                        <Text style={[styles.quantityButtonText, { color: (theme.background.white || '#fff') }]}>+</Text>
                       </TouchableOpacity>
                     </View>
                     <TouchableOpacity 
@@ -379,7 +383,7 @@ const CartScreen = ({navigation}) => {
                         );
                       }}
                     >
-                      <MaterialIcons name="delete-outline" size={20} color="#ef4444" />
+                      <MaterialIcons name="delete-outline" size={20} color={theme.error} />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -388,24 +392,24 @@ const CartScreen = ({navigation}) => {
           )}
 
           {/* Barre récapitulatif */}
-          <View style={styles.summaryBar}>
+          <View style={[styles.summaryBar, { backgroundColor: (theme.background.white || '#fff'), borderColor: theme.background.border }]}>
             <View style={styles.totalContainer}>
               <Text style={styles.totalLabel}>Total:</Text>
-              <Text style={styles.totalAmount}>{Number(total).toFixed(2)} €</Text>
+              <Text style={[styles.totalAmount, { color: theme.primary }]}>{Number(total).toFixed(2)} €</Text>
             </View>
             {/* Debug: Afficher le détail des prix */}
             {items.length > 0 && (
-              <View style={{ marginBottom: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#eee' }}>
-                <Text style={{ fontSize: 11, color: '#999', marginBottom: 4 }}>Détail:</Text>
+              <View style={{ marginBottom: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: theme.background.border }}>
+                <Text style={{ fontSize: 11, color: theme.text.tertiary, marginBottom: 4 }}>Détail:</Text>
                 {items.map((it, idx) => (
-                  <Text key={idx} style={{ fontSize: 10, color: '#999' }}>
+                  <Text key={idx} style={{ fontSize: 10, color: theme.text.tertiary }}>
                     • {it.name}: {Number(it.price).toFixed(2)}€ × {it.quantity} = {(Number(it.price) * (it.quantity || 1)).toFixed(2)}€
                   </Text>
                 ))}
               </View>
             )}
-            <TouchableOpacity style={[styles.checkoutButton, creating && { opacity: 0.7 }]} onPress={onCheckout} disabled={creating}>
-              <Text style={styles.checkoutButtonText}>{creating ? 'Création…' : 'Commander'}</Text>
+            <TouchableOpacity style={[styles.checkoutButton, { backgroundColor: theme.primary }, creating && { opacity: 0.7 }]} onPress={onCheckout} disabled={creating}>
+              <Text style={[styles.checkoutButtonText, { color: (theme.background.white || '#fff') }]}>{creating ? 'Création…' : 'Commander'}</Text>
             </TouchableOpacity>
           </View>
 
@@ -419,12 +423,11 @@ const CartScreen = ({navigation}) => {
 };
 
 const styles = StyleSheet.create({
-  mainContainer: { flex: 1, backgroundColor: '#f5f5f5', flexDirection: 'column' },
-  scrollContainer: { flex: 1, backgroundColor: '#f5f5f5' },
+  mainContainer: { flex: 1, flexDirection: 'column' },
+  scrollContainer: { flex: 1 },
   scrollContent: { flexGrow: 1 },
   content: { padding: 15 },
   cartItemCard: {
-    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 15,
     marginBottom: 15,
@@ -456,7 +459,6 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 17,
     fontWeight: 'bold',
-    color: '#333',
     marginBottom: 4,
   },
   priceRow: {
@@ -466,29 +468,24 @@ const styles = StyleSheet.create({
   },
   itemUnitPrice: {
     fontSize: 15,
-    color: '#666',
     fontWeight: '600',
   },
   itemQuantityMultiplier: {
     fontSize: 13,
-    color: '#999',
     marginLeft: 6,
   },
   itemTotalPrice: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#22c55e',
   },
   optionsSection: {
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
   },
   optionsSectionTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
     marginBottom: 10,
   },
   optionGroup: {
@@ -502,7 +499,6 @@ const styles = StyleSheet.create({
   optionGroupTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#666',
     marginLeft: 6,
   },
   optionItems: {
@@ -515,14 +511,12 @@ const styles = StyleSheet.create({
   },
   optionItemText: {
     fontSize: 13,
-    color: '#555',
     marginLeft: 6,
   },
   priceBreakdown: {
     marginBottom: 16,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
   },
   priceBreakdownRow: {
     flexDirection: 'row',
@@ -533,12 +527,10 @@ const styles = StyleSheet.create({
   priceBreakdownLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#666',
   },
   priceBreakdownValue: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#333',
   },
   priceBreakdownSection: {
     marginTop: 10,
@@ -547,7 +539,6 @@ const styles = StyleSheet.create({
   priceBreakdownSectionTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#666',
     marginBottom: 6,
     textTransform: 'uppercase',
   },
@@ -560,13 +551,11 @@ const styles = StyleSheet.create({
   },
   priceBreakdownSubItemText: {
     fontSize: 12,
-    color: '#555',
     flex: 1,
   },
   priceBreakdownSubItemPrice: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#666',
     marginLeft: 8,
   },
   itemActions: {
@@ -576,14 +565,12 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
   },
   quantityContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   quantityButton: {
-    backgroundColor: '#22c55e',
     width: 30,
     height: 30,
     borderRadius: 15,
@@ -591,7 +578,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   quantityButtonText: {
-    color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -604,16 +590,14 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   emptyState: { alignItems: 'center', paddingVertical: 40 },
-  emptyTitle: { fontSize: 18, fontWeight: 'bold', color: '#333' },
-  emptySubtitle: { fontSize: 13, color: '#666', marginTop: 6, marginBottom: 14 },
-  exploreBtn: { backgroundColor: '#22c55e', borderRadius: 8, paddingHorizontal: 16, paddingVertical: 10 },
-  exploreBtnText: { color: '#fff', fontWeight: '600' },
+  emptyTitle: { fontSize: 18, fontWeight: 'bold' },
+  emptySubtitle: { fontSize: 13, marginTop: 6, marginBottom: 14 },
+  exploreBtn: { borderRadius: 8, paddingHorizontal: 16, paddingVertical: 10 },
+  exploreBtnText: { fontWeight: '600' },
   summaryBar: {
-    backgroundColor: '#fff',
     padding: 16,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#eee',
     marginTop: 12,
   },
   totalContainer: {
@@ -628,16 +612,13 @@ const styles = StyleSheet.create({
   totalAmount: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#22c55e',
   },
   checkoutButton: {
-    backgroundColor: '#22c55e',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
   },
   checkoutButtonText: {
-    color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
   },

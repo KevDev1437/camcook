@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
+﻿import { useCallback, useEffect, useState } from 'react';
 import { Alert, Image, RefreshControl, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { MaterialIcons } from '@expo/vector-icons';
 import Header from '../../components/Header';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import { useRestaurant } from '../../contexts/RestaurantContext';
+import { getThemeColors } from '../../config/theme';
 import { adminService } from '../../services/adminService';
 import restaurantService from '../../services/restaurantService';
 import api from '../../config/api';
@@ -12,6 +14,8 @@ import api from '../../config/api';
 const AdminMenuScreen = ({ navigation }) => {
   const { count } = useCart();
   const { logout } = useAuth();
+  const { restaurant } = useRestaurant();
+  const theme = getThemeColors(restaurant);
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -221,7 +225,7 @@ const AdminMenuScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background.light }]}>
       <Header
         onNotifications={() => navigation.navigate('AdminOrders')}
         notificationCount={0}
@@ -236,35 +240,35 @@ const AdminMenuScreen = ({ navigation }) => {
         contentContainerStyle={styles.contentContainer}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchAll(); }} />}
       >
-        <Text style={styles.title}>Gestion des Menus</Text>
+        <Text style={[styles.title, { color: theme.text.primary }]}>Gestion des Menus</Text>
 
         {loading ? (
           <View style={styles.loadingBox}>
-            <Text style={styles.loadingText}>Chargement...</Text>
+            <Text style={[styles.loadingText, { color: (theme.text.secondary || '#666') }]}>Chargement...</Text>
           </View>
         ) : (
           <>
             {/* Formulaire ajout */}
-            <View style={styles.menuCard}>
-              <Text style={styles.menuName}>Ajouter un menu</Text>
+            <View style={[styles.menuCard, { backgroundColor: (theme.background.white || '#fff'), borderColor: theme.background.border }]}>
+              <Text style={[styles.menuName, { color: theme.text.primary }]}>Ajouter un menu</Text>
               <View style={styles.menuRow}>
                 <View style={styles.menuCol}>
                   <Text style={styles.menuLabel}>Nom</Text>
-                  <TextInput style={styles.input} value={newItem.name} onChangeText={(t) => setNewItem((p) => ({ ...p, name: t }))} placeholder="Nom du plat" />
+                  <TextInput style={[styles.input, { backgroundColor: theme.background.lighter, borderColor: theme.background.border, color: theme.text.primary }]} value={newItem.name} onChangeText={(t) => setNewItem((p) => ({ ...p, name: t }))} placeholder="Nom du plat" />
                 </View>
                 <View style={styles.menuCol}>
                   <Text style={styles.menuLabel}>Prix (€)</Text>
-                  <TextInput style={styles.input} value={newItem.priceStr} onChangeText={(t) => setNewItem((p) => ({ ...p, priceStr: t }))} placeholder="0.00" keyboardType="decimal-pad" />
+                  <TextInput style={[styles.input, { backgroundColor: theme.background.lighter, borderColor: theme.background.border, color: theme.text.primary }]} value={newItem.priceStr} onChangeText={(t) => setNewItem((p) => ({ ...p, priceStr: t }))} placeholder="0.00" keyboardType="decimal-pad" />
                 </View>
               </View>
               <View style={styles.menuRow}>
                 <View style={styles.menuCol}>
                   <Text style={styles.menuLabel}>Catégorie</Text>
-                  <TextInput style={styles.input} value={newItem.category} onChangeText={(t) => setNewItem((p) => ({ ...p, category: t }))} placeholder="Plats" />
+                  <TextInput style={[styles.input, { backgroundColor: theme.background.lighter, borderColor: theme.background.border, color: theme.text.primary }]} value={newItem.category} onChangeText={(t) => setNewItem((p) => ({ ...p, category: t }))} placeholder="Plats" />
                 </View>
                 <View style={styles.menuCol}>
                   <Text style={styles.menuLabel}>Description</Text>
-                  <TextInput style={styles.input} value={newItem.description} onChangeText={(t) => setNewItem((p) => ({ ...p, description: t }))} placeholder="Description" />
+                  <TextInput style={[styles.input, { backgroundColor: theme.background.lighter, borderColor: theme.background.border, color: theme.text.primary }]} value={newItem.description} onChangeText={(t) => setNewItem((p) => ({ ...p, description: t }))} placeholder="Description" />
                 </View>
               </View>
               
@@ -282,7 +286,7 @@ const AdminMenuScreen = ({ navigation }) => {
                       style={styles.removeImageBtn}
                       onPress={() => setNewItem(prev => ({ ...prev, selectedImage: null, imageUrl: '' }))}
                     >
-                      <MaterialIcons name="close" size={20} color="#fff" />
+                      <MaterialIcons name="close" size={20} color={(theme.background.white || '#fff')} />
                     </TouchableOpacity>
                   </View>
                 ) : null}
@@ -291,12 +295,12 @@ const AdminMenuScreen = ({ navigation }) => {
                     style={[styles.imageBtn, styles.imageBtnPrimary]}
                     onPress={() => pickImage(null)}
                   >
-                    <MaterialIcons name="photo-library" size={18} color="#fff" />
-                    <Text style={styles.imageBtnText}>Galerie</Text>
+                    <MaterialIcons name="photo-library" size={18} color={(theme.background.white || '#fff')} />
+                    <Text style={[styles.imageBtnText, { color: (theme.background.white || '#fff') }]}>Galerie</Text>
                   </TouchableOpacity>
-                  <Text style={styles.imageOrText}>ou</Text>
+                  <Text style={[styles.imageOrText, { color: theme.text.tertiary }]}>ou</Text>
                   <TextInput
-                    style={[styles.input, styles.imageUrlInput]}
+                    style={[styles.input, styles.imageUrlInput, { backgroundColor: theme.background.lighter, borderColor: theme.background.border, color: theme.text.primary }]}
                     value={newItem.imageUrl}
                     onChangeText={(url) => handleImageUrlChange(null, url)}
                     placeholder="URL de l'image"
@@ -305,14 +309,14 @@ const AdminMenuScreen = ({ navigation }) => {
                 </View>
               </View>
               
-              <TouchableOpacity style={styles.saveBtn} onPress={addMenuItem}>
-                <Text style={styles.saveBtnText}>Ajouter</Text>
+              <TouchableOpacity style={[styles.saveBtn, { backgroundColor: theme.primary }]} onPress={addMenuItem}>
+                <Text style={[styles.saveBtnText, { color: (theme.background.white || '#fff') }]}>Ajouter</Text>
               </TouchableOpacity>
             </View>
 
             {/* Liste / édition menu (nom et prix uniquement) */}
             {/* Les accompagnements et boissons sont gérés globalement dans Accompagnements */}
-            <Text style={styles.helperText}>(Accompagnements et boissons gérés globalement dans Accompagnements)</Text>
+            <Text style={[styles.helperText, { color: theme.text.tertiary }]}>(Accompagnements et boissons gérés globalement dans Accompagnements)</Text>
             {menu.map((it) => {
               const images = Array.isArray(it.images) ? it.images : [];
               const currentImageUrl = images.length > 0 ? images[0] : '';
@@ -325,14 +329,14 @@ const AdminMenuScreen = ({ navigation }) => {
               const displayImage = e.selectedImage || e.imageUrl || currentImageUrl;
               
               return (
-                <View key={it.id} style={styles.menuCard}>
-                  <Text style={styles.menuName}>{it.name}</Text>
+                <View key={it.id} style={[styles.menuCard, { backgroundColor: (theme.background.white || '#fff'), borderColor: theme.background.border }]}>
+                  <Text style={[styles.menuName, { color: theme.text.primary }]}>{it.name}</Text>
                   
                   <View style={styles.menuRow}>
                     <View style={styles.menuCol}>
                       <Text style={styles.menuLabel}>Nom</Text>
                       <TextInput 
-                        style={styles.input} 
+                        style={[styles.input, { backgroundColor: theme.background.lighter, borderColor: theme.background.border, color: theme.text.primary }]} 
                         value={e.name} 
                         onChangeText={(t) => onChangeEditor(it.id, 'name', t)} 
                         placeholder="Nom du plat" 
@@ -341,7 +345,7 @@ const AdminMenuScreen = ({ navigation }) => {
                     <View style={styles.menuCol}>
                       <Text style={styles.menuLabel}>Prix (€)</Text>
                       <TextInput 
-                        style={styles.input} 
+                        style={[styles.input, { backgroundColor: theme.background.lighter, borderColor: theme.background.border, color: theme.text.primary }]} 
                         value={e.price} 
                         onChangeText={(t) => onChangeEditor(it.id, 'price', t)} 
                         placeholder="0.00" 
@@ -367,7 +371,7 @@ const AdminMenuScreen = ({ navigation }) => {
                             onChangeEditor(it.id, 'imageUrl', '');
                           }}
                         >
-                          <MaterialIcons name="close" size={20} color="#fff" />
+                          <MaterialIcons name="close" size={20} color={(theme.background.white || '#fff')} />
                         </TouchableOpacity>
                       </View>
                     ) : null}
@@ -376,12 +380,12 @@ const AdminMenuScreen = ({ navigation }) => {
                         style={[styles.imageBtn, styles.imageBtnPrimary]}
                         onPress={() => pickImage(it.id)}
                       >
-                        <MaterialIcons name="photo-library" size={18} color="#fff" />
-                        <Text style={styles.imageBtnText}>Galerie</Text>
+                        <MaterialIcons name="photo-library" size={18} color={(theme.background.white || '#fff')} />
+                        <Text style={[styles.imageBtnText, { color: (theme.background.white || '#fff') }]}>Galerie</Text>
                       </TouchableOpacity>
-                      <Text style={styles.imageOrText}>ou</Text>
+                      <Text style={[styles.imageOrText, { color: theme.text.tertiary }]}>ou</Text>
                       <TextInput
-                        style={[styles.input, styles.imageUrlInput]}
+                        style={[styles.input, styles.imageUrlInput, { backgroundColor: theme.background.lighter, borderColor: theme.background.border, color: theme.text.primary }]}
                         value={e.imageUrl || ''}
                         onChangeText={(url) => handleImageUrlChange(it.id, url)}
                         placeholder="URL de l'image"
@@ -392,17 +396,17 @@ const AdminMenuScreen = ({ navigation }) => {
                   
                   <View style={[styles.menuRow, { marginTop: 10 }]}>
                     <TouchableOpacity 
-                      style={[styles.saveBtn, { flex: 1, marginRight: 6 }, savingId === it.id && { opacity: 0.7 }]} 
+                      style={[styles.saveBtn, { flex: 1, marginRight: 6, backgroundColor: theme.primary }, savingId === it.id && { opacity: 0.7 }]} 
                       onPress={() => saveMenuItem(it)} 
                       disabled={savingId === it.id}
                     >
-                      <Text style={styles.saveBtnText}>{savingId === it.id ? 'Sauvegarde…' : 'Sauvegarder'}</Text>
+                      <Text style={[styles.saveBtnText, { color: (theme.background.white || '#fff') }]}>{savingId === it.id ? 'Sauvegarde…' : 'Sauvegarder'}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity 
-                      style={[styles.deleteBtn, { flex: 1, marginLeft: 6 }]} 
+                      style={[styles.deleteBtn, { flex: 1, marginLeft: 6, backgroundColor: theme.error }]} 
                       onPress={() => deleteMenu(it)}
                     >
-                      <Text style={styles.deleteBtnText}>Supprimer</Text>
+                      <Text style={[styles.deleteBtnText, { color: (theme.background.white || '#fff') }]}>Supprimer</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -416,23 +420,23 @@ const AdminMenuScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: { flex: 1 },
   content: { flex: 1 },
   contentContainer: { padding: 16, paddingBottom: 80 },
-  title: { fontSize: 24, fontWeight: '800', marginBottom: 12, color: '#333' },
+  title: { fontSize: 24, fontWeight: '800', marginBottom: 12 },
   loadingBox: { alignItems: 'center', paddingVertical: 32 },
-  loadingText: { color: '#666', marginTop: 8 },
-  menuCard: { backgroundColor: '#fff', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#eee', marginBottom: 10 },
-  menuName: { fontWeight: '800', color: '#333', marginBottom: 8 },
+  loadingText: { marginTop: 8 },
+  menuCard: { borderRadius: 12, padding: 12, borderWidth: 1, marginBottom: 10 },
+  menuName: { fontWeight: '800', marginBottom: 8 },
   menuRow: { flexDirection: 'row', gap: 10 },
   menuCol: { flex: 1 },
   menuLabel: { color: '#555', marginBottom: 6 },
-  input: { backgroundColor: '#fafafa', borderWidth: 1, borderColor: '#eee', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8 },
-  saveBtn: { marginTop: 10, backgroundColor: '#22c55e', paddingVertical: 10, borderRadius: 8, alignItems: 'center' },
-  saveBtnText: { color: '#fff', fontWeight: '800' },
-  deleteBtn: { marginTop: 10, backgroundColor: '#ef4444', paddingVertical: 10, borderRadius: 8, alignItems: 'center' },
-  deleteBtnText: { color: '#fff', fontWeight: '800' },
-  helperText: { fontSize: 11, color: '#999', marginTop: 4, marginBottom: 8, fontStyle: 'italic' },
+  input: { borderWidth: 1, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8 },
+  saveBtn: { marginTop: 10, paddingVertical: 10, borderRadius: 8, alignItems: 'center' },
+  saveBtnText: { fontWeight: '800' },
+  deleteBtn: { marginTop: 10, paddingVertical: 10, borderRadius: 8, alignItems: 'center' },
+  deleteBtnText: { fontWeight: '800' },
+  helperText: { fontSize: 11, marginTop: 4, marginBottom: 8, fontStyle: 'italic' },
   imageSection: { marginTop: 12 },
   imagePreviewContainer: { position: 'relative', marginBottom: 10, borderRadius: 8, overflow: 'hidden' },
   imagePreview: { width: '100%', height: 150, backgroundColor: '#e0e0e0' },
@@ -440,8 +444,8 @@ const styles = StyleSheet.create({
   imageButtonsRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   imageBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 8, paddingHorizontal: 12, borderRadius: 8 },
   imageBtnPrimary: { backgroundColor: '#2196F3' },
-  imageBtnText: { color: '#fff', fontWeight: '600', fontSize: 14 },
-  imageOrText: { color: '#999', fontSize: 12 },
+  imageBtnText: { fontWeight: '600', fontSize: 14 },
+  imageOrText: { fontSize: 12 },
   imageUrlInput: { flex: 1, marginTop: 0 },
 });
 

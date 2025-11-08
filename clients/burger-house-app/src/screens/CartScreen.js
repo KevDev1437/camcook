@@ -1,14 +1,13 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import Hero from '../components/Hero';
+import api from '../config/api';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useNotifications } from '../context/NotificationContext';
-import { orderService } from '../services/orderService';
-import api from '../config/api';
 
 const CartScreen = ({navigation}) => {
   const { items, count, total, increment, decrement, remove, clear } = useCart();
@@ -379,7 +378,7 @@ const CartScreen = ({navigation}) => {
                         );
                       }}
                     >
-                      <MaterialIcons name="delete-outline" size={20} color="#ef4444" />
+                      <MaterialIcons name="delete-outline" size={20} color="theme.error" />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -395,10 +394,10 @@ const CartScreen = ({navigation}) => {
             </View>
             {/* Debug: Afficher le détail des prix */}
             {items.length > 0 && (
-              <View style={{ marginBottom: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#eee' }}>
-                <Text style={{ fontSize: 11, color: '#999', marginBottom: 4 }}>Détail:</Text>
+              <View style={{ marginBottom: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: 'theme.background.border' }}>
+                <Text style={{ fontSize: 11, color: 'theme.text.tertiary', marginBottom: 4 }}>Détail:</Text>
                 {items.map((it, idx) => (
-                  <Text key={idx} style={{ fontSize: 10, color: '#999' }}>
+                  <Text key={idx} style={{ fontSize: 10, color: 'theme.text.tertiary' }}>
                     • {it.name}: {Number(it.price).toFixed(2)}€ × {it.quantity} = {(Number(it.price) * (it.quantity || 1)).toFixed(2)}€
                   </Text>
                 ))}
@@ -419,12 +418,12 @@ const CartScreen = ({navigation}) => {
 };
 
 const styles = StyleSheet.create({
-  mainContainer: { flex: 1, backgroundColor: '#f5f5f5', flexDirection: 'column' },
-  scrollContainer: { flex: 1, backgroundColor: '#f5f5f5' },
+  mainContainer: { flex: 1, backgroundColor: 'theme.background.light', flexDirection: 'column' },
+  scrollContainer: { flex: 1, backgroundColor: 'theme.background.light' },
   scrollContent: { flexGrow: 1 },
   content: { padding: 15 },
   cartItemCard: {
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     borderRadius: 12,
     padding: 15,
     marginBottom: 15,
@@ -456,7 +455,7 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 17,
     fontWeight: 'bold',
-    color: '#333',
+    color: 'theme.text.primary',
     marginBottom: 4,
   },
   priceRow: {
@@ -466,12 +465,12 @@ const styles = StyleSheet.create({
   },
   itemUnitPrice: {
     fontSize: 15,
-    color: '#666',
+    color: 'theme.text.secondary',
     fontWeight: '600',
   },
   itemQuantityMultiplier: {
     fontSize: 13,
-    color: '#999',
+    color: 'theme.text.tertiary',
     marginLeft: 6,
   },
   itemTotalPrice: {
@@ -488,7 +487,7 @@ const styles = StyleSheet.create({
   optionsSectionTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: 'theme.text.primary',
     marginBottom: 10,
   },
   optionGroup: {
@@ -502,7 +501,7 @@ const styles = StyleSheet.create({
   optionGroupTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#666',
+    color: 'theme.text.secondary',
     marginLeft: 6,
   },
   optionItems: {
@@ -533,12 +532,12 @@ const styles = StyleSheet.create({
   priceBreakdownLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#666',
+    color: 'theme.text.secondary',
   },
   priceBreakdownValue: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#333',
+    color: 'theme.text.primary',
   },
   priceBreakdownSection: {
     marginTop: 10,
@@ -547,7 +546,7 @@ const styles = StyleSheet.create({
   priceBreakdownSectionTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#666',
+    color: 'theme.text.secondary',
     marginBottom: 6,
     textTransform: 'uppercase',
   },
@@ -566,7 +565,7 @@ const styles = StyleSheet.create({
   priceBreakdownSubItemPrice: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#666',
+    color: 'theme.text.secondary',
     marginLeft: 8,
   },
   itemActions: {
@@ -591,7 +590,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   quantityButtonText: {
-    color: '#fff',
+    color: 'theme.background.white',
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -604,16 +603,16 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   emptyState: { alignItems: 'center', paddingVertical: 40 },
-  emptyTitle: { fontSize: 18, fontWeight: 'bold', color: '#333' },
-  emptySubtitle: { fontSize: 13, color: '#666', marginTop: 6, marginBottom: 14 },
+  emptyTitle: { fontSize: 18, fontWeight: 'bold', color: 'theme.text.primary' },
+  emptySubtitle: { fontSize: 13, color: 'theme.text.secondary', marginTop: 6, marginBottom: 14 },
   exploreBtn: { backgroundColor: '#22c55e', borderRadius: 8, paddingHorizontal: 16, paddingVertical: 10 },
-  exploreBtnText: { color: '#fff', fontWeight: '600' },
+  exploreBtnText: { color: 'theme.background.white', fontWeight: '600' },
   summaryBar: {
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     padding: 16,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: 'theme.background.border',
     marginTop: 12,
   },
   totalContainer: {
@@ -637,7 +636,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   checkoutButtonText: {
-    color: '#fff',
+    color: 'theme.background.white',
     fontSize: 18,
     fontWeight: 'bold',
   },

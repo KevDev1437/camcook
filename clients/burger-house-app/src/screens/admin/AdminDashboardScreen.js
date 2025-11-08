@@ -13,12 +13,12 @@ import { adminService } from '../../services/adminService';
 const screenWidth = Dimensions.get('window').width;
 
 const COLORS = {
-  pending: '#f59e0b',
+  pending: 'theme.warning',
   preparing: '#06b6d4',
   ready: '#22c55e',
   on_delivery: '#60a5fa',
-  completed: '#10b981',
-  cancelled: '#ef4444',
+  completed: 'theme.success',
+  cancelled: 'theme.error',
 };
 
 const AdminDashboardScreen = ({ navigation }) => {
@@ -226,7 +226,7 @@ const AdminDashboardScreen = ({ navigation }) => {
     return entries.map(([k, v], idx) => ({
       name: toName(k),
       population: v,
-      color: COLORS[k] || ['#22c55e', '#06b6d4', '#22c55e', '#60a5fa', '#a78bfa', '#ef4444'][idx % 6],
+      color: COLORS[k] || ['#22c55e', '#06b6d4', '#22c55e', '#60a5fa', '#a78bfa', 'theme.error'][idx % 6],
       legendFontColor: '#777',
       legendFontSize: 12,
     }));
@@ -300,7 +300,7 @@ const AdminDashboardScreen = ({ navigation }) => {
             {/* Message d'erreur */}
             {error && (
               <View style={styles.errorBanner}>
-                <MaterialIcons name="error-outline" size={20} color="#ef4444" />
+                <MaterialIcons name="error-outline" size={20} color="theme.error" />
                 <Text style={styles.errorText}>{error}</Text>
                 <TouchableOpacity onPress={() => fetchAll()}>
                   <Text style={styles.retryText}>Réessayer</Text>
@@ -355,12 +355,12 @@ const AdminDashboardScreen = ({ navigation }) => {
                 height={200}
                 yAxisSuffix="€"
                 chartConfig={{
-                  backgroundColor: '#fff',
-                  backgroundGradientFrom: '#fff',
-                  backgroundGradientTo: '#fff',
+                  backgroundColor: 'theme.background.white',
+                  backgroundGradientFrom: 'theme.background.white',
+                  backgroundGradientTo: 'theme.background.white',
                   decimalPlaces: 2,
                   color: (opacity = 1) => `rgba(34, 197, 94, ${opacity})`,
-                  labelColor: () => '#666',
+                  labelColor: () => 'theme.text.secondary',
                   propsForDots: { r: '3', strokeWidth: '1', stroke: '#22c55e' },
                 }}
                 bezier
@@ -376,8 +376,8 @@ const AdminDashboardScreen = ({ navigation }) => {
                   width={screenWidth - 32}
                   height={200}
                   chartConfig={{
-                    color: () => '#333',
-                    labelColor: () => '#666',
+                    color: () => 'theme.text.primary',
+                    labelColor: () => 'theme.text.secondary',
                   }}
                   accessor="population"
                   backgroundColor="transparent"
@@ -413,34 +413,34 @@ const AdminDashboardScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: { flex: 1, backgroundColor: 'theme.background.light' },
   content: { flex: 1 },
   contentContainer: { padding: 16, paddingBottom: 80 },
-  title: { fontSize: 24, fontWeight: '800', marginBottom: 12, color: '#333' },
+  title: { fontSize: 24, fontWeight: '800', marginBottom: 12, color: 'theme.text.primary' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   gridItem: { width: '48%' },
-  card: { backgroundColor: '#fff', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#eee', marginTop: 16 },
-  cardTitle: { fontSize: 16, fontWeight: '700', marginBottom: 8, color: '#333' },
-  sectionTitle: { fontSize: 18, fontWeight: '800', marginTop: 20, marginBottom: 8, color: '#333' },
-  rowCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#fff', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#eee', marginBottom: 8 },
-  rowMain: { color: '#333', fontWeight: '600' },
+  card: { backgroundColor: 'theme.background.white', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: 'theme.background.border', marginTop: 16 },
+  cardTitle: { fontSize: 16, fontWeight: '700', marginBottom: 8, color: 'theme.text.primary' },
+  sectionTitle: { fontSize: 18, fontWeight: '800', marginTop: 20, marginBottom: 8, color: 'theme.text.primary' },
+  rowCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: 'theme.background.white', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: 'theme.background.border', marginBottom: 8 },
+  rowMain: { color: 'theme.text.primary', fontWeight: '600' },
   rowSub: { color: '#777', marginTop: 2 },
-  muted: { color: '#999' },
+  muted: { color: 'theme.text.tertiary' },
   loadingBox: { alignItems: 'center', paddingVertical: 32 },
-  loadingText: { color: '#666', marginTop: 8 },
+  loadingText: { color: 'theme.text.secondary', marginTop: 8 },
   // Menu editor styles
-  menuCard: { backgroundColor: '#fff', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#eee', marginBottom: 10 },
-  menuName: { fontWeight: '800', color: '#333', marginBottom: 8 },
+  menuCard: { backgroundColor: 'theme.background.white', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: 'theme.background.border', marginBottom: 10 },
+  menuName: { fontWeight: '800', color: 'theme.text.primary', marginBottom: 8 },
   menuRow: { flexDirection: 'row', gap: 10 },
   menuCol: { flex: 1 },
   menuColFull: { flex: 1 },
   menuLabel: { color: '#555', marginBottom: 6 },
-  input: { backgroundColor: '#fafafa', borderWidth: 1, borderColor: '#eee', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8 },
+  input: { backgroundColor: 'theme.background.lighter', borderWidth: 1, borderColor: 'theme.background.border', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8 },
   saveBtn: { marginTop: 10, backgroundColor: '#22c55e', paddingVertical: 10, borderRadius: 8, alignItems: 'center' },
-  saveBtnText: { color: '#fff', fontWeight: '800' },
-  deleteBtn: { marginTop: 10, backgroundColor: '#ef4444', paddingVertical: 10, borderRadius: 8, alignItems: 'center' },
-  deleteBtnText: { color: '#fff', fontWeight: '800' },
-  helperText: { fontSize: 11, color: '#999', marginTop: 4, fontStyle: 'italic' },
+  saveBtnText: { color: 'theme.background.white', fontWeight: '800' },
+  deleteBtn: { marginTop: 10, backgroundColor: 'theme.error', paddingVertical: 10, borderRadius: 8, alignItems: 'center' },
+  deleteBtnText: { color: 'theme.background.white', fontWeight: '800' },
+  helperText: { fontSize: 11, color: 'theme.text.tertiary', marginTop: 4, fontStyle: 'italic' },
 });
 
 export default AdminDashboardScreen;

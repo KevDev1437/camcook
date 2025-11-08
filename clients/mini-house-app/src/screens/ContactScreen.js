@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
@@ -7,11 +7,15 @@ import api from '../config/api';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useNotifications } from '../context/NotificationContext';
+import { useRestaurant } from '../contexts/RestaurantContext';
+import { getThemeColors } from '../config/theme';
 
 const ContactScreen = ({ navigation }) => {
   const { count } = useCart();
   const { logout } = useAuth();
   const { notifications, notificationCount, onNotificationPress, markAsRead, clearNotification } = useNotifications();
+  const { restaurant } = useRestaurant();
+  const theme = getThemeColors(restaurant);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [type, setType] = useState('restaurant'); // 'restaurant' | 'problem'
@@ -132,45 +136,45 @@ const ContactScreen = ({ navigation }) => {
           image={require('../assets/hero-contact.jpg')}
         />
         <View style={styles.content}>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.subtitle, { color: (theme.text.secondary || '#666') }]}>
             Vous pouvez contacter le restaurant ou signaler un problème.
           </Text>
 
           <View style={styles.toggleRow}>
             <TouchableOpacity
-              style={[styles.toggleBtn, type === 'restaurant' && styles.toggleBtnActive]}
+              style={[styles.toggleBtn, { backgroundColor: theme.background.border }, type === 'restaurant' && { backgroundColor: '#dcfce7', borderWidth: 1, borderColor: theme.primary }]}
               onPress={() => setType('restaurant')}
             >
-              <Text style={[styles.toggleText, type === 'restaurant' && styles.toggleTextActive]}>Contacter le restaurant</Text>
+              <Text style={[styles.toggleText, type === 'restaurant' && { color: theme.primary, fontWeight: '600' }]}>Contacter le restaurant</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.toggleBtn, type === 'problem' && styles.toggleBtnActive]}
+              style={[styles.toggleBtn, { backgroundColor: theme.background.border }, type === 'problem' && { backgroundColor: '#dcfce7', borderWidth: 1, borderColor: theme.primary }]}
               onPress={() => setType('problem')}
             >
-              <Text style={[styles.toggleText, type === 'problem' && styles.toggleTextActive]}>Signaler un problème</Text>
+              <Text style={[styles.toggleText, type === 'problem' && { color: theme.primary, fontWeight: '600' }]}>Signaler un problème</Text>
             </TouchableOpacity>
           </View>
 
           {/* Nom (obligatoire) */}
           <View style={styles.labelRow}>
-            <Text style={styles.labelText}>
+            <Text style={[styles.labelText, { color: theme.text.primary }]}>
               Nom<Text style={styles.required}> *</Text>
             </Text>
           </View>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { backgroundColor: (theme.background.white || '#fff'), color: theme.text.primary }]}
             placeholder="Votre nom"
             value={name}
             onChangeText={setName}
           />
           {/* Email (obligatoire) */}
           <View style={styles.labelRow}>
-            <Text style={styles.labelText}>
+            <Text style={[styles.labelText, { color: theme.text.primary }]}>
               Email<Text style={styles.required}> *</Text>
             </Text>
           </View>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { backgroundColor: (theme.background.white || '#fff'), color: theme.text.primary }]}
             placeholder="Votre email"
             value={email}
             onChangeText={setEmail}
@@ -180,12 +184,12 @@ const ContactScreen = ({ navigation }) => {
           />
           {/* Message (obligatoire) */}
           <View style={styles.labelRow}>
-            <Text style={styles.labelText}>
+            <Text style={[styles.labelText, { color: theme.text.primary }]}>
               Message<Text style={styles.required}> *</Text>
             </Text>
           </View>
           <TextInput
-            style={[styles.input, styles.textarea]}
+            style={[styles.input, styles.textarea, { backgroundColor: (theme.background.white || '#fff'), color: theme.text.primary }]}
             placeholder="Votre message"
             value={message}
             onChangeText={setMessage}
@@ -193,20 +197,20 @@ const ContactScreen = ({ navigation }) => {
             numberOfLines={5}
           />
 
-          <TouchableOpacity style={styles.submitBtn} onPress={onSubmit} disabled={sending}>
-            <Text style={styles.submitText}>{sending ? 'Envoi...' : 'Envoyer'}</Text>
+          <TouchableOpacity style={[styles.submitBtn, { backgroundColor: theme.primary }]} onPress={onSubmit} disabled={sending}>
+            <Text style={[styles.submitText, { color: (theme.background.white || '#fff') }]}>{sending ? 'Envoi...' : 'Envoyer'}</Text>
           </TouchableOpacity>
 
           {/* FAQ */}
           <View style={styles.faqSection}>
-            <Text style={styles.faqTitle}>FAQ</Text>
+            <Text style={[styles.faqTitle, { color: theme.text.primary }]}>FAQ</Text>
             {FAQ_DATA.map((item, idx) => {
               const isOpen = openFaq.includes(idx);
               return (
-                <View key={`faq-${idx}`} style={styles.faqItem}>
+                <View key={`faq-${idx}`} style={[styles.faqItem, { backgroundColor: (theme.background.white || '#fff') }]}>
                   <TouchableOpacity style={styles.faqQuestionRow} onPress={() => toggleFaq(idx)}>
                     <Text style={styles.faqArrow}>{isOpen ? '▼' : '▶'}</Text>
-                    <Text style={styles.faqQuestionText}>{item.q}</Text>
+                    <Text style={[styles.faqQuestionText, { color: theme.text.primary }]}>{item.q}</Text>
                   </TouchableOpacity>
                   {isOpen && (
                     <Text style={styles.faqAnswer}>{item.a}</Text>
@@ -228,26 +232,24 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f9f9f9' },
   scrollContent: { flexGrow: 1 },
   content: { paddingHorizontal: 16, paddingVertical: 20 },
-  title: { fontSize: 22, fontWeight: 'bold', color: '#333', marginBottom: 6 },
-  subtitle: { fontSize: 13, color: '#666', marginBottom: 16 },
+  title: { fontSize: 22, fontWeight: 'bold', marginBottom: 6 },
+  subtitle: { fontSize: 13, marginBottom: 16 },
   toggleRow: { flexDirection: 'row', gap: 8, marginBottom: 16, flexWrap: 'wrap' },
-  toggleBtn: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 20, backgroundColor: '#eee' },
-  toggleBtnActive: { backgroundColor: '#dcfce7', borderWidth: 1, borderColor: '#22c55e' },
+  toggleBtn: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 20 },
   toggleText: { color: '#555', fontSize: 12 },
-  toggleTextActive: { color: '#22c55e', fontWeight: '600' },
   labelRow: { marginBottom: 6 },
-  labelText: { fontSize: 13, color: '#333', fontWeight: '600' },
+  labelText: { fontSize: 13, fontWeight: '600' },
   required: { color: '#ff3b30' },
-  input: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e0e0e0', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, marginBottom: 12, fontSize: 14, color: '#333' },
+  input: { borderWidth: 1, borderColor: '#e0e0e0', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, marginBottom: 12, fontSize: 14 },
   textarea: { height: 140, textAlignVertical: 'top' },
-  submitBtn: { backgroundColor: '#22c55e', borderRadius: 8, paddingVertical: 12, alignItems: 'center', marginTop: 4 },
-  submitText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  submitBtn: { borderRadius: 8, paddingVertical: 12, alignItems: 'center', marginTop: 4 },
+  submitText: { fontSize: 16, fontWeight: '600' },
   faqSection: { marginTop: 24 },
-  faqTitle: { fontSize: 18, fontWeight: 'bold', color: '#333', marginBottom: 12 },
-  faqItem: { backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#e0e0e0', marginBottom: 10 },
+  faqTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 12 },
+  faqItem: { borderRadius: 8, borderWidth: 1, borderColor: '#e0e0e0', marginBottom: 10 },
   faqQuestionRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 12 },
-  faqArrow: { width: 18, textAlign: 'center', marginRight: 8, color: '#22c55e' },
-  faqQuestionText: { flex: 1, fontSize: 14, color: '#333', fontWeight: '600' },
+  faqArrow: { width: 18, textAlign: 'center', marginRight: 8 },
+  faqQuestionText: { flex: 1, fontSize: 14, fontWeight: '600' },
   faqAnswer: { paddingHorizontal: 12, paddingBottom: 12, fontSize: 13, color: '#555' },
 });
 

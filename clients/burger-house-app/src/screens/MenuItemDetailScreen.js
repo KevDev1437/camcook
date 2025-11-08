@@ -510,7 +510,7 @@ const MenuItemDetailScreen = ({ route, navigation }) => {
                     onPress={() => toggleAccompagnement(choice)}
                   >
                     <View style={[styles.extraCheckbox, selected && styles.extraCheckboxChecked]}>
-                      {selected && <MaterialIcons name="check" size={14} color="#fff" />}
+                      {selected && <MaterialIcons name="check" size={14} color="theme.background.white" />}
                     </View>
                     <Text style={styles.extraLabel}>
                       {label} 
@@ -544,7 +544,7 @@ const MenuItemDetailScreen = ({ route, navigation }) => {
                     onPress={() => toggleDrink(choice)}
                   >
                     <View style={[styles.extraCheckbox, selected && styles.extraCheckboxChecked]}>
-                      {selected && <MaterialIcons name="check" size={14} color="#fff" />}
+                      {selected && <MaterialIcons name="check" size={14} color="theme.background.white" />}
                     </View>
                     <Text style={styles.extraLabel}>
                       {label} 
@@ -679,7 +679,7 @@ const styles = StyleSheet.create({
   },
   // Styles compléments additionnels
   extraSection: {
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
@@ -689,7 +689,7 @@ const styles = StyleSheet.create({
   extraTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: 'theme.text.primary',
     marginBottom: 8,
   },
   extraList: {
@@ -709,7 +709,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
   },
   extraCheckboxChecked: {
     backgroundColor: '#22c55e',
@@ -717,7 +717,7 @@ const styles = StyleSheet.create({
   },
   extraLabel: {
     fontSize: 14,
-    color: '#333',
+    color: 'theme.text.primary',
   },
   extraPrice: {
     color: '#22c55e',
@@ -734,12 +734,12 @@ const styles = StyleSheet.create({
   checklistBullet: {
     width: 14,
     textAlign: 'center',
-    color: '#333',
+    color: 'theme.text.primary',
     marginRight: 6,
   },
   checklistText: {
     fontSize: 14,
-    color: '#333',
+    color: 'theme.text.primary',
   },
   toolsRow: {
     paddingHorizontal: 16,
@@ -768,14 +768,14 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     marginRight: 8,
     marginBottom: 8,
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
   },
   portionChipActive: {
     backgroundColor: '#ffefe8',
     borderColor: '#22c55e',
   },
   portionChipText: {
-    color: '#333',
+    color: 'theme.text.primary',
     fontWeight: '600',
   },
   portionChipTextActive: {

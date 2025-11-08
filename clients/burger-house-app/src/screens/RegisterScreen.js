@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  ActivityIndicator,
-  Alert,
-  ScrollView,
-  Image,
+    ActivityIndicator,
+    Alert,
+    Image,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { useRestaurant } from '../contexts/RestaurantContext';
@@ -117,7 +117,7 @@ const RegisterScreen = ({ navigation }) => {
               onPress={handleRegister}
               disabled={loading}>
               {loading ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color="theme.background.white" />
               ) : (
                 <Text style={styles.buttonText}>S'inscrire</Text>
               )}
@@ -139,7 +139,7 @@ const RegisterScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
   },
   scrollContent: {
     flexGrow: 1,
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: 'theme.text.secondary',
     textAlign: 'center',
     marginBottom: 30,
   },
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   input: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'theme.background.light',
     borderRadius: 10,
     padding: 15,
     fontSize: 16,
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffb399',
   },
   buttonText: {
-    color: '#fff',
+    color: 'theme.background.white',
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   footerText: {
-    color: '#666',
+    color: 'theme.text.secondary',
     fontSize: 14,
   },
   linkText: {

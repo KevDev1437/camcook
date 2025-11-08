@@ -670,6 +670,34 @@ body {
     padding: 30px;
 }
 
+/* Theme tabs */
+.theme-tab-btn {
+    padding: 10px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.theme-tab-btn:hover {
+    color: var(--primary-color);
+    background: var(--bg-color);
+}
+
+.theme-tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    font-weight: 600;
+}
+
+.theme-tab-content {
+    padding-top: 20px;
+}
+
 .modal-footer {
     padding: 20px 30px;
     border-top: 1px solid var(--border-color);

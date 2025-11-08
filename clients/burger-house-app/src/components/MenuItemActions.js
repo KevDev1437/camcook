@@ -26,9 +26,9 @@ const MenuItemActions = ({ quantity, onQuantityChange, onAddToCart, disabled = f
         activeOpacity={disabled || loading ? 1 : 0.7}
       >
         {loading ? (
-          <ActivityIndicator color="#fff" />
+          <ActivityIndicator color="theme.background.white" />
         ) : (
-          <MaterialIcons name="shopping-cart" size={24} color="#fff" />
+          <MaterialIcons name="shopping-cart" size={24} color="theme.background.white" />
         )}
         <Text style={styles.addToCartText}>
           {loading ? 'Ajout...' : `Ajouter au panier (${quantity})${pricePreview ? ` — ${pricePreview}` : ''}`}
@@ -40,7 +40,7 @@ const MenuItemActions = ({ quantity, onQuantityChange, onAddToCart, disabled = f
 
 const styles = StyleSheet.create({
   actionSection: {
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   quantityText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: 'theme.text.primary',
     minWidth: 30,
     textAlign: 'center',
   },
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   addToCartText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#fff',
+    color: 'theme.background.white',
   },
 });
 

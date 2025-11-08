@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+﻿import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -14,10 +14,14 @@ import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { adminService } from '../../services/adminService';
 import { useNotifications } from '../../context/NotificationContext';
+import { useRestaurant } from '../../contexts/RestaurantContext';
+import { getThemeColors } from '../../config/theme';
 
 const AdminPaymentsScreen = ({ navigation }) => {
   const { count } = useCart();
   const { logout } = useAuth();
+  const { restaurant } = useRestaurant();
+  const theme = getThemeColors(restaurant);
   // Le contexte filtre déjà les messages pour les admins
   const { 
     notifications: generalNotifications, // Déjà filtrées (sans messages)
@@ -53,17 +57,17 @@ const AdminPaymentsScreen = ({ navigation }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'succeeded':
-        return '#22c55e';
+        return theme.primary;
       case 'pending':
-        return '#f59e0b';
+        return theme.warning;
       case 'failed':
-        return '#ef4444';
+        return theme.error;
       case 'canceled':
-        return '#6b7280';
+        return theme.text.tertiary;
       case 'requires_action':
         return '#3b82f6';
       default:
-        return '#6b7280';
+        return theme.text.tertiary;
     }
   };
 
@@ -99,15 +103,23 @@ const AdminPaymentsScreen = ({ navigation }) => {
 
   const FilterButton = ({ value, label, active }) => (
     <TouchableOpacity
-      style={[styles.filterBtn, active && styles.filterBtnActive]}
+      style={[
+        styles.filterBtn,
+        { backgroundColor: (theme.background.white || '#fff'), borderColor: theme.background.border },
+        active && { backgroundColor: theme.primary, borderColor: theme.primary }
+      ]}
       onPress={() => setStatusFilter(value)}
     >
-      <Text style={[styles.filterBtnText, active && styles.filterBtnTextActive]}>{label}</Text>
+      <Text style={[
+        styles.filterBtnText,
+        { color: (theme.text.secondary || '#666') },
+        active && { color: (theme.background.white || '#fff') }
+      ]}>{label}</Text>
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background.light }]}>
       <Header
         onCart={() => navigation.navigate('AdminDashboard')}
         cartCount={count}
@@ -124,7 +136,7 @@ const AdminPaymentsScreen = ({ navigation }) => {
         style={styles.content}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={fetchPayments} />}
       >
-        <Text style={styles.title}>Paiements</Text>
+        <Text style={[styles.title, { color: theme.text.primary }]}>Paiements</Text>
 
         {/* Filtres */}
         <View style={styles.filters}>
@@ -137,21 +149,21 @@ const AdminPaymentsScreen = ({ navigation }) => {
 
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#22c55e" />
-            <Text style={styles.loadingText}>Chargement des paiements...</Text>
+            <ActivityIndicator size="large" color={theme.primary} />
+            <Text style={[styles.loadingText, { color: (theme.text.secondary || '#666') }]}>Chargement des paiements...</Text>
           </View>
         ) : payments.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <MaterialIcons name="payment" size={64} color="#ccc" />
-            <Text style={styles.emptyText}>Aucun paiement trouvé</Text>
+            <MaterialIcons name="payment" size={64} color={theme.text.tertiary} />
+            <Text style={[styles.emptyText, { color: theme.text.tertiary }]}>Aucun paiement trouvé</Text>
           </View>
         ) : (
           payments.map((payment) => (
-            <View key={payment.id} style={styles.card}>
+            <View key={payment.id} style={[styles.card, { backgroundColor: (theme.background.white || '#fff') }]}>
               <View style={styles.cardHeader}>
                 <View style={{ flex: 1 }}>
                   <View style={styles.paymentHeader}>
-                    <Text style={styles.paymentMethod}>
+                    <Text style={[styles.paymentMethod, { color: theme.text.primary }]}>
                       {getPaymentMethodIcon(payment.paymentMethod)} {payment.paymentMethod.toUpperCase()}
                     </Text>
                     <View
@@ -165,10 +177,10 @@ const AdminPaymentsScreen = ({ navigation }) => {
                       </Text>
                     </View>
                   </View>
-                  <Text style={styles.amount}>
+                  <Text style={[styles.amount, { color: theme.primary }]}>
                     {payment.amount.toFixed(2)} {payment.currency}
                   </Text>
-                  <Text style={styles.date}>
+                  <Text style={[styles.date, { color: (theme.text.secondary || '#666') }]}>
                     {new Date(payment.createdAt).toLocaleString('fr-FR', {
                       day: '2-digit',
                       month: '2-digit',
@@ -182,31 +194,31 @@ const AdminPaymentsScreen = ({ navigation }) => {
 
               {/* Informations de commande */}
               {payment.order && (
-                <View style={styles.orderInfo}>
+                <View style={[styles.orderInfo, { backgroundColor: theme.background.lighter }]}>
                   <View style={styles.orderRow}>
-                    <MaterialIcons name="receipt" size={16} color="#666" />
-                    <Text style={styles.orderText}>
+                    <MaterialIcons name="receipt" size={16} color={(theme.text.secondary || '#666')} />
+                    <Text style={[styles.orderText, { color: theme.text.primary }]}>
                       Commande #{payment.order.orderNumber}
                     </Text>
                   </View>
                   {payment.order.customer && (
                     <View style={styles.orderRow}>
-                      <MaterialIcons name="person" size={16} color="#666" />
-                      <Text style={styles.orderText}>
+                      <MaterialIcons name="person" size={16} color={(theme.text.secondary || '#666')} />
+                      <Text style={[styles.orderText, { color: theme.text.primary }]}>
                         {payment.order.customer.name || payment.order.customer.email}
                       </Text>
                     </View>
                   )}
-                  <Text style={styles.orderStatus}>
+                  <Text style={[styles.orderStatus, { color: (theme.text.secondary || '#666') }]}>
                     Statut: {payment.order.status}
                   </Text>
                 </View>
               )}
 
               {/* ID du Payment Intent */}
-              <View style={styles.paymentIdContainer}>
-                <Text style={styles.paymentIdLabel}>Payment Intent ID:</Text>
-                <Text style={styles.paymentId} numberOfLines={1} ellipsizeMode="middle">
+              <View style={[styles.paymentIdContainer, { borderTopColor: theme.background.border }]}>
+                <Text style={[styles.paymentIdLabel, { color: theme.text.tertiary }]}>Payment Intent ID:</Text>
+                <Text style={[styles.paymentId, { color: (theme.text.secondary || '#666') }]} numberOfLines={1} ellipsizeMode="middle">
                   {payment.id}
                 </Text>
               </View>
@@ -221,7 +233,6 @@ const AdminPaymentsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   content: {
     flex: 1,
@@ -230,7 +241,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
     marginBottom: 16,
   },
   filters: {
@@ -243,23 +253,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#e0e0e0',
     marginRight: 8,
     marginBottom: 8,
   },
-  filterBtnActive: {
-    backgroundColor: '#22c55e',
-    borderColor: '#22c55e',
-  },
   filterBtnText: {
     fontSize: 14,
-    color: '#666',
     fontWeight: '500',
-  },
-  filterBtnTextActive: {
-    color: '#fff',
   },
   loadingContainer: {
     alignItems: 'center',
@@ -268,7 +268,6 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 14,
-    color: '#666',
   },
   emptyContainer: {
     alignItems: 'center',
@@ -277,10 +276,8 @@ const styles = StyleSheet.create({
   emptyText: {
     marginTop: 16,
     fontSize: 16,
-    color: '#999',
   },
   card: {
-    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -302,7 +299,6 @@ const styles = StyleSheet.create({
   paymentMethod: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
   },
   statusBadge: {
     paddingHorizontal: 12,
@@ -316,15 +312,12 @@ const styles = StyleSheet.create({
   amount: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#22c55e',
     marginBottom: 4,
   },
   date: {
     fontSize: 12,
-    color: '#666',
   },
   orderInfo: {
-    backgroundColor: '#f9f9f9',
     borderRadius: 8,
     padding: 12,
     marginTop: 12,
@@ -337,29 +330,24 @@ const styles = StyleSheet.create({
   },
   orderText: {
     fontSize: 14,
-    color: '#333',
     marginLeft: 8,
     flex: 1,
   },
   orderStatus: {
     fontSize: 12,
-    color: '#666',
     marginTop: 4,
   },
   paymentIdContainer: {
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
     paddingTop: 12,
     marginTop: 8,
   },
   paymentIdLabel: {
     fontSize: 11,
-    color: '#999',
     marginBottom: 4,
   },
   paymentId: {
     fontSize: 11,
-    color: '#666',
     fontFamily: 'monospace',
   },
 });

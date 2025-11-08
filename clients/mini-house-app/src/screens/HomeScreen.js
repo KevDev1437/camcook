@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -16,6 +16,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useNotifications } from '../context/NotificationContext';
 import { useRestaurant } from '../contexts/RestaurantContext';
+import { getThemeColors } from '../config/theme';
 import restaurantService from '../services/restaurantService';
 
 const HomeScreen = ({ navigation }) => {
@@ -23,6 +24,7 @@ const HomeScreen = ({ navigation }) => {
   const { logout } = useAuth();
   const { notifications, notificationCount, onNotificationPress, markAsRead, clearNotification } = useNotifications();
   const { restaurant, restaurantId, loading: restaurantLoading } = useRestaurant();
+  const theme = getThemeColors(restaurant);
   const [menuItems, setMenuItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -77,7 +79,7 @@ const HomeScreen = ({ navigation }) => {
   if (restaurantLoading || loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#22c55e" />
+        <ActivityIndicator size="large" color={theme.primary} />
       </View>
     );
   }
@@ -145,13 +147,13 @@ const HomeScreen = ({ navigation }) => {
         />
         {/* Titre centré */}
         <View style={styles.titleContainer}>
-          <Text style={styles.mainTitle}>Nos Menus</Text>
+          <Text style={[styles.mainTitle, { color: theme.text.primary }]}>Nos Menus</Text>
         </View>
 
         {/* Section Menu - Grille Moderne */}
         <View style={styles.section}>
           {filteredItems.length === 0 ? (
-            <Text style={styles.noDataText}>
+            <Text style={[styles.noDataText, { color: theme.text.tertiary }]}>
               {searchText ? 'Aucun plat ne correspond à votre recherche' : 'Aucun plat disponible'}
             </Text>
           ) : (
@@ -181,7 +183,7 @@ const HomeScreen = ({ navigation }) => {
                     
                     {/* Overlay sombre avec texte */}
                     <View style={styles.overlay}>
-                      <Text style={styles.cardTitle}>{item.name}</Text>
+                      <Text style={[styles.cardTitle, { color: (theme.background.white || '#fff') }]}>{item.name}</Text>
                     </View>
                   </View>
                 </TouchableOpacity>
@@ -231,12 +233,10 @@ const styles = StyleSheet.create({
   mainTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
     textAlign: 'center',
   },
   noDataText: {
     textAlign: 'center',
-    color: '#999',
     fontSize: 14,
     marginVertical: 40,
   },
@@ -295,7 +295,6 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#fff',
     textAlign: 'center',
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 1, height: 1 },

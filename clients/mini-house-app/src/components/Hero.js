@@ -1,6 +1,7 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+﻿import React from 'react';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { useRestaurant } from '../contexts/RestaurantContext';
+import { getThemeColors } from '../config/theme';
 
 // Section Hero (bannière) affichée juste après le Header.
 // Support pour images de fond et carrousel d'images/vidéos.
@@ -12,6 +13,7 @@ const Hero = ({
   image = null // Image locale (require) ou URL (string)
 }) => {
   const { restaurant } = useRestaurant();
+  const theme = getThemeColors(restaurant);
   
   // Utiliser les données du restaurant si disponibles
   const heroTitle = title || restaurant?.name || 'Bienvenue';
@@ -29,8 +31,8 @@ const Hero = ({
       )}
       <View style={styles.overlay} />
       <View style={styles.textWrap}>
-        <Text style={styles.title}>{heroTitle}</Text>
-        <Text style={styles.subtitle}>{heroSubtitle}</Text>
+        <Text style={[styles.title, { color: (theme.background.white || '#fff') }]}>{heroTitle}</Text>
+        <Text style={[styles.subtitle, { color: theme.background.border }]}>{heroSubtitle}</Text>
       </View>
     </View>
   );
@@ -60,12 +62,10 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   title: {
-    color: '#fff',
     fontSize: 22,
     fontWeight: '800',
   },
   subtitle: {
-    color: '#eee',
     fontSize: 13,
     marginTop: 6,
   },

@@ -12,7 +12,7 @@ const MenuItemDescription = ({ description, longDescription }) => {
 
 const styles = StyleSheet.create({
   descriptionSection: {
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
@@ -20,13 +20,13 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 14,
-    color: '#666',
+    color: 'theme.text.secondary',
     lineHeight: 20,
     marginBottom: 12,
   },
   longDescription: {
     fontSize: 14,
-    color: '#666',
+    color: 'theme.text.secondary',
     lineHeight: 20,
     marginTop: 12,
   },

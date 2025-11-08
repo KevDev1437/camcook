@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, ActivityIndicator, RefreshControl } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, RefreshControl, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Header from '../../components/Header';
 import api from '../../config/api';
 import { useAuth } from '../../context/AuthContext';
@@ -375,9 +375,9 @@ const AdminAccompanimentsScreen = ({ navigation }) => {
                 disabled={savingId === 'add-accomp'}
               >
                 {savingId === 'add-accomp' ? (
-                  <ActivityIndicator color="#fff" size="small" />
+                  <ActivityIndicator color="theme.background.white" size="small" />
                 ) : (
-                  <MaterialIcons name="add" size={24} color="#fff" />
+                  <MaterialIcons name="add" size={24} color="theme.background.white" />
                 )}
               </TouchableOpacity>
             </View>
@@ -424,10 +424,10 @@ const AdminAccompanimentsScreen = ({ navigation }) => {
                       disabled={isSaving}
                     >
                       {isSaving ? (
-                        <ActivityIndicator color="#fff" size="small" />
+                        <ActivityIndicator color="theme.background.white" size="small" />
                       ) : (
                         <>
-                          <MaterialIcons name="save" size={18} color="#fff" />
+                          <MaterialIcons name="save" size={18} color="theme.background.white" />
                           <Text style={styles.saveButtonText}>Sauvegarder</Text>
                         </>
                       )}
@@ -436,7 +436,7 @@ const AdminAccompanimentsScreen = ({ navigation }) => {
                       style={styles.deleteButton}
                       onPress={() => deleteAccomp(acc.id)}
                     >
-                      <MaterialIcons name="delete" size={18} color="#fff" />
+                      <MaterialIcons name="delete" size={18} color="theme.background.white" />
                       <Text style={styles.deleteButtonText}>Supprimer</Text>
                     </TouchableOpacity>
                   </View>
@@ -479,9 +479,9 @@ const AdminAccompanimentsScreen = ({ navigation }) => {
                 disabled={savingId === 'add-drink'}
               >
                 {savingId === 'add-drink' ? (
-                  <ActivityIndicator color="#fff" size="small" />
+                  <ActivityIndicator color="theme.background.white" size="small" />
                 ) : (
-                  <MaterialIcons name="add" size={24} color="#fff" />
+                  <MaterialIcons name="add" size={24} color="theme.background.white" />
                 )}
               </TouchableOpacity>
             </View>
@@ -528,10 +528,10 @@ const AdminAccompanimentsScreen = ({ navigation }) => {
                       disabled={isSaving}
                     >
                       {isSaving ? (
-                        <ActivityIndicator color="#fff" size="small" />
+                        <ActivityIndicator color="theme.background.white" size="small" />
                       ) : (
                         <>
-                          <MaterialIcons name="save" size={18} color="#fff" />
+                          <MaterialIcons name="save" size={18} color="theme.background.white" />
                           <Text style={styles.saveButtonText}>Sauvegarder</Text>
                         </>
                       )}
@@ -540,7 +540,7 @@ const AdminAccompanimentsScreen = ({ navigation }) => {
                       style={styles.deleteButton}
                       onPress={() => deleteDrink(drink.id)}
                     >
-                      <MaterialIcons name="delete" size={18} color="#fff" />
+                      <MaterialIcons name="delete" size={18} color="theme.background.white" />
                       <Text style={styles.deleteButtonText}>Supprimer</Text>
                     </TouchableOpacity>
                   </View>
@@ -556,25 +556,25 @@ const AdminAccompanimentsScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: { flex: 1, backgroundColor: 'theme.background.light' },
   content: { flex: 1 },
   contentContainer: { padding: 16, paddingBottom: 80 },
-  title: { fontSize: 24, fontWeight: '800', marginBottom: 8, color: '#333' },
-  description: { fontSize: 14, color: '#666', marginBottom: 24, fontStyle: 'italic' },
+  title: { fontSize: 24, fontWeight: '800', marginBottom: 8, color: 'theme.text.primary' },
+  description: { fontSize: 14, color: 'theme.text.secondary', marginBottom: 24, fontStyle: 'italic' },
   section: { marginBottom: 24 },
-  sectionTitle: { fontSize: 20, fontWeight: '700', marginBottom: 12, color: '#333' },
+  sectionTitle: { fontSize: 20, fontWeight: '700', marginBottom: 12, color: 'theme.text.primary' },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: 'theme.background.border',
   },
   cardTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#333',
+    color: 'theme.text.primary',
     marginBottom: 12,
   },
   addRow: {
@@ -592,14 +592,14 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   addInput: {
-    backgroundColor: '#fafafa',
+    backgroundColor: 'theme.background.lighter',
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: 'theme.background.border',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 16,
-    color: '#333',
+    color: 'theme.text.primary',
   },
   addButton: {
     backgroundColor: '#22c55e',
@@ -628,14 +628,14 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   input: {
-    backgroundColor: '#fafafa',
+    backgroundColor: 'theme.background.lighter',
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: 'theme.background.border',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 16,
-    color: '#333',
+    color: 'theme.text.primary',
   },
   actionRow: {
     flexDirection: 'row',
@@ -655,12 +655,12 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   saveButtonText: {
-    color: '#fff',
+    color: 'theme.background.white',
     fontWeight: '700',
     fontSize: 14,
   },
   deleteButton: {
-    backgroundColor: '#ef4444',
+    backgroundColor: 'theme.error',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -670,13 +670,13 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   deleteButtonText: {
-    color: '#fff',
+    color: 'theme.background.white',
     fontWeight: '700',
     fontSize: 14,
   },
   emptyText: {
     fontSize: 14,
-    color: '#999',
+    color: 'theme.text.tertiary',
     fontStyle: 'italic',
     textAlign: 'center',
     paddingVertical: 20,
@@ -689,7 +689,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    color: '#666',
+    color: 'theme.text.secondary',
     fontSize: 16,
   },
 });

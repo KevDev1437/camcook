@@ -1,7 +1,11 @@
-import { MaterialIcons } from '@expo/vector-icons';
+﻿import { MaterialIcons } from '@expo/vector-icons';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useRestaurant } from '../contexts/RestaurantContext';
+import { getThemeColors } from '../config/theme';
 
 const MenuItemOptions = ({ options, selectedOptions, onOptionChange, isExpanded, onToggle }) => {
+  const { restaurant } = useRestaurant();
+  const theme = getThemeColors(restaurant);
   if (!options || options.length === 0) return null;
 
   // Helpers pour gérer des structures d'options hétérogènes
@@ -29,9 +33,9 @@ const MenuItemOptions = ({ options, selectedOptions, onOptionChange, isExpanded,
   };
 
   return (
-    <View style={styles.optionsSection}>
+    <View style={[styles.optionsSection, { backgroundColor: (theme.background.white || '#fff') }]}>
       <TouchableOpacity onPress={onToggle}>
-        <Text style={styles.sectionTitle}>
+        <Text style={[styles.sectionTitle, { color: theme.text.primary }]}>
           {isExpanded ? '▼' : '▶'} Compléments
         </Text>
       </TouchableOpacity>
@@ -40,7 +44,7 @@ const MenuItemOptions = ({ options, selectedOptions, onOptionChange, isExpanded,
         <View style={styles.optionsContent}>
           {options.map((option, optIdx) => (
             <View key={option?.id ?? option?.name ?? `option-${optIdx}`} style={styles.optionGroup}>
-              <Text style={styles.optionName}>{option.name}</Text>
+              <Text style={[styles.optionName, { color: theme.text.primary }]}>{option.name}</Text>
               
               {option.type === 'radio' && (
                 <View style={styles.choicesContainer}>
@@ -58,10 +62,10 @@ const MenuItemOptions = ({ options, selectedOptions, onOptionChange, isExpanded,
                       <View
                         style={[
                           styles.radioCircle,
-                          isSelected && styles.radioCircleSelected,
+                          isSelected && { backgroundColor: theme.primary, borderColor: theme.primary },
                         ]}
                       />
-                      <Text style={styles.choiceText}>{label}</Text>
+                      <Text style={[styles.choiceText, { color: theme.text.primary }]}>{label}</Text>
                     </TouchableOpacity>
                     );
                   })}
@@ -84,10 +88,10 @@ const MenuItemOptions = ({ options, selectedOptions, onOptionChange, isExpanded,
                     >
                       <View style={styles.checkbox}>
                         {isChecked && (
-                          <MaterialIcons name="check" size={16} color="#fff" />
+                          <MaterialIcons name="check" size={16} color={(theme.background.white || '#fff')} />
                         )}
                       </View>
-                      <Text style={styles.choiceText}>{label}</Text>
+                      <Text style={[styles.choiceText, { color: theme.text.primary }]}>{label}</Text>
                     </TouchableOpacity>
                     );
                   })}
@@ -103,7 +107,6 @@ const MenuItemOptions = ({ options, selectedOptions, onOptionChange, isExpanded,
 
 const styles = StyleSheet.create({
   optionsSection: {
-    backgroundColor: '#fff',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
@@ -113,7 +116,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
   },
   optionsContent: {
     marginTop: 12,
@@ -124,7 +126,6 @@ const styles = StyleSheet.create({
   optionName: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
     marginBottom: 10,
   },
   choicesContainer: {
@@ -143,10 +144,6 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     marginRight: 10,
   },
-  radioCircleSelected: {
-    backgroundColor: '#22c55e',
-    borderColor: '#22c55e',
-  },
   checkboxButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -161,11 +158,9 @@ const styles = StyleSheet.create({
     marginRight: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
   },
   choiceText: {
     fontSize: 14,
-    color: '#333',
   },
 });
 

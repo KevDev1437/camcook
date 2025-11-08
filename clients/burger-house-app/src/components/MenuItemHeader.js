@@ -21,7 +21,7 @@ const MenuItemHeader = ({ name, price, rating, ratingCount }) => {
 
 const styles = StyleSheet.create({
   headerSection: {
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: 'theme.text.primary',
     flex: 1,
   },
   itemPrice: {
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   },
   ratingText: {
     fontSize: 14,
-    color: '#666',
+    color: 'theme.text.secondary',
     marginLeft: 6,
   },
 });

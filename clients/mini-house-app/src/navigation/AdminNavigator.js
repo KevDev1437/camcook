@@ -1,6 +1,8 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useRestaurant } from '../contexts/RestaurantContext';
+import { getThemeColors } from '../config/theme';
 
 import AdminAccompanimentsScreen from '../screens/admin/AdminAccompanimentsScreen';
 import AdminContactsScreen from '../screens/admin/AdminContactsScreen';
@@ -29,11 +31,13 @@ const AdminStackNavigator = () => {
 
 // Tab Navigator pour les onglets principaux
 const AdminTabNavigator = () => {
+  const { restaurant } = useRestaurant();
+  const theme = getThemeColors(restaurant);
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: '#22c55e',
-        tabBarInactiveTintColor: '#999',
+        tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.text.tertiary,
         tabBarStyle: { height: 60, paddingBottom: 6 },
       }}
     >

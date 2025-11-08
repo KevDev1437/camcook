@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 import StatusBadge from '../components/admin/StatusBadge';
 import Footer from '../components/Footer';
@@ -6,6 +6,8 @@ import Header from '../components/Header';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useNotifications } from '../context/NotificationContext';
+import { useRestaurant } from '../contexts/RestaurantContext';
+import { getThemeColors } from '../config/theme';
 import { orderService } from '../services/orderService';
 
 const OrderDetailScreen = ({ route, navigation }) => {
@@ -13,6 +15,8 @@ const OrderDetailScreen = ({ route, navigation }) => {
   const { count } = useCart();
   const { logout } = useAuth();
   const { notifications, notificationCount, onNotificationPress, markAsRead, clearNotification } = useNotifications();
+  const { restaurant } = useRestaurant();
+  const theme = getThemeColors(restaurant);
   const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState(null);
 
@@ -30,7 +34,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
   }, [id]);
 
   return (
-    <View style={styles.mainContainer}>
+    <View style={[styles.mainContainer, { backgroundColor: theme.background.light }]}>
       <Header
         onCart={() => navigation.navigate('Cart')}
         cartCount={count}
@@ -64,24 +68,24 @@ const OrderDetailScreen = ({ route, navigation }) => {
         showCart={true}
       />
 
-      <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView style={[styles.container, { backgroundColor: theme.background.light }]} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {loading ? (
-          <View style={styles.loader}><ActivityIndicator color="#22c55e" /></View>
+          <View style={styles.loader}><ActivityIndicator color={theme.primary} /></View>
         ) : order ? (
           <View style={styles.content}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <Text style={styles.title}>Commande #{order.orderNumber}</Text>
+              <Text style={[styles.title, { color: theme.text.primary }]}>Commande #{order.orderNumber}</Text>
               <StatusBadge status={order.status} type="order" />
             </View>
-            <Text style={styles.sub}>{new Date(order.createdAt).toLocaleString()}</Text>
-            <View style={styles.itemsBox}>
+            <Text style={[styles.sub, { color: (theme.text.secondary || '#666') }]}>{new Date(order.createdAt).toLocaleString()}</Text>
+            <View style={[styles.itemsBox, { backgroundColor: (theme.background.white || '#fff'), borderColor: theme.background.border }]}>
               {Array.isArray(order.items) && order.items.map((it, idx) => (
                 <View key={idx} style={styles.itemRow}>
-                  <Text style={styles.itemQty}>x{it.quantity || 1}</Text>
+                  <Text style={[styles.itemQty, { color: theme.text.primary }]}>x{it.quantity || 1}</Text>
                   <View style={{ flex: 1 }}>
-                    <Text style={styles.itemName}>{it.name || 'Article'}</Text>
+                    <Text style={[styles.itemName, { color: theme.text.primary }]}>{it.name || 'Article'}</Text>
                     {it.options && (
-                      <Text style={styles.itemOpts}>
+                      <Text style={[styles.itemOpts, { color: (theme.text.secondary || '#666') }]}>
                         {(() => {
                           const acc = Array.isArray(it.options.accompagnements) ? it.options.accompagnements : [];
                           const drink = it.options.boisson ? ` • Boisson: ${it.options.boisson}` : '';
@@ -91,20 +95,20 @@ const OrderDetailScreen = ({ route, navigation }) => {
                       </Text>
                     )}
                   </View>
-                  <Text style={styles.itemPrice}>{Number(it.price || it.unitPrice || 0).toFixed(2)} €</Text>
+                  <Text style={[styles.itemPrice, { color: theme.primary }]}>{Number(it.price || it.unitPrice || 0).toFixed(2)} €</Text>
                 </View>
               ))}
             </View>
 
-            <View style={styles.totalsBox}>
-              <Row label="Sous-total" value={`${Number(order.subtotal||0).toFixed(2)} €`} />
-              <Row label="Frais de livraison" value={`${Number(order.deliveryFee||0).toFixed(2)} €`} />
-              <Row label="Taxes" value={`${Number(order.tax||0).toFixed(2)} €`} />
-              <Row label="Total" value={`${Number(order.total||0).toFixed(2)} €`} strong />
+            <View style={[styles.totalsBox, { backgroundColor: (theme.background.white || '#fff'), borderColor: theme.background.border }]}>
+              <Row label="Sous-total" value={`${Number(order.subtotal||0).toFixed(2)} €`} theme={theme} />
+              <Row label="Frais de livraison" value={`${Number(order.deliveryFee||0).toFixed(2)} €`} theme={theme} />
+              <Row label="Taxes" value={`${Number(order.tax||0).toFixed(2)} €`} theme={theme} />
+              <Row label="Total" value={`${Number(order.total||0).toFixed(2)} €`} strong theme={theme} />
             </View>
           </View>
         ) : (
-          <View style={styles.loader}><Text style={{ color: '#333' }}>Commande introuvable</Text></View>
+          <View style={styles.loader}><Text style={{ color: theme.text.primary }}>Commande introuvable</Text></View>
         )}
         <Footer onContact={() => navigation?.navigate('Contact')} />
       </ScrollView>
@@ -112,31 +116,31 @@ const OrderDetailScreen = ({ route, navigation }) => {
   );
 };
 
-const Row = ({ label, value, strong }) => (
+const Row = ({ label, value, strong, theme }) => (
   <View style={styles.row}> 
     <Text style={[styles.rowLabel, strong && { fontWeight: '800' }]}>{label}</Text>
-    <Text style={[styles.rowValue, strong && { color: '#22c55e' }]}>{value}</Text>
+    <Text style={[styles.rowValue, strong && { color: theme.primary }]}>{value}</Text>
   </View>
 );
 
 const styles = StyleSheet.create({
-  mainContainer: { flex: 1, backgroundColor: '#f5f5f5', flexDirection: 'column' },
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  mainContainer: { flex: 1, flexDirection: 'column' },
+  container: { flex: 1 },
   scrollContent: { flexGrow: 1 },
   loader: { padding: 40, alignItems: 'center' },
   content: { padding: 16 },
-  title: { fontSize: 20, fontWeight: '800', color: '#333', marginBottom: 6 },
-  sub: { color: '#666', marginBottom: 10 },
-  itemsBox: { backgroundColor: '#fff', borderRadius: 10, padding: 10, borderWidth: 1, borderColor: '#eee' },
+  title: { fontSize: 20, fontWeight: '800', marginBottom: 6 },
+  sub: { marginBottom: 10 },
+  itemsBox: { borderRadius: 10, padding: 10, borderWidth: 1 },
   itemRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 6, gap: 8 },
-  itemQty: { color: '#333', width: 26, fontWeight: '700' },
-  itemName: { color: '#333', fontWeight: '700' },
-  itemOpts: { color: '#666', fontSize: 12 },
-  itemPrice: { color: '#22c55e', fontWeight: '700', minWidth: 70, textAlign: 'right' },
-  totalsBox: { backgroundColor: '#fff', borderRadius: 10, padding: 10, borderWidth: 1, borderColor: '#eee', marginTop: 12 },
+  itemQty: { width: 26, fontWeight: '700' },
+  itemName: { fontWeight: '700' },
+  itemOpts: { fontSize: 12 },
+  itemPrice: { fontWeight: '700', minWidth: 70, textAlign: 'right' },
+  totalsBox: { borderRadius: 10, padding: 10, borderWidth: 1, marginTop: 12 },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 6 },
   rowLabel: { color: '#555' },
-  rowValue: { color: '#333', fontWeight: '700' },
+  rowValue: { fontWeight: '700' },
 });
 
 export default OrderDetailScreen;

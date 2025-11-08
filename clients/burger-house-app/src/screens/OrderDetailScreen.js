@@ -104,7 +104,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
             </View>
           </View>
         ) : (
-          <View style={styles.loader}><Text style={{ color: '#333' }}>Commande introuvable</Text></View>
+          <View style={styles.loader}><Text style={{ color: 'theme.text.primary' }}>Commande introuvable</Text></View>
         )}
         <Footer onContact={() => navigation?.navigate('Contact')} />
       </ScrollView>
@@ -120,23 +120,23 @@ const Row = ({ label, value, strong }) => (
 );
 
 const styles = StyleSheet.create({
-  mainContainer: { flex: 1, backgroundColor: '#f5f5f5', flexDirection: 'column' },
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  mainContainer: { flex: 1, backgroundColor: 'theme.background.light', flexDirection: 'column' },
+  container: { flex: 1, backgroundColor: 'theme.background.light' },
   scrollContent: { flexGrow: 1 },
   loader: { padding: 40, alignItems: 'center' },
   content: { padding: 16 },
-  title: { fontSize: 20, fontWeight: '800', color: '#333', marginBottom: 6 },
-  sub: { color: '#666', marginBottom: 10 },
-  itemsBox: { backgroundColor: '#fff', borderRadius: 10, padding: 10, borderWidth: 1, borderColor: '#eee' },
+  title: { fontSize: 20, fontWeight: '800', color: 'theme.text.primary', marginBottom: 6 },
+  sub: { color: 'theme.text.secondary', marginBottom: 10 },
+  itemsBox: { backgroundColor: 'theme.background.white', borderRadius: 10, padding: 10, borderWidth: 1, borderColor: 'theme.background.border' },
   itemRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 6, gap: 8 },
-  itemQty: { color: '#333', width: 26, fontWeight: '700' },
-  itemName: { color: '#333', fontWeight: '700' },
-  itemOpts: { color: '#666', fontSize: 12 },
+  itemQty: { color: 'theme.text.primary', width: 26, fontWeight: '700' },
+  itemName: { color: 'theme.text.primary', fontWeight: '700' },
+  itemOpts: { color: 'theme.text.secondary', fontSize: 12 },
   itemPrice: { color: '#22c55e', fontWeight: '700', minWidth: 70, textAlign: 'right' },
-  totalsBox: { backgroundColor: '#fff', borderRadius: 10, padding: 10, borderWidth: 1, borderColor: '#eee', marginTop: 12 },
+  totalsBox: { backgroundColor: 'theme.background.white', borderRadius: 10, padding: 10, borderWidth: 1, borderColor: 'theme.background.border', marginTop: 12 },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 6 },
   rowLabel: { color: '#555' },
-  rowValue: { color: '#333', fontWeight: '700' },
+  rowValue: { color: 'theme.text.primary', fontWeight: '700' },
 });
 
 export default OrderDetailScreen;

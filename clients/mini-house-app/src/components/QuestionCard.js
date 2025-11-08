@@ -1,5 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native';
+﻿import { StyleSheet, Text, View } from 'react-native';
 import { useRestaurant } from '../contexts/RestaurantContext';
+import { getThemeColors } from '../config/theme';
 
 /**
  * Composant pour afficher une carte de question/réponse - Multi-Tenant
@@ -8,16 +9,17 @@ import { useRestaurant } from '../contexts/RestaurantContext';
  */
 const QuestionCard = ({ question }) => {
   const { restaurant } = useRestaurant();
+  const theme = getThemeColors(restaurant);
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.author}>{question.userName}</Text>
-        <Text style={styles.date}>{question.date}</Text>
+        <Text style={[styles.author, { color: theme.text.primary }]}>{question.userName}</Text>
+        <Text style={[styles.date, { color: theme.text.tertiary }]}>{question.date}</Text>
       </View>
 
       {/* Question */}
-      <Text style={styles.questionText}>❓ {question.text}</Text>
+      <Text style={[styles.questionText, { color: (theme.text.secondary || '#666') }]}>❓ {question.text}</Text>
 
       {/* Réponse si disponible */}
       {question.answer && (
@@ -48,15 +50,12 @@ const styles = StyleSheet.create({
   author: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#333',
   },
   date: {
     fontSize: 11,
-    color: '#999',
   },
   questionText: {
     fontSize: 13,
-    color: '#666',
     lineHeight: 18,
     marginBottom: 10,
   },

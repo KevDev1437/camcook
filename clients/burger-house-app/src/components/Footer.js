@@ -132,7 +132,7 @@ const Footer = ({
             onPress={handlePhone}
             activeOpacity={0.7}
           >
-            <MaterialIcons name="phone" size={14} color="#fff" />
+            <MaterialIcons name="phone" size={14} color="theme.background.white" />
             <Text style={styles.linkText}>{contact.phone}</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -140,12 +140,12 @@ const Footer = ({
             onPress={handleEmail}
             activeOpacity={0.7}
           >
-            <MaterialIcons name="email" size={14} color="#fff" />
+            <MaterialIcons name="email" size={14} color="theme.background.white" />
             <Text style={styles.linkText}>{contact.email}</Text>
           </TouchableOpacity>
           {contact.address ? (
             <View style={[styles.link, { marginTop: 2 }]}>
-              <MaterialIcons name="place" size={14} color="#fff" />
+              <MaterialIcons name="place" size={14} color="theme.background.white" />
               <Text style={styles.linkText}>{contact.address}</Text>
             </View>
           ) : null}
@@ -178,25 +178,25 @@ const Footer = ({
               style={styles.socialButton}
               activeOpacity={0.7}
             >
-              <MaterialIcons name="facebook" size={20} color="#fff" />
+              <MaterialIcons name="facebook" size={20} color="theme.background.white" />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.socialButton}
               activeOpacity={0.7}
             >
-              <MaterialIcons name="camera-alt" size={20} color="#fff" />
+              <MaterialIcons name="camera-alt" size={20} color="theme.background.white" />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.socialButton}
               activeOpacity={0.7}
             >
-              <MaterialIcons name="video-camera-front" size={20} color="#fff" />
+              <MaterialIcons name="video-camera-front" size={20} color="theme.background.white" />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.socialButton}
               activeOpacity={0.7}
             >
-              <MaterialIcons name="language" size={20} color="#fff" />
+              <MaterialIcons name="language" size={20} color="theme.background.white" />
             </TouchableOpacity>
           </View>
         </View>
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
   },
   bottomBar: {
     borderTopWidth: 1,
-    borderTopColor: '#333',
+    borderTopColor: 'theme.text.primary',
     paddingHorizontal: 16,
     paddingVertical: 12,
     flexDirection: 'row',

@@ -4,7 +4,7 @@
 
 ### 1. **pending** — En attente
 - **Description** : Commande créée, en attente de confirmation par le restaurant
-- **Couleur** : Orange/Ambre (#f59e0b)
+- **Couleur** : Orange/Ambre (theme.warning)
 - **Actions disponibles** :
   - Confirmer → `confirmed`
   - Refuser → `rejected`
@@ -26,7 +26,7 @@
 
 ### 4. **ready** — Prête
 - **Description** : Commande prête à être récupérée ou livrée
-- **Couleur** : Vert (#10b981)
+- **Couleur** : Vert (theme.success)
 - **Actions disponibles** :
   - Pour livraison : En livraison → `on_delivery`
   - Pour emporter : Terminer → `completed`
@@ -46,7 +46,7 @@
 
 ### 7. **cancelled** — Annulée
 - **Description** : Commande annulée (peut être annulée à tout moment)
-- **Couleur** : Rouge (#ef4444)
+- **Couleur** : Rouge (theme.error)
 - **Actions disponibles** : Aucune (état final)
 
 ### 8. **rejected** — Refusée

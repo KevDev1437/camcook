@@ -451,7 +451,7 @@ cat > "$TEMP_JSON" << 'APPJSONEOF'
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "theme.background.whitefff"
     },
     "ios": {
       "supportsTablet": true,
@@ -460,7 +460,7 @@ cat > "$TEMP_JSON" << 'APPJSONEOF'
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "theme.background.whitefff"
       },
       "edgeToEdgeEnabled": true,
       "package": "BUNDLE_ID_PLACEHOLDER"

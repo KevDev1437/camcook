@@ -1,11 +1,11 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Image,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { useRestaurant } from '../contexts/RestaurantContext';
 
@@ -65,7 +65,7 @@ const Header = ({
               onPress={onCart}
               activeOpacity={0.7}
             >
-              <MaterialIcons name="shopping-cart" size={24} color="#fff" />
+              <MaterialIcons name="shopping-cart" size={24} color="theme.background.white" />
               {cartCount > 0 && (
                 <View style={styles.badge}>
                   <Text style={styles.badgeText}>
@@ -85,7 +85,7 @@ const Header = ({
                   onPress={onReviews}
                   activeOpacity={0.7}
                 >
-                  <MaterialIcons name="rate-review" size={24} color="#fff" />
+                  <MaterialIcons name="rate-review" size={24} color="theme.background.white" />
                 </TouchableOpacity>
               )}
               {onContacts && (
@@ -94,7 +94,7 @@ const Header = ({
                   onPress={onContacts}
                   activeOpacity={0.7}
                 >
-                  <MaterialIcons name="mail" size={24} color="#fff" />
+                  <MaterialIcons name="mail" size={24} color="theme.background.white" />
                   {unreadMessagesCount > 0 && (
                     <View style={styles.badge}>
                       <Text style={styles.badgeText}>
@@ -118,7 +118,7 @@ const Header = ({
               }}
               activeOpacity={0.7}
             >
-              <MaterialIcons name="notifications" size={24} color="#fff" />
+              <MaterialIcons name="notifications" size={24} color="theme.background.white" />
               {notificationCount > 0 && (
                 <View style={styles.badge}>
                   <Text style={styles.badgeText}>
@@ -137,7 +137,7 @@ const Header = ({
                     }}
                     style={{ padding: 4 }}
                   >
-                    <MaterialIcons name="close" size={18} color="#999" />
+                    <MaterialIcons name="close" size={18} color="theme.text.tertiary" />
                   </TouchableOpacity>
                 </View>
                 {notifications.length > 0 ? (
@@ -205,7 +205,7 @@ const Header = ({
                           style={styles.deleteButton}
                           activeOpacity={0.7}
                         >
-                          <MaterialIcons name="delete-outline" size={18} color="#ef4444" />
+                          <MaterialIcons name="delete-outline" size={18} color="theme.error" />
                         </TouchableOpacity>
                       )}
                     </View>
@@ -225,7 +225,7 @@ const Header = ({
               onPress={() => setMenuOpen((v) => !v)}
               activeOpacity={0.7}
             >
-              <MaterialIcons name="account-circle" size={24} color="#fff" />
+              <MaterialIcons name="account-circle" size={24} color="theme.background.white" />
             </TouchableOpacity>
             {menuOpen && (
               <View style={styles.dropdown}>
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
   logoText: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#fff',
+    color: 'theme.background.white',
   },
   iconsContainer: {
     flexDirection: 'row',
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   badgeText: {
-    color: '#fff',
+    color: 'theme.background.white',
     fontSize: 11,
     fontWeight: 'bold',
   },
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 40,
     right: 0,
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     borderRadius: 8,
     paddingVertical: 6,
     minWidth: 280,
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 6,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: 'theme.background.border',
     zIndex: 100,
   },
   dropdownHeader: {
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
   dropdownHeaderText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#333',
+    color: 'theme.text.primary',
     textTransform: 'uppercase',
   },
   dropdownItem: {
@@ -360,13 +360,13 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   dropdownText: {
-    color: '#333',
+    color: 'theme.text.primary',
     fontSize: 13,
     fontWeight: '500',
     marginBottom: 4,
   },
   dropdownTime: {
-    color: '#999',
+    color: 'theme.text.tertiary',
     fontSize: 11,
     fontStyle: 'italic',
   },
@@ -381,12 +381,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   groupedBadgeText: {
-    color: '#fff',
+    color: 'theme.background.white',
     fontSize: 10,
     fontWeight: 'bold',
   },
   groupedText: {
-    color: '#666',
+    color: 'theme.text.secondary',
     fontSize: 10,
     fontStyle: 'italic',
     marginTop: 4,

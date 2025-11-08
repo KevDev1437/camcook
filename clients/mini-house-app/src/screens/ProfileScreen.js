@@ -1,18 +1,22 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Image, ActivityIndicator, TextInput, Modal} from 'react-native';
+﻿import { MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import Header from '../components/Header';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Footer from '../components/Footer';
+import Header from '../components/Header';
+import api from '../config/api';
+import { getThemeColors } from '../config/theme';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useNotifications } from '../context/NotificationContext';
-import api from '../config/api';
-import { MaterialIcons } from '@expo/vector-icons';
+import { useRestaurant } from '../contexts/RestaurantContext';
 
 const ProfileScreen = ({ navigation }) => {
   const { user, logout, updateUser } = useAuth();
   const { count } = useCart();
   const { notifications, notificationCount, onNotificationPress, markAsRead, clearNotification } = useNotifications();
+  const { restaurant } = useRestaurant();
+  const theme = getThemeColors(restaurant);
   const [avatarUri, setAvatarUri] = useState(null);
   const [backgroundUri, setBackgroundUri] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -482,14 +486,14 @@ const ProfileScreen = ({ navigation }) => {
         showCart={true}
       />
 
-      <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
+      <ScrollView style={[styles.container, { backgroundColor: theme.background.light }]} contentContainerStyle={styles.scrollContent}>
+        <View style={[styles.header, { backgroundColor: (theme.background.white || '#fff'), borderBottomColor: theme.background.border }]}>
           {/* Photo de fond avec overlay */}
           <View style={styles.backgroundContainer}>
             {backgroundUri ? (
               <Image source={{ uri: backgroundUri }} style={styles.backgroundImage} resizeMode="cover" />
             ) : (
-              <View style={styles.backgroundPlaceholder} />
+              <View style={[styles.backgroundPlaceholder, { backgroundColor: theme.primary }]} />
             )}
             {/* Overlay pour améliorer la lisibilité */}
             <View style={styles.backgroundOverlay} />
@@ -499,8 +503,8 @@ const ProfileScreen = ({ navigation }) => {
               onPress={() => pickImage('background')}
               disabled={uploading}
             >
-              <MaterialIcons name="camera-alt" size={20} color="#fff" />
-              <Text style={styles.editButtonText}>Changer</Text>
+              <MaterialIcons name="camera-alt" size={20} color={(theme.background.white || '#fff')} />
+              <Text style={[styles.editButtonText, { color: (theme.background.white || '#fff') }]}>Changer</Text>
             </TouchableOpacity>
 
             {/* Contenu au-dessus de la photo de fond */}
@@ -510,40 +514,40 @@ const ProfileScreen = ({ navigation }) => {
                 {avatarUri ? (
                   <Image source={{ uri: avatarUri }} style={styles.avatar} resizeMode="cover" />
                 ) : (
-                  <View style={styles.avatar}>
-                    <Text style={styles.avatarText}>
+                  <View style={[styles.avatar, { backgroundColor: theme.primary, borderColor: (theme.background.white || '#fff') }]}>
+                    <Text style={[styles.avatarText, { color: (theme.background.white || '#fff') }]}>
                       {getInitials(user?.name).toUpperCase()}
                     </Text>
                   </View>
                 )}
-                <TouchableOpacity 
-                  style={styles.editAvatarButton}
+                  <TouchableOpacity
+                  style={[styles.editAvatarButton, { backgroundColor: theme.primary, borderColor: (theme.background.white || '#fff') }]}
                   onPress={() => pickImage('avatar')}
                   disabled={uploading}
                 >
-                  <MaterialIcons name="camera-alt" size={16} color="#fff" />
+                  <MaterialIcons name="camera-alt" size={16} color={(theme.background.white || '#fff')} />
                 </TouchableOpacity>
                 {uploading && (
                   <View style={styles.uploadingOverlay}>
-                    <ActivityIndicator size="small" color="#fff" />
+                    <ActivityIndicator size="small" color={(theme.background.white || '#fff')} />
                   </View>
                 )}
               </View>
 
               {/* Nom et email sur la photo de fond */}
-              <Text style={styles.userName}>{user?.name || 'Utilisateur'}</Text>
-              <Text style={styles.userEmail}>{user?.email || ''}</Text>
+              <Text style={[styles.userName, { color: (theme.background.white || '#fff') }]}>{user?.name || 'Utilisateur'}</Text>
+              <Text style={[styles.userEmail, { color: (theme.background.white || '#fff') }]}>{user?.email || ''}</Text>
             </View>
           </View>
         </View>
 
         <View style={styles.section}>
           <TouchableOpacity 
-            style={styles.menuItem}
+            style={[styles.menuItem, { backgroundColor: (theme.background.white || '#fff') }]}
             onPress={() => setShowEditModal(true)}
           >
-            <Text style={styles.menuItemText}>📝 Modifier le profil</Text>
-            <Text style={styles.menuItemArrow}>›</Text>
+            <Text style={[styles.menuItemText, { color: theme.text.primary }]}>📝 Modifier le profil</Text>
+            <Text style={[styles.menuItemArrow, { color: theme.text.tertiary }]}>›</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
@@ -559,46 +563,46 @@ const ProfileScreen = ({ navigation }) => {
             }}
           >
             <View style={styles.menuItemContent}>
-              <Text style={styles.menuItemText}>📍 Mes adresses</Text>
+              <Text style={[styles.menuItemText, { color: theme.text.primary }]}>📍 Mes adresses</Text>
               {addresses.length > 0 && (
-                <Text style={styles.menuItemBadge}>{addresses.length}</Text>
+                <Text style={[styles.menuItemBadge, { backgroundColor: theme.primary, color: (theme.background.white || '#fff') }]}>{addresses.length}</Text>
               )}
             </View>
-            <Text style={styles.menuItemArrow}>{showAddressesList ? '⌄' : '›'}</Text>
+            <Text style={[styles.menuItemArrow, { color: theme.text.tertiary }]}>{showAddressesList ? '⌄' : '›'}</Text>
           </TouchableOpacity>
 
           {/* Liste des adresses */}
           {addresses.length > 0 && showAddressesList && (
-            <View style={styles.addressesListContainer}>
-              <View style={styles.addressesListHeader}>
-                <Text style={styles.addressesListTitle}>Vos adresses</Text>
+            <View style={[styles.addressesListContainer, { backgroundColor: (theme.background.white || '#fff') }]}>
+              <View style={[styles.addressesListHeader, { borderBottomColor: theme.background.border }]}>
+                <Text style={[styles.addressesListTitle, { color: theme.text.primary }]}>Vos adresses</Text>
                 <TouchableOpacity
                   style={styles.addAddressSmallButton}
                   onPress={() => handleOpenAddressModal()}
                 >
-                  <MaterialIcons name="add" size={18} color="#22c55e" />
-                  <Text style={styles.addAddressSmallText}>Ajouter</Text>
+                  <MaterialIcons name="add" size={18} color={theme.primary} />
+                  <Text style={[styles.addAddressSmallText, { color: theme.primary }]}>Ajouter</Text>
                 </TouchableOpacity>
               </View>
 
               {loadingAddresses ? (
-                <ActivityIndicator size="small" color="#22c55e" style={{ marginVertical: 20 }} />
+                <ActivityIndicator size="small" color={theme.primary} style={{ marginVertical: 20 }} />
               ) : (
                 addresses.map((address) => (
                   <View key={address.id} style={styles.addressCard}>
                     <View style={styles.addressInfo}>
                       <View style={styles.addressHeader}>
                         {address.isDefault && (
-                          <View style={styles.defaultBadge}>
-                            <Text style={styles.defaultBadgeText}>Par défaut</Text>
+                          <View style={[styles.defaultBadge, { backgroundColor: theme.primary }]}>
+                            <Text style={[styles.defaultBadgeText, { color: (theme.background.white || '#fff') }]}>Par défaut</Text>
                           </View>
                         )}
                         {address.label && (
-                          <Text style={styles.addressLabel}>{address.label}</Text>
+                          <Text style={[styles.addressLabel, { color: theme.text.primary }]}>{address.label}</Text>
                         )}
                       </View>
-                      <Text style={styles.addressStreet}>{address.street}</Text>
-                      <Text style={styles.addressCity}>
+                      <Text style={[styles.addressStreet, { color: (theme.text.secondary || '#666') }]}>{address.street}</Text>
+                      <Text style={[styles.addressCity, { color: (theme.text.secondary || '#666') }]}>
                         {address.city}{address.postalCode ? `, ${address.postalCode}` : ''}
                       </Text>
                     </View>
@@ -608,14 +612,14 @@ const ProfileScreen = ({ navigation }) => {
                           style={styles.addressActionButton}
                           onPress={() => handleSetDefault(address.id)}
                         >
-                          <MaterialIcons name="star-border" size={20} color="#666" />
+                          <MaterialIcons name="star-border" size={20} color={(theme.text.secondary || '#666')} />
                         </TouchableOpacity>
                       )}
                       <TouchableOpacity
                         style={styles.addressActionButton}
                         onPress={() => handleOpenAddressModal(address)}
                       >
-                        <MaterialIcons name="edit" size={20} color="#666" />
+                        <MaterialIcons name="edit" size={20} color={(theme.text.secondary || '#666')} />
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.addressActionButton}
@@ -630,24 +634,24 @@ const ProfileScreen = ({ navigation }) => {
             </View>
           )}
 
-          <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuItemText}>💳 Moyens de paiement</Text>
-            <Text style={styles.menuItemArrow}>›</Text>
+          <TouchableOpacity style={[styles.menuItem, { backgroundColor: (theme.background.white || '#fff') }]}>
+            <Text style={[styles.menuItemText, { color: theme.text.primary }]}>💳 Moyens de paiement</Text>
+            <Text style={[styles.menuItemArrow, { color: theme.text.tertiary }]}>›</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuItemText}>⭐ Restaurants favoris</Text>
-            <Text style={styles.menuItemArrow}>›</Text>
+          <TouchableOpacity style={[styles.menuItem, { backgroundColor: (theme.background.white || '#fff') }]}>
+            <Text style={[styles.menuItemText, { color: theme.text.primary }]}>⭐ Restaurants favoris</Text>
+            <Text style={[styles.menuItemArrow, { color: theme.text.tertiary }]}>›</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuItemText}>⚙️ Paramètres</Text>
-            <Text style={styles.menuItemArrow}>›</Text>
+          <TouchableOpacity style={[styles.menuItem, { backgroundColor: (theme.background.white || '#fff') }]}>
+            <Text style={[styles.menuItemText, { color: theme.text.primary }]}>⚙️ Paramètres</Text>
+            <Text style={[styles.menuItemArrow, { color: theme.text.tertiary }]}>›</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuItemText}>ℹ️ Aide & Support</Text>
-            <Text style={styles.menuItemArrow}>›</Text>
+          <TouchableOpacity style={[styles.menuItem, { backgroundColor: (theme.background.white || '#fff') }]}>
+            <Text style={[styles.menuItemText, { color: theme.text.primary }]}>ℹ️ Aide & Support</Text>
+            <Text style={[styles.menuItemArrow, { color: theme.text.tertiary }]}>›</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={[styles.menuItem, styles.logoutItem]} onPress={handleLogout}>
@@ -668,20 +672,20 @@ const ProfileScreen = ({ navigation }) => {
         onRequestClose={() => setShowEditModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Modifier le profil</Text>
+          <View style={[styles.modalContent, { backgroundColor: (theme.background.white || '#fff') }]}>
+            <View style={[styles.modalHeader, { borderBottomColor: theme.background.border }]}>
+              <Text style={[styles.modalTitle, { color: theme.text.primary }]}>Modifier le profil</Text>
               <TouchableOpacity 
                 onPress={() => setShowEditModal(false)}
                 style={styles.closeButton}
               >
-                <MaterialIcons name="close" size={24} color="#333" />
+                <MaterialIcons name="close" size={24} color={theme.text.primary} />
               </TouchableOpacity>
             </View>
 
             <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
               <View style={styles.formGroup}>
-                <Text style={styles.label}>Nom complet</Text>
+                <Text style={[styles.label, { color: theme.text.primary }]}>Nom complet</Text>
                 <TextInput
                   style={styles.input}
                   value={formData.name}
@@ -713,9 +717,9 @@ const ProfileScreen = ({ navigation }) => {
                 />
               </View>
 
-              <View style={styles.divider} />
+              <View style={[styles.divider, { backgroundColor: theme.background.border }]} />
 
-              <Text style={styles.sectionTitle}>Changer le mot de passe (optionnel)</Text>
+              <Text style={[styles.sectionTitle, { color: theme.text.primary }]}>Changer le mot de passe (optionnel)</Text>
 
               <View style={styles.formGroup}>
                 <Text style={styles.label}>Mot de passe actuel</Text>
@@ -751,22 +755,22 @@ const ProfileScreen = ({ navigation }) => {
               </View>
             </ScrollView>
 
-            <View style={styles.modalFooter}>
+            <View style={[styles.modalFooter, { borderTopColor: theme.background.border }]}>
               <TouchableOpacity 
-                style={[styles.modalButton, styles.cancelButton]}
+                style={[styles.modalButton, styles.cancelButton, { backgroundColor: theme.background.light }]}
                 onPress={() => setShowEditModal(false)}
               >
-                <Text style={styles.cancelButtonText}>Annuler</Text>
+                <Text style={[styles.cancelButtonText, { color: (theme.text.secondary || '#666') }]}>Annuler</Text>
               </TouchableOpacity>
               <TouchableOpacity 
-                style={[styles.modalButton, styles.saveButton]}
+                style={[styles.modalButton, { backgroundColor: theme.primary }]}
                 onPress={handleSaveProfile}
                 disabled={editingProfile}
               >
                 {editingProfile ? (
-                  <ActivityIndicator size="small" color="#fff" />
+                  <ActivityIndicator size="small" color={(theme.background.white || '#fff')} />
                 ) : (
-                  <Text style={styles.saveButtonText}>Enregistrer</Text>
+                  <Text style={[styles.saveButtonText, { color: (theme.background.white || '#fff') }]}>Enregistrer</Text>
                 )}
               </TouchableOpacity>
             </View>
@@ -782,16 +786,16 @@ const ProfileScreen = ({ navigation }) => {
         onRequestClose={() => setShowAddressModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
+          <View style={[styles.modalContent, { backgroundColor: (theme.background.white || '#fff') }]}>
+            <View style={[styles.modalHeader, { borderBottomColor: theme.background.border }]}>
+              <Text style={[styles.modalTitle, { color: theme.text.primary }]}>
                 {editingAddress ? 'Modifier l\'adresse' : 'Ajouter une adresse'}
               </Text>
               <TouchableOpacity 
                 onPress={() => setShowAddressModal(false)}
                 style={styles.closeButton}
               >
-                <MaterialIcons name="close" size={24} color="#333" />
+                <MaterialIcons name="close" size={24} color={theme.text.primary} />
               </TouchableOpacity>
             </View>
 
@@ -846,25 +850,25 @@ const ProfileScreen = ({ navigation }) => {
                   <MaterialIcons 
                     name={addressForm.isDefault ? 'check-box' : 'check-box-outline-blank'} 
                     size={24} 
-                    color={addressForm.isDefault ? '#22c55e' : '#999'} 
+                    color={addressForm.isDefault ? theme.primary : theme.text.tertiary} 
                   />
-                  <Text style={styles.checkboxLabel}>Définir comme adresse par défaut</Text>
+                  <Text style={[styles.checkboxLabel, { color: theme.text.primary }]}>Définir comme adresse par défaut</Text>
                 </TouchableOpacity>
               </View>
             </ScrollView>
 
-            <View style={styles.modalFooter}>
+            <View style={[styles.modalFooter, { borderTopColor: theme.background.border }]}>
               <TouchableOpacity 
-                style={[styles.modalButton, styles.cancelButton]}
+                style={[styles.modalButton, styles.cancelButton, { backgroundColor: theme.background.light }]}
                 onPress={() => setShowAddressModal(false)}
               >
-                <Text style={styles.cancelButtonText}>Annuler</Text>
+                <Text style={[styles.cancelButtonText, { color: (theme.text.secondary || '#666') }]}>Annuler</Text>
               </TouchableOpacity>
               <TouchableOpacity 
-                style={[styles.modalButton, styles.saveButton]}
+                style={[styles.modalButton, { backgroundColor: theme.primary }]}
                 onPress={handleSaveAddress}
               >
-                <Text style={styles.saveButtonText}>
+                <Text style={[styles.saveButtonText, { color: (theme.background.white || '#fff') }]}>
                   {editingAddress ? 'Modifier' : 'Ajouter'}
                 </Text>
               </TouchableOpacity>
@@ -879,22 +883,18 @@ const ProfileScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
     flexDirection: 'column',
   },
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   scrollContent: {
     flexGrow: 1,
   },
   header: {
-    backgroundColor: '#fff',
     paddingTop: 0,
     paddingBottom: 0,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
   },
   backgroundContainer: {
     width: '100%',
@@ -911,7 +911,6 @@ const styles = StyleSheet.create({
   backgroundPlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#22c55e',
     position: 'absolute',
     top: 0,
     left: 0,
@@ -938,7 +937,6 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   editButtonText: {
-    color: '#fff',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -959,11 +957,9 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#22c55e',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 5,
-    borderColor: '#fff',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
@@ -977,11 +973,9 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#22c55e',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 3,
-    borderColor: '#fff',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
@@ -1002,12 +996,10 @@ const styles = StyleSheet.create({
   avatarText: {
     fontSize: 40,
     fontWeight: 'bold',
-    color: '#fff',
   },
   userName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
     marginBottom: 5,
     textShadowColor: 'rgba(0, 0, 0, 0.5)',
     textShadowOffset: { width: 0, height: 1 },
@@ -1015,7 +1007,6 @@ const styles = StyleSheet.create({
   },
   userEmail: {
     fontSize: 15,
-    color: '#fff',
     textShadowColor: 'rgba(0, 0, 0, 0.5)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
@@ -1024,7 +1015,6 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   menuItem: {
-    backgroundColor: '#fff',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -1044,11 +1034,8 @@ const styles = StyleSheet.create({
   },
   menuItemText: {
     fontSize: 16,
-    color: '#333',
   },
   menuItemBadge: {
-    backgroundColor: '#22c55e',
-    color: '#fff',
     fontSize: 12,
     fontWeight: '600',
     paddingHorizontal: 8,
@@ -1058,7 +1045,6 @@ const styles = StyleSheet.create({
   },
   menuItemArrow: {
     fontSize: 24,
-    color: '#999',
   },
   logoutItem: {
     marginTop: 20,
@@ -1074,7 +1060,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '90%',
@@ -1085,12 +1070,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
   },
   closeButton: {
     padding: 5,
@@ -1104,7 +1087,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
     marginBottom: 8,
   },
   input: {
@@ -1117,20 +1099,17 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: '#eee',
     marginVertical: 20,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
     marginBottom: 15,
   },
   modalFooter: {
     flexDirection: 'row',
     padding: 20,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
     gap: 10,
   },
   modalButton: {
@@ -1141,24 +1120,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   cancelButton: {
-    backgroundColor: '#f5f5f5',
   },
   cancelButtonText: {
-    color: '#666',
     fontSize: 16,
     fontWeight: '600',
   },
-  saveButton: {
-    backgroundColor: '#22c55e',
-  },
   saveButtonText: {
-    color: '#fff',
     fontSize: 16,
     fontWeight: '600',
   },
   // Addresses styles
   addressesListContainer: {
-    backgroundColor: '#fff',
     borderRadius: 10,
     padding: 15,
     marginBottom: 10,
@@ -1170,12 +1142,10 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     paddingBottom: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
   },
   addressesListTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
   },
   addAddressSmallButton: {
     flexDirection: 'row',
@@ -1184,11 +1154,9 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 15,
     borderWidth: 1,
-    borderColor: '#22c55e',
     gap: 5,
   },
   addAddressSmallText: {
-    color: '#22c55e',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -1212,29 +1180,24 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   defaultBadge: {
-    backgroundColor: '#22c55e',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
   },
   defaultBadgeText: {
-    color: '#fff',
     fontSize: 10,
     fontWeight: '600',
   },
   addressLabel: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
   },
   addressStreet: {
     fontSize: 14,
-    color: '#666',
     marginBottom: 3,
   },
   addressCity: {
     fontSize: 14,
-    color: '#666',
   },
   addressActions: {
     flexDirection: 'row',
@@ -1251,7 +1214,6 @@ const styles = StyleSheet.create({
   checkboxLabel: {
     marginLeft: 10,
     fontSize: 16,
-    color: '#333',
   },
 });
 

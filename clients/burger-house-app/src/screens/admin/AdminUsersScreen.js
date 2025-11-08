@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Switch, TouchableOpacity, Alert } from 'react-native';
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import Header from '../../components/Header';
 // import api from '../../config/api';
-import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
+import { useCart } from '../../context/CartContext';
 import { adminService } from '../../services/adminService';
 
 const AdminUsersScreen = ({ navigation }) => {
@@ -146,26 +146,26 @@ const RoleButton = ({ label, active, onPress }) => (
 );
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: { flex: 1, backgroundColor: 'theme.background.light' },
   content: { flex: 1 },
   contentContainer: { padding: 16, paddingBottom: 80 },
-  title: { fontSize: 22, fontWeight: '700', marginBottom: 8, color: '#333' },
-  card: { backgroundColor: '#fff', borderRadius: 12, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: '#eee' },
+  title: { fontSize: 22, fontWeight: '700', marginBottom: 8, color: 'theme.text.primary' },
+  card: { backgroundColor: 'theme.background.white', borderRadius: 12, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: 'theme.background.border' },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   name: { color: '#111', fontWeight: '700', fontSize: 16 },
-  email: { color: '#666', marginTop: 2 },
+  email: { color: 'theme.text.secondary', marginTop: 2 },
   activeWrap: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  activeLabel: { color: '#333', marginRight: 6 },
+  activeLabel: { color: 'theme.text.primary', marginRight: 6 },
   rolesRow: { flexDirection: 'row', gap: 8, marginTop: 10 },
-  roleBtn: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 999, borderWidth: 1, borderColor: '#ddd', backgroundColor: '#fff' },
+  roleBtn: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 999, borderWidth: 1, borderColor: '#ddd', backgroundColor: 'theme.background.white' },
   roleBtnActive: { backgroundColor: '#22c55e', borderColor: '#22c55e' },
-  roleBtnText: { color: '#333', fontWeight: '700' },
-  roleBtnTextActive: { color: '#fff' },
+  roleBtnText: { color: 'theme.text.primary', fontWeight: '700' },
+  roleBtnTextActive: { color: 'theme.background.white' },
   metaRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 },
-  meta: { color: '#999', fontSize: 12 },
+  meta: { color: 'theme.text.tertiary', fontSize: 12 },
   actionsRow: { marginTop: 10, flexDirection: 'row', justifyContent: 'flex-end' },
-  deleteBtn: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 8, borderWidth: 1, borderColor: '#ef4444', backgroundColor: '#fff' },
-  deleteText: { color: '#ef4444', fontWeight: '700' },
+  deleteBtn: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 8, borderWidth: 1, borderColor: 'theme.error', backgroundColor: 'theme.background.white' },
+  deleteText: { color: 'theme.error', fontWeight: '700' },
 });
 
 export default AdminUsersScreen;

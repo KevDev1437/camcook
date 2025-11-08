@@ -1,13 +1,17 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, ActivityIndicator, Switch } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Header from '../../components/Header';
 import api from '../../config/api';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import { useRestaurant } from '../../contexts/RestaurantContext';
+import { getThemeColors } from '../../config/theme';
 
 const AdminProfileScreen = ({ navigation }) => {
   const { user: currentUser, logout } = useAuth();
+  const { restaurant } = useRestaurant();
+  const theme = getThemeColors(restaurant);
   const { count } = useCart();
   
   const [loading, setLoading] = useState(true);
@@ -201,7 +205,7 @@ const AdminProfileScreen = ({ navigation }) => {
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: theme.background.light }]}>
         <Header
           onNotifications={() => navigation.navigate('AdminOrders')}
           notificationCount={0}
@@ -209,15 +213,15 @@ const AdminProfileScreen = ({ navigation }) => {
           onLogout={logout}
         />
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#22c55e" />
-          <Text style={styles.loadingText}>Chargement du profil...</Text>
+          <ActivityIndicator size="large" color={theme.primary} />
+          <Text style={[styles.loadingText, { color: (theme.text.secondary || '#666') }]}>Chargement du profil...</Text>
         </View>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background.light }]}>
       <Header
         onNotifications={() => navigation.navigate('AdminOrders')}
         notificationCount={0}
@@ -226,36 +230,36 @@ const AdminProfileScreen = ({ navigation }) => {
       />
       {navigation.canGoBack() && (
         <TouchableOpacity
-          style={styles.backButton}
+          style={[styles.backButton, { backgroundColor: (theme.background.white || '#fff'), borderBottomColor: theme.background.border }]}
           onPress={() => navigation.goBack()}
         >
-          <MaterialIcons name="arrow-back" size={24} color="#333" />
-          <Text style={styles.backButtonText}>Retour</Text>
+          <MaterialIcons name="arrow-back" size={24} color={theme.text.primary} />
+          <Text style={[styles.backButtonText, { color: theme.text.primary }]}>Retour</Text>
         </TouchableOpacity>
       )}
       
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
-        <View style={styles.header}>
+        <View style={[styles.header, { backgroundColor: (theme.background.white || '#fff'), borderColor: theme.background.border }]}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>
+            <Text style={[styles.avatarText, { color: (theme.background.white || '#fff') }]}>
               {getInitials(formData.name)}
             </Text>
           </View>
-          <Text style={styles.userName}>{formData.name || 'Admin'}</Text>
-          <Text style={styles.userEmail}>{formData.email || ''}</Text>
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>ADMIN</Text>
+          <Text style={[styles.userName, { color: theme.text.primary }]}>{formData.name || 'Admin'}</Text>
+          <Text style={[styles.userEmail, { color: (theme.text.secondary || '#666') }]}>{formData.email || ''}</Text>
+          <View style={[styles.badge, { backgroundColor: theme.primary }]}>
+            <Text style={[styles.badgeText, { color: (theme.background.white || '#fff') }]}>ADMIN</Text>
           </View>
         </View>
 
         {/* Informations du profil */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Informations du profil</Text>
+        <View style={[styles.card, { backgroundColor: (theme.background.white || '#fff'), borderColor: theme.background.border }]}>
+          <Text style={[styles.cardTitle, { color: theme.text.primary }]}>Informations du profil</Text>
           
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Nom complet</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: theme.background.lighter, borderColor: theme.background.border, color: theme.text.primary }]}
               value={formData.name}
               onChangeText={(text) => setFormData({ ...formData, name: text })}
               placeholder="Votre nom"
@@ -265,7 +269,7 @@ const AdminProfileScreen = ({ navigation }) => {
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Email</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: theme.background.lighter, borderColor: theme.background.border, color: theme.text.primary }]}
               value={formData.email}
               onChangeText={(text) => setFormData({ ...formData, email: text })}
               placeholder="votre@email.com"
@@ -277,7 +281,7 @@ const AdminProfileScreen = ({ navigation }) => {
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Téléphone</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: theme.background.lighter, borderColor: theme.background.border, color: theme.text.primary }]}
               value={formData.phone}
               onChangeText={(text) => setFormData({ ...formData, phone: text })}
               placeholder="+33612345678"
@@ -286,24 +290,24 @@ const AdminProfileScreen = ({ navigation }) => {
           </View>
 
           <TouchableOpacity
-            style={[styles.saveButton, saving && styles.saveButtonDisabled]}
+            style={[styles.saveButton, { backgroundColor: theme.primary }, saving && styles.saveButtonDisabled]}
             onPress={handleSaveProfile}
             disabled={saving}
           >
-            <Text style={styles.saveButtonText}>
+            <Text style={[styles.saveButtonText, { color: (theme.background.white || '#fff') }]}>
               {saving ? 'Sauvegarde...' : 'Enregistrer les modifications'}
             </Text>
           </TouchableOpacity>
         </View>
 
         {/* Modification du mot de passe */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Modifier le mot de passe</Text>
+        <View style={[styles.card, { backgroundColor: (theme.background.white || '#fff'), borderColor: theme.background.border }]}>
+          <Text style={[styles.cardTitle, { color: theme.text.primary }]}>Modifier le mot de passe</Text>
           
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Mot de passe actuel</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: theme.background.lighter, borderColor: theme.background.border, color: theme.text.primary }]}
               value={passwordData.currentPassword}
               onChangeText={(text) => setPasswordData({ ...passwordData, currentPassword: text })}
               placeholder="Mot de passe actuel"
@@ -314,7 +318,7 @@ const AdminProfileScreen = ({ navigation }) => {
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Nouveau mot de passe</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: theme.background.lighter, borderColor: theme.background.border, color: theme.text.primary }]}
               value={passwordData.newPassword}
               onChangeText={(text) => setPasswordData({ ...passwordData, newPassword: text })}
               placeholder="Nouveau mot de passe (min. 6 caractères)"
@@ -325,7 +329,7 @@ const AdminProfileScreen = ({ navigation }) => {
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Confirmer le nouveau mot de passe</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: theme.background.lighter, borderColor: theme.background.border, color: theme.text.primary }]}
               value={passwordData.confirmPassword}
               onChangeText={(text) => setPasswordData({ ...passwordData, confirmPassword: text })}
               placeholder="Confirmer le nouveau mot de passe"
@@ -334,36 +338,36 @@ const AdminProfileScreen = ({ navigation }) => {
           </View>
 
           <TouchableOpacity
-            style={[styles.changePasswordButton, changingPassword && styles.changePasswordButtonDisabled]}
+            style={[styles.changePasswordButton, { backgroundColor: theme.primary }, changingPassword && styles.changePasswordButtonDisabled]}
             onPress={handleChangePassword}
             disabled={changingPassword}
           >
-            <Text style={styles.changePasswordButtonText}>
+            <Text style={[styles.changePasswordButtonText, { color: (theme.background.white || '#fff') }]}>
               {changingPassword ? 'Modification...' : 'Modifier le mot de passe'}
             </Text>
           </TouchableOpacity>
         </View>
 
         {/* Paramètres personnels */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Paramètres</Text>
+        <View style={[styles.card, { backgroundColor: (theme.background.white || '#fff'), borderColor: theme.background.border }]}>
+          <Text style={[styles.cardTitle, { color: theme.text.primary }]}>Paramètres</Text>
           
           <View style={styles.settingsRow}>
-            <Text style={styles.settingsLabel}>Thème</Text>
+            <Text style={[styles.settingsLabel, { color: theme.text.primary }]}>Thème</Text>
             <View style={styles.themeContainer}>
               <TouchableOpacity
-                style={[styles.themeButton, settings.theme === 'light' && styles.themeButtonActive]}
+                style={[styles.themeButton, { backgroundColor: theme.background.lighter, borderColor: '#ddd' }, settings.theme === 'light' && [styles.themeButtonActive, { backgroundColor: theme.primary, borderColor: theme.primary }]]}
                 onPress={() => saveSettings({ theme: 'light' })}
               >
-                <Text style={[styles.themeButtonText, settings.theme === 'light' && styles.themeButtonTextActive]}>
+                <Text style={[styles.themeButtonText, { color: (theme.text.secondary || '#666') }, settings.theme === 'light' && { color: (theme.background.white || '#fff') }]}>
                   Clair
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.themeButton, settings.theme === 'dark' && styles.themeButtonActive]}
+                style={[styles.themeButton, { backgroundColor: theme.background.lighter, borderColor: '#ddd' }, settings.theme === 'dark' && [styles.themeButtonActive, { backgroundColor: theme.primary, borderColor: theme.primary }]]}
                 onPress={() => saveSettings({ theme: 'dark' })}
               >
-                <Text style={[styles.themeButtonText, settings.theme === 'dark' && styles.themeButtonTextActive]}>
+                <Text style={[styles.themeButtonText, { color: (theme.text.secondary || '#666') }, settings.theme === 'dark' && { color: (theme.background.white || '#fff') }]}>
                   Sombre
                 </Text>
               </TouchableOpacity>
@@ -371,7 +375,7 @@ const AdminProfileScreen = ({ navigation }) => {
           </View>
 
           <View style={styles.settingsRow}>
-            <Text style={styles.settingsLabel}>Notifications</Text>
+            <Text style={[styles.settingsLabel, { color: theme.text.primary }]}>Notifications</Text>
             <Switch
               value={settings.notifications}
               onValueChange={(value) => saveSettings({ notifications: value })}
@@ -380,11 +384,11 @@ const AdminProfileScreen = ({ navigation }) => {
         </View>
 
         {/* Informations supplémentaires */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Informations</Text>
-          <Text style={styles.infoText}>ID: {currentUser?.id || 'N/A'}</Text>
-          <Text style={styles.infoText}>Rôle: {currentUser?.role || 'superadmin'}</Text>
-          <Text style={styles.infoText}>
+        <View style={[styles.card, { backgroundColor: (theme.background.white || '#fff'), borderColor: theme.background.border }]}>
+          <Text style={[styles.cardTitle, { color: theme.text.primary }]}>Informations</Text>
+          <Text style={[styles.infoText, { color: (theme.text.secondary || '#666') }]}>ID: {currentUser?.id || 'N/A'}</Text>
+          <Text style={[styles.infoText, { color: (theme.text.secondary || '#666') }]}>Rôle: {currentUser?.role || 'superadmin'}</Text>
+          <Text style={[styles.infoText, { color: (theme.text.secondary || '#666') }]}>
             Membre depuis: {currentUser?.createdAt 
               ? new Date(currentUser.createdAt).toLocaleDateString('fr-FR')
               : 'N/A'}
@@ -398,7 +402,6 @@ const AdminProfileScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   content: {
     flex: 1,
@@ -415,23 +418,19 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    color: '#666',
     fontSize: 14,
   },
   header: {
-    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 24,
     alignItems: 'center',
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#eee',
   },
   avatar: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#22c55e',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
@@ -439,42 +438,34 @@ const styles = StyleSheet.create({
   avatarText: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#fff',
   },
   userName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
     marginBottom: 6,
   },
   userEmail: {
     fontSize: 14,
-    color: '#666',
     marginBottom: 12,
   },
   badge: {
-    backgroundColor: '#22c55e',
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 20,
   },
   badgeText: {
-    color: '#fff',
     fontSize: 12,
     fontWeight: 'bold',
   },
   card: {
-    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#eee',
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
     marginBottom: 16,
   },
   inputGroup: {
@@ -487,17 +478,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#fafafa',
     borderWidth: 1,
-    borderColor: '#eee',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 12,
     fontSize: 16,
-    color: '#333',
   },
   saveButton: {
-    backgroundColor: '#22c55e',
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
@@ -507,12 +494,10 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   saveButtonText: {
-    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
   },
   changePasswordButton: {
-    backgroundColor: '#4CAF50',
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
@@ -522,27 +507,22 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   changePasswordButtonText: {
-    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
   },
   infoText: {
     fontSize: 14,
-    color: '#666',
     marginBottom: 8,
   },
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 12,
-    backgroundColor: '#fff',
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
   },
   backButtonText: {
     marginLeft: 8,
     fontSize: 16,
-    color: '#333',
     fontWeight: '600',
   },
   settingsRow: {
@@ -555,7 +535,6 @@ const styles = StyleSheet.create({
   settingsLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
     flex: 1,
   },
   themeContainer: {
@@ -568,19 +547,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ddd',
-    backgroundColor: '#fafafa',
   },
   themeButtonActive: {
-    backgroundColor: '#22c55e',
-    borderColor: '#22c55e',
   },
   themeButtonText: {
     fontSize: 14,
-    color: '#666',
     fontWeight: '600',
   },
   themeButtonTextActive: {
-    color: '#fff',
   },
 });
 

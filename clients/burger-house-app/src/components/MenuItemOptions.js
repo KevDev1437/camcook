@@ -84,7 +84,7 @@ const MenuItemOptions = ({ options, selectedOptions, onOptionChange, isExpanded,
                     >
                       <View style={styles.checkbox}>
                         {isChecked && (
-                          <MaterialIcons name="check" size={16} color="#fff" />
+                          <MaterialIcons name="check" size={16} color="theme.background.white" />
                         )}
                       </View>
                       <Text style={styles.choiceText}>{label}</Text>
@@ -103,7 +103,7 @@ const MenuItemOptions = ({ options, selectedOptions, onOptionChange, isExpanded,
 
 const styles = StyleSheet.create({
   optionsSection: {
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: 'theme.text.primary',
   },
   optionsContent: {
     marginTop: 12,
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   optionName: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: 'theme.text.primary',
     marginBottom: 10,
   },
   choicesContainer: {
@@ -161,11 +161,11 @@ const styles = StyleSheet.create({
     marginRight: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
   },
   choiceText: {
     fontSize: 14,
-    color: '#333',
+    color: 'theme.text.primary',
   },
 });
 

@@ -1,4 +1,4 @@
-import { MaterialIcons } from '@expo/vector-icons';
+﻿import { MaterialIcons } from '@expo/vector-icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Dimensions, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { LineChart, PieChart } from 'react-native-chart-kit';
@@ -8,22 +8,28 @@ import Header from '../../components/Header';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { useNotifications } from '../../context/NotificationContext';
+import { useRestaurant } from '../../contexts/RestaurantContext';
+import { getThemeColors } from '../../config/theme';
 import { adminService } from '../../services/adminService';
 
 const screenWidth = Dimensions.get('window').width;
 
-const COLORS = {
-  pending: '#f59e0b',
-  preparing: '#06b6d4',
-  ready: '#22c55e',
-  on_delivery: '#60a5fa',
-  completed: '#10b981',
-  cancelled: '#ef4444',
-};
+// COLORS sera défini dans le composant avec le thème
 
 const AdminDashboardScreen = ({ navigation }) => {
   const { count } = useCart();
   const { logout } = useAuth();
+  const { restaurant } = useRestaurant();
+  const theme = getThemeColors(restaurant);
+  
+  const COLORS = {
+    pending: theme.warning,
+    preparing: '#06b6d4',
+    ready: theme.primary,
+    on_delivery: '#60a5fa',
+    completed: theme.success,
+    cancelled: theme.error,
+  };
   // Le contexte filtre déjà les messages pour les admins
   const { 
     notifications: generalNotifications, // Déjà filtrées (sans messages)
@@ -226,14 +232,14 @@ const AdminDashboardScreen = ({ navigation }) => {
     return entries.map(([k, v], idx) => ({
       name: toName(k),
       population: v,
-      color: COLORS[k] || ['#22c55e', '#06b6d4', '#22c55e', '#60a5fa', '#a78bfa', '#ef4444'][idx % 6],
+      color: COLORS[k] || (k === 'ready' ? theme.primary : ['#06b6d4', theme.primary, '#60a5fa', '#a78bfa', theme.error][idx % 5]),
       legendFontColor: '#777',
       legendFontSize: 12,
     }));
-  }, [metrics.statusCount]);
+  }, [metrics.statusCount, theme, COLORS]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background.light }]}>
       <Header
         onNotifications={() => navigation.navigate('AdminOrders')}
         notificationCount={generalNotificationCount}
@@ -266,12 +272,12 @@ const AdminDashboardScreen = ({ navigation }) => {
         contentContainerStyle={styles.contentContainer}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchAll(); }} />}
       >
-        <Text style={styles.title}>Dashboard</Text>
+        <Text style={[styles.title, { color: theme.text.primary }]}>Dashboard</Text>
 
         {loading ? (
           <View style={styles.loadingBox}>
-            <ActivityIndicator size="large" color="#22c55e" />
-            <Text style={styles.loadingText}>Chargement des métriques…</Text>
+            <ActivityIndicator size="large" color={theme.primary} />
+            <Text style={[styles.loadingText, { color: (theme.text.secondary || '#666') }]}>Chargement des métriques…</Text>
           </View>
         ) : (
           <>
@@ -300,7 +306,7 @@ const AdminDashboardScreen = ({ navigation }) => {
             {/* Message d'erreur */}
             {error && (
               <View style={styles.errorBanner}>
-                <MaterialIcons name="error-outline" size={20} color="#ef4444" />
+                <MaterialIcons name="error-outline" size={20} color={theme.error} />
                 <Text style={styles.errorText}>{error}</Text>
                 <TouchableOpacity onPress={() => fetchAll()}>
                   <Text style={styles.retryText}>Réessayer</Text>
@@ -315,7 +321,7 @@ const AdminDashboardScreen = ({ navigation }) => {
                   title={periodFilter === 'today' ? 'Ventes du jour' : periodFilter === 'week' ? 'Ventes 7 jours' : 'Ventes du mois'}
                   value={`${metrics.revenuePeriod.toFixed(2)} €`}
                   icon="euro"
-                  color="#22c55e"
+                  color={theme.primary}
                   onPress={() => navigation.navigate('AdminOrders')}
                   trend={previousMetricsRef.current ? { percentage: metrics.revenueTrend } : null}
                 />
@@ -330,14 +336,14 @@ const AdminDashboardScreen = ({ navigation }) => {
                 <KpiCard title="Messages" value={`${metrics.unreadMessages}`} icon="mail" color="#60a5fa" onPress={() => navigation.navigate('AdminContacts')} />
               </View>
               <View style={styles.gridItem}>
-                <KpiCard title="Clients actifs" value={`${metrics.activeCustomers}`} icon="people" color="#22c55e" onPress={() => navigation.navigate('AdminUsers')} />
+                <KpiCard title="Clients actifs" value={`${metrics.activeCustomers}`} icon="people" color={theme.primary} onPress={() => navigation.navigate('AdminUsers')} />
               </View>
               <View style={styles.gridItem}>
                 <KpiCard
                   title="Commandes livrées"
                   value={`${metrics.completedOrders}`}
                   icon="check-circle"
-                  color="#22c55e"
+                  color={theme.primary}
                   onPress={() => navigation.navigate('AdminOrders')}
                   trend={previousMetricsRef.current ? { percentage: metrics.completedOrdersTrend } : null}
                 />
@@ -345,8 +351,8 @@ const AdminDashboardScreen = ({ navigation }) => {
             </View>
 
             {/* Charts */}
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>
+            <View style={[styles.card, { backgroundColor: (theme.background.white || '#fff'), borderColor: theme.background.border }]}>
+              <Text style={[styles.cardTitle, { color: theme.text.primary }]}>
                 {periodFilter === 'today' ? 'Ventes du jour' : periodFilter === 'week' ? 'Ventes 7 derniers jours' : 'Ventes du mois'}
               </Text>
               <LineChart
@@ -355,29 +361,29 @@ const AdminDashboardScreen = ({ navigation }) => {
                 height={200}
                 yAxisSuffix="€"
                 chartConfig={{
-                  backgroundColor: '#fff',
-                  backgroundGradientFrom: '#fff',
-                  backgroundGradientTo: '#fff',
+                  backgroundColor: theme.background?.white || '#fff',
+                  backgroundGradientFrom: theme.background?.white || '#fff',
+                  backgroundGradientTo: theme.background?.white || '#fff',
                   decimalPlaces: 2,
                   color: (opacity = 1) => `rgba(34, 197, 94, ${opacity})`,
-                  labelColor: () => '#666',
-                  propsForDots: { r: '3', strokeWidth: '1', stroke: '#22c55e' },
+                  labelColor: () => (theme.text?.secondary || '#666'),
+                  propsForDots: { r: '3', strokeWidth: '1', stroke: theme.primary || '#FF6B6B' },
                 }}
                 bezier
                 style={{ borderRadius: 12 }}
               />
             </View>
 
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Répartition statuts</Text>
+            <View style={[styles.card, { backgroundColor: (theme.background.white || '#fff'), borderColor: theme.background.border }]}>
+              <Text style={[styles.cardTitle, { color: theme.text.primary }]}>Répartition statuts</Text>
               {pieData.length ? (
                 <PieChart
                   data={pieData}
                   width={screenWidth - 32}
                   height={200}
                   chartConfig={{
-                    color: () => '#333',
-                    labelColor: () => '#666',
+                    color: () => (theme.text?.primary || '#333'),
+                    labelColor: () => (theme.text?.secondary || '#666'),
                   }}
                   accessor="population"
                   backgroundColor="transparent"
@@ -385,16 +391,16 @@ const AdminDashboardScreen = ({ navigation }) => {
                   hasLegend
                 />
               ) : (
-                <Text style={styles.muted}>Pas de données</Text>
+                <Text style={[styles.muted, { color: theme.text.tertiary }]}>Pas de données</Text>
               )}
             </View>
 
             {/* Recents (liens supprimés) */}
             
             {orders.slice(0, 5).map((o) => (
-              <View key={o.id} style={styles.rowCard}>
+              <View key={o.id} style={[styles.rowCard, { backgroundColor: (theme.background.white || '#fff'), borderColor: theme.background.border }]}>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.rowMain}>#{o.orderNumber} • {new Date(o.createdAt).toLocaleString()}</Text>
+                  <Text style={[styles.rowMain, { color: theme.text.primary }]}>#{o.orderNumber} • {new Date(o.createdAt).toLocaleString()}</Text>
                   <Text style={styles.rowSub}>{(Number(o.total) || 0).toFixed(2)} €</Text>
                 </View>
                 <StatusBadge status={o.status} />
@@ -413,34 +419,34 @@ const AdminDashboardScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: { flex: 1 },
   content: { flex: 1 },
   contentContainer: { padding: 16, paddingBottom: 80 },
-  title: { fontSize: 24, fontWeight: '800', marginBottom: 12, color: '#333' },
+  title: { fontSize: 24, fontWeight: '800', marginBottom: 12 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   gridItem: { width: '48%' },
-  card: { backgroundColor: '#fff', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#eee', marginTop: 16 },
-  cardTitle: { fontSize: 16, fontWeight: '700', marginBottom: 8, color: '#333' },
-  sectionTitle: { fontSize: 18, fontWeight: '800', marginTop: 20, marginBottom: 8, color: '#333' },
-  rowCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#fff', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#eee', marginBottom: 8 },
-  rowMain: { color: '#333', fontWeight: '600' },
+  card: { borderRadius: 12, padding: 12, borderWidth: 1, marginTop: 16 },
+  cardTitle: { fontSize: 16, fontWeight: '700', marginBottom: 8 },
+  sectionTitle: { fontSize: 18, fontWeight: '800', marginTop: 20, marginBottom: 8 },
+  rowCard: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 12, padding: 12, borderWidth: 1, marginBottom: 8 },
+  rowMain: { fontWeight: '600' },
   rowSub: { color: '#777', marginTop: 2 },
-  muted: { color: '#999' },
+  muted: { },
   loadingBox: { alignItems: 'center', paddingVertical: 32 },
-  loadingText: { color: '#666', marginTop: 8 },
+  loadingText: { marginTop: 8 },
   // Menu editor styles
-  menuCard: { backgroundColor: '#fff', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#eee', marginBottom: 10 },
-  menuName: { fontWeight: '800', color: '#333', marginBottom: 8 },
+  menuCard: { borderRadius: 12, padding: 12, borderWidth: 1, marginBottom: 10 },
+  menuName: { fontWeight: '800', marginBottom: 8 },
   menuRow: { flexDirection: 'row', gap: 10 },
   menuCol: { flex: 1 },
   menuColFull: { flex: 1 },
   menuLabel: { color: '#555', marginBottom: 6 },
-  input: { backgroundColor: '#fafafa', borderWidth: 1, borderColor: '#eee', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8 },
-  saveBtn: { marginTop: 10, backgroundColor: '#22c55e', paddingVertical: 10, borderRadius: 8, alignItems: 'center' },
-  saveBtnText: { color: '#fff', fontWeight: '800' },
-  deleteBtn: { marginTop: 10, backgroundColor: '#ef4444', paddingVertical: 10, borderRadius: 8, alignItems: 'center' },
-  deleteBtnText: { color: '#fff', fontWeight: '800' },
-  helperText: { fontSize: 11, color: '#999', marginTop: 4, fontStyle: 'italic' },
+  input: { borderWidth: 1, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8 },
+  saveBtn: { marginTop: 10, paddingVertical: 10, borderRadius: 8, alignItems: 'center' },
+  saveBtnText: { fontWeight: '800' },
+  deleteBtn: { marginTop: 10, paddingVertical: 10, borderRadius: 8, alignItems: 'center' },
+  deleteBtnText: { fontWeight: '800' },
+  helperText: { fontSize: 11, marginTop: 4, fontStyle: 'italic' },
 });
 
 export default AdminDashboardScreen;

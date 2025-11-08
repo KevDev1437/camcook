@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Modal, RefreshControl, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import StatusBadge from '../../components/admin/StatusBadge';
 import Header from '../../components/Header';
@@ -172,7 +172,7 @@ const AdminOrdersScreen = ({ navigation }) => {
                     </Text>
                   )}
                   {o.customer && (
-                    <Text style={{ fontSize: 11, color: '#666', marginBottom: 2 }}>
+                    <Text style={{ fontSize: 11, color: 'theme.text.secondary', marginBottom: 2 }}>
                       👤 Client: {o.customer.name || o.customer.email || 'Inconnu'}
                     </Text>
                   )}
@@ -211,7 +211,7 @@ const AdminOrdersScreen = ({ navigation }) => {
                   )}
                   {/* Informations de paiement */}
                   <View style={{ flexDirection: 'row', marginTop: 4, alignItems: 'center' }}>
-                    <Text style={{ fontSize: 12, color: '#666', marginRight: 8 }}>
+                    <Text style={{ fontSize: 12, color: 'theme.text.secondary', marginRight: 8 }}>
                       Paiement: {
                         o.paymentStatus === 'paid' ? '✅ Payé' :
                         o.paymentStatus === 'pending' ? '⏳ En attente' :
@@ -221,7 +221,7 @@ const AdminOrdersScreen = ({ navigation }) => {
                       }
                     </Text>
                     {o.paymentMethod && (
-                      <Text style={{ fontSize: 12, color: '#666' }}>
+                      <Text style={{ fontSize: 12, color: 'theme.text.secondary' }}>
                         • {
                           o.paymentMethod === 'stripe_card' ? '💳 Carte' :
                           o.paymentMethod === 'stripe_apple_pay' ? '🍎 Apple Pay' :
@@ -352,33 +352,33 @@ const AdminOrdersScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: { flex: 1, backgroundColor: 'theme.background.light' },
   content: { flex: 1 },
   contentContainer: { padding: 16, paddingBottom: 80 },
-  title: { fontSize: 22, fontWeight: '700', marginBottom: 8, color: '#333' },
+  title: { fontSize: 22, fontWeight: '700', marginBottom: 8, color: 'theme.text.primary' },
   filtersRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap', marginBottom: 8 },
-  filterBtn: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, borderWidth: 1, borderColor: '#ddd', backgroundColor: '#fff' },
+  filterBtn: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, borderWidth: 1, borderColor: '#ddd', backgroundColor: 'theme.background.white' },
   filterBtnActive: { borderColor: '#22c55e', backgroundColor: '#22c55e15' },
-  filterText: { color: '#333', fontWeight: '600' },
+  filterText: { color: 'theme.text.primary', fontWeight: '600' },
   filterTextActive: { color: '#22c55e' },
-  banner: { backgroundColor: '#fff8e1', borderWidth: 1, borderColor: '#ffecb3', padding: 10, borderRadius: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  banner: { backgroundColor: 'theme.background.white8e1', borderWidth: 1, borderColor: '#ffecb3', padding: 10, borderRadius: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   bannerText: { color: '#8d6e63', fontWeight: '700' },
   bannerClose: { color: '#8d6e63', fontWeight: '700' },
-  card: { backgroundColor: '#fff', borderRadius: 12, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: '#eee' },
+  card: { backgroundColor: 'theme.background.white', borderRadius: 12, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: 'theme.background.border' },
   cardHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 8, gap: 8 },
   orderNum: { fontSize: 16, fontWeight: '800', color: '#111' },
-  orderMeta: { fontSize: 12, color: '#666' },
-  itemsBox: { backgroundColor: '#fafafa', borderRadius: 8, padding: 8, borderWidth: 1, borderColor: '#f0f0f0', marginTop: 6 },
+  orderMeta: { fontSize: 12, color: 'theme.text.secondary' },
+  itemsBox: { backgroundColor: 'theme.background.lighter', borderRadius: 8, padding: 8, borderWidth: 1, borderColor: '#f0f0f0', marginTop: 6 },
   itemRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 6, gap: 8 },
-  itemQty: { color: '#333', width: 26, fontWeight: '700' },
-  itemName: { color: '#333', fontWeight: '700' },
-  itemOpts: { color: '#666', fontSize: 12 },
+  itemQty: { color: 'theme.text.primary', width: 26, fontWeight: '700' },
+  itemName: { color: 'theme.text.primary', fontWeight: '700' },
+  itemOpts: { color: 'theme.text.secondary', fontSize: 12 },
   itemPrice: { color: '#22c55e', fontWeight: '700', minWidth: 70, textAlign: 'right' },
   actionsRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 10, marginTop: 10 },
   actionBtn: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 },
-  actionText: { color: '#fff', fontWeight: '700' },
-  approveBtn: { backgroundColor: '#10b981' },
-  rejectBtn: { backgroundColor: '#ef4444' },
+  actionText: { color: 'theme.background.white', fontWeight: '700' },
+  approveBtn: { backgroundColor: 'theme.success' },
+  rejectBtn: { backgroundColor: 'theme.error' },
   processBtn: { backgroundColor: '#3b82f6' },
   // Modal styles
   modalOverlay: {
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     borderRadius: 20,
     padding: 24,
     width: '85%',
@@ -397,13 +397,13 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#333',
+    color: 'theme.text.primary',
     marginBottom: 8,
     textAlign: 'center',
   },
   modalSubtitle: {
     fontSize: 14,
-    color: '#666',
+    color: 'theme.text.secondary',
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -419,7 +419,7 @@ const styles = StyleSheet.create({
   },
   modalHint: {
     fontSize: 12,
-    color: '#999',
+    color: 'theme.text.tertiary',
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -440,18 +440,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#22c55e',
   },
   modalButtonTextCancel: {
-    color: '#666',
+    color: 'theme.text.secondary',
     fontWeight: '700',
     fontSize: 16,
   },
   modalButtonTextConfirm: {
-    color: '#fff',
+    color: 'theme.background.white',
     fontWeight: '700',
     fontSize: 16,
   },
   // Styles pour le temps estimé
   estimatedTimeContainer: {
-    backgroundColor: '#fff3cd',
+    backgroundColor: 'theme.background.white3cd',
     borderWidth: 1,
     borderColor: '#ffc107',
     borderRadius: 8,

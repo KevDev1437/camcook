@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
   author: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#333',
+    color: 'theme.text.primary',
   },
   stars: {
     fontSize: 12,
@@ -52,13 +52,13 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 13,
-    color: '#666',
+    color: 'theme.text.secondary',
     lineHeight: 18,
     marginBottom: 6,
   },
   date: {
     fontSize: 11,
-    color: '#999',
+    color: 'theme.text.tertiary',
   },
 });
 

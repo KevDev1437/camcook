@@ -1,5 +1,5 @@
-import React from 'react';
 import { MaterialIcons } from '@expo/vector-icons';
+import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const MenuItemReviews = ({ reviews, isExpanded, onToggle }) => {
@@ -42,7 +42,7 @@ const MenuItemReviews = ({ reviews, isExpanded, onToggle }) => {
 
 const styles = StyleSheet.create({
   reviewsSection: {
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: 'theme.text.primary',
   },
   reviewsContent: {
     marginTop: 12,
@@ -75,20 +75,20 @@ const styles = StyleSheet.create({
   reviewAuthor: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#333',
+    color: 'theme.text.primary',
   },
   starsContainer: {
     flexDirection: 'row',
   },
   reviewText: {
     fontSize: 13,
-    color: '#666',
+    color: 'theme.text.secondary',
     lineHeight: 18,
     marginBottom: 8,
   },
   reviewDate: {
     fontSize: 11,
-    color: '#999',
+    color: 'theme.text.tertiary',
   },
 });
 

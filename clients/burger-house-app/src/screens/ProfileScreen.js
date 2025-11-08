@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Image, ActivityIndicator, TextInput, Modal} from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import Header from '../components/Header';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Footer from '../components/Footer';
+import Header from '../components/Header';
+import api from '../config/api';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useNotifications } from '../context/NotificationContext';
-import api from '../config/api';
-import { MaterialIcons } from '@expo/vector-icons';
 
 const ProfileScreen = ({ navigation }) => {
   const { user, logout, updateUser } = useAuth();
@@ -499,7 +499,7 @@ const ProfileScreen = ({ navigation }) => {
               onPress={() => pickImage('background')}
               disabled={uploading}
             >
-              <MaterialIcons name="camera-alt" size={20} color="#fff" />
+              <MaterialIcons name="camera-alt" size={20} color="theme.background.white" />
               <Text style={styles.editButtonText}>Changer</Text>
             </TouchableOpacity>
 
@@ -521,11 +521,11 @@ const ProfileScreen = ({ navigation }) => {
                   onPress={() => pickImage('avatar')}
                   disabled={uploading}
                 >
-                  <MaterialIcons name="camera-alt" size={16} color="#fff" />
+                  <MaterialIcons name="camera-alt" size={16} color="theme.background.white" />
                 </TouchableOpacity>
                 {uploading && (
                   <View style={styles.uploadingOverlay}>
-                    <ActivityIndicator size="small" color="#fff" />
+                    <ActivityIndicator size="small" color="theme.background.white" />
                   </View>
                 )}
               </View>
@@ -608,14 +608,14 @@ const ProfileScreen = ({ navigation }) => {
                           style={styles.addressActionButton}
                           onPress={() => handleSetDefault(address.id)}
                         >
-                          <MaterialIcons name="star-border" size={20} color="#666" />
+                          <MaterialIcons name="star-border" size={20} color="theme.text.secondary" />
                         </TouchableOpacity>
                       )}
                       <TouchableOpacity
                         style={styles.addressActionButton}
                         onPress={() => handleOpenAddressModal(address)}
                       >
-                        <MaterialIcons name="edit" size={20} color="#666" />
+                        <MaterialIcons name="edit" size={20} color="theme.text.secondary" />
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.addressActionButton}
@@ -675,7 +675,7 @@ const ProfileScreen = ({ navigation }) => {
                 onPress={() => setShowEditModal(false)}
                 style={styles.closeButton}
               >
-                <MaterialIcons name="close" size={24} color="#333" />
+                <MaterialIcons name="close" size={24} color="theme.text.primary" />
               </TouchableOpacity>
             </View>
 
@@ -764,7 +764,7 @@ const ProfileScreen = ({ navigation }) => {
                 disabled={editingProfile}
               >
                 {editingProfile ? (
-                  <ActivityIndicator size="small" color="#fff" />
+                  <ActivityIndicator size="small" color="theme.background.white" />
                 ) : (
                   <Text style={styles.saveButtonText}>Enregistrer</Text>
                 )}
@@ -791,7 +791,7 @@ const ProfileScreen = ({ navigation }) => {
                 onPress={() => setShowAddressModal(false)}
                 style={styles.closeButton}
               >
-                <MaterialIcons name="close" size={24} color="#333" />
+                <MaterialIcons name="close" size={24} color="theme.text.primary" />
               </TouchableOpacity>
             </View>
 
@@ -846,7 +846,7 @@ const ProfileScreen = ({ navigation }) => {
                   <MaterialIcons 
                     name={addressForm.isDefault ? 'check-box' : 'check-box-outline-blank'} 
                     size={24} 
-                    color={addressForm.isDefault ? '#22c55e' : '#999'} 
+                    color={addressForm.isDefault ? '#22c55e' : 'theme.text.tertiary'} 
                   />
                   <Text style={styles.checkboxLabel}>Définir comme adresse par défaut</Text>
                 </TouchableOpacity>
@@ -879,22 +879,22 @@ const ProfileScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'theme.background.light',
     flexDirection: 'column',
   },
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'theme.background.light',
   },
   scrollContent: {
     flexGrow: 1,
   },
   header: {
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     paddingTop: 0,
     paddingBottom: 0,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: 'theme.background.border',
   },
   backgroundContainer: {
     width: '100%',
@@ -938,7 +938,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   editButtonText: {
-    color: '#fff',
+    color: 'theme.background.white',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -963,7 +963,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 5,
-    borderColor: '#fff',
+    borderColor: 'theme.background.white',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
@@ -981,7 +981,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 3,
-    borderColor: '#fff',
+    borderColor: 'theme.background.white',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
@@ -1002,12 +1002,12 @@ const styles = StyleSheet.create({
   avatarText: {
     fontSize: 40,
     fontWeight: 'bold',
-    color: '#fff',
+    color: 'theme.background.white',
   },
   userName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: 'theme.background.white',
     marginBottom: 5,
     textShadowColor: 'rgba(0, 0, 0, 0.5)',
     textShadowOffset: { width: 0, height: 1 },
@@ -1015,7 +1015,7 @@ const styles = StyleSheet.create({
   },
   userEmail: {
     fontSize: 15,
-    color: '#fff',
+    color: 'theme.background.white',
     textShadowColor: 'rgba(0, 0, 0, 0.5)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
@@ -1024,7 +1024,7 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   menuItem: {
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -1044,11 +1044,11 @@ const styles = StyleSheet.create({
   },
   menuItemText: {
     fontSize: 16,
-    color: '#333',
+    color: 'theme.text.primary',
   },
   menuItemBadge: {
     backgroundColor: '#22c55e',
-    color: '#fff',
+    color: 'theme.background.white',
     fontSize: 12,
     fontWeight: '600',
     paddingHorizontal: 8,
@@ -1058,7 +1058,7 @@ const styles = StyleSheet.create({
   },
   menuItemArrow: {
     fontSize: 24,
-    color: '#999',
+    color: 'theme.text.tertiary',
   },
   logoutItem: {
     marginTop: 20,
@@ -1074,7 +1074,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '90%',
@@ -1085,12 +1085,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: 'theme.background.border',
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: 'theme.text.primary',
   },
   closeButton: {
     padding: 5,
@@ -1104,7 +1104,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: 'theme.text.primary',
     marginBottom: 8,
   },
   input: {
@@ -1117,20 +1117,20 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: '#eee',
+    backgroundColor: 'theme.background.border',
     marginVertical: 20,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: 'theme.text.primary',
     marginBottom: 15,
   },
   modalFooter: {
     flexDirection: 'row',
     padding: 20,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: 'theme.background.border',
     gap: 10,
   },
   modalButton: {
@@ -1141,10 +1141,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   cancelButton: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'theme.background.light',
   },
   cancelButtonText: {
-    color: '#666',
+    color: 'theme.text.secondary',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -1152,13 +1152,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#22c55e',
   },
   saveButtonText: {
-    color: '#fff',
+    color: 'theme.background.white',
     fontSize: 16,
     fontWeight: '600',
   },
   // Addresses styles
   addressesListContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     borderRadius: 10,
     padding: 15,
     marginBottom: 10,
@@ -1170,12 +1170,12 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     paddingBottom: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: 'theme.background.border',
   },
   addressesListTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: 'theme.text.primary',
   },
   addAddressSmallButton: {
     flexDirection: 'row',
@@ -1218,23 +1218,23 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   defaultBadgeText: {
-    color: '#fff',
+    color: 'theme.background.white',
     fontSize: 10,
     fontWeight: '600',
   },
   addressLabel: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: 'theme.text.primary',
   },
   addressStreet: {
     fontSize: 14,
-    color: '#666',
+    color: 'theme.text.secondary',
     marginBottom: 3,
   },
   addressCity: {
     fontSize: 14,
-    color: '#666',
+    color: 'theme.text.secondary',
   },
   addressActions: {
     flexDirection: 'row',
@@ -1251,7 +1251,7 @@ const styles = StyleSheet.create({
   checkboxLabel: {
     marginLeft: 10,
     fontSize: 16,
-    color: '#333',
+    color: 'theme.text.primary',
   },
 });
 

@@ -35,7 +35,7 @@ const MenuItemQuestions = ({ questions, isExpanded, onToggle }) => {
 
 const styles = StyleSheet.create({
   questionsSection: {
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: 'theme.text.primary',
   },
   questionsContent: {
     marginTop: 12,
@@ -62,12 +62,12 @@ const styles = StyleSheet.create({
   questionAuthor: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#333',
+    color: 'theme.text.primary',
     marginBottom: 6,
   },
   questionText: {
     fontSize: 13,
-    color: '#666',
+    color: 'theme.text.secondary',
     lineHeight: 18,
     marginBottom: 8,
   },
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   },
   questionDate: {
     fontSize: 11,
-    color: '#999',
+    color: 'theme.text.tertiary',
   },
 });
 

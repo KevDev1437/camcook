@@ -1,6 +1,8 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useRestaurant } from '../contexts/RestaurantContext';
+import { getThemeColors } from '../config/theme';
 
 // Screens
 import CartScreen from '../screens/CartScreen';
@@ -68,11 +70,13 @@ const HomeStack = () => {
 // Bottom Tab Navigator - Main Navigator
 // Bottom Tab Navigator - Main tabs
 const Tabs = () => {
+  const { restaurant } = useRestaurant();
+  const theme = getThemeColors(restaurant);
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: '#22c55e',
-        tabBarInactiveTintColor: '#999',
+        tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.text.tertiary,
         tabBarHideOnKeyboard: false,
         tabBarStyle: {
           paddingBottom: 5,

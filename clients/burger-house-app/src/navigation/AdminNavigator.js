@@ -33,7 +33,7 @@ const AdminTabNavigator = () => {
     <Tab.Navigator
       screenOptions={{
         tabBarActiveTintColor: '#22c55e',
-        tabBarInactiveTintColor: '#999',
+        tabBarInactiveTintColor: 'theme.text.tertiary',
         tabBarStyle: { height: 60, paddingBottom: 6 },
       }}
     >

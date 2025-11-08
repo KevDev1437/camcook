@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -54,7 +54,7 @@ const RegisterScreen = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: (theme.background.white || '#fff') }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.content}>
@@ -74,11 +74,11 @@ const RegisterScreen = ({ navigation }) => {
             )}
           </View>
           <Text style={[styles.title, { color: theme.primary }]}>Créer un compte</Text>
-          <Text style={styles.subtitle}>Rejoignez {restaurant?.name || 'nous'} aujourd'hui</Text>
+          <Text style={[styles.subtitle, { color: (theme.text.secondary || '#666') }]}>Rejoignez {restaurant?.name || 'nous'} aujourd'hui</Text>
 
           <View style={styles.form}>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: theme.background.light, color: theme.text.primary }]}
               placeholder="Nom complet"
               value={name}
               onChangeText={setName}
@@ -86,7 +86,7 @@ const RegisterScreen = ({ navigation }) => {
             />
 
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: theme.background.light, color: theme.text.primary }]}
               placeholder="Email"
               value={email}
               onChangeText={setEmail}
@@ -96,7 +96,7 @@ const RegisterScreen = ({ navigation }) => {
             />
 
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: theme.background.light, color: theme.text.primary }]}
               placeholder="Téléphone (ex: +237600000000)"
               value={phone}
               onChangeText={setPhone}
@@ -105,7 +105,7 @@ const RegisterScreen = ({ navigation }) => {
             />
 
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: theme.background.light, color: theme.text.primary }]}
               placeholder="Mot de passe"
               value={password}
               onChangeText={setPassword}
@@ -114,7 +114,7 @@ const RegisterScreen = ({ navigation }) => {
             />
 
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: theme.background.light, color: theme.text.primary }]}
               placeholder="Confirmer le mot de passe"
               value={confirmPassword}
               onChangeText={setConfirmPassword}
@@ -127,14 +127,14 @@ const RegisterScreen = ({ navigation }) => {
               onPress={handleRegister}
               disabled={loading}>
               {loading ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color={(theme.background.white || '#fff')} />
               ) : (
-                <Text style={styles.buttonText}>S'inscrire</Text>
+                <Text style={[styles.buttonText, { color: (theme.background.white || '#fff') }]}>S'inscrire</Text>
               )}
             </TouchableOpacity>
 
             <View style={styles.footer}>
-              <Text style={styles.footerText}>Déjà un compte ? </Text>
+              <Text style={[styles.footerText, { color: (theme.text.secondary || '#666') }]}>Déjà un compte ? </Text>
               <TouchableOpacity onPress={() => navigation.navigate('Login')}>
                 <Text style={[styles.linkText, { color: theme.primary }]}>Se connecter</Text>
               </TouchableOpacity>
@@ -149,7 +149,6 @@ const RegisterScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   scrollContent: {
     flexGrow: 1,
@@ -177,7 +176,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
     textAlign: 'center',
     marginBottom: 30,
   },
@@ -185,7 +183,6 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   input: {
-    backgroundColor: '#f5f5f5',
     borderRadius: 10,
     padding: 15,
     fontSize: 16,
@@ -203,7 +200,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffb399',
   },
   buttonText: {
-    color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -213,7 +209,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   footerText: {
-    color: '#666',
     fontSize: 14,
   },
   linkText: {

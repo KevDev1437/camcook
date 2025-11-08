@@ -61,7 +61,7 @@ const TabNavigator = () => {
     <Tab.Navigator
       screenOptions={{
         tabBarActiveTintColor: theme.primary,
-        tabBarInactiveTintColor: '#999',
+        tabBarInactiveTintColor: theme.text.tertiary,
         tabBarStyle: {
           paddingBottom: 5,
           height: 60,

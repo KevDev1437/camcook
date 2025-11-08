@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+﻿import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import StatusBadge from '../components/admin/StatusBadge';
 import Footer from '../components/Footer';
@@ -9,6 +9,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useNotifications } from '../context/NotificationContext';
 import { useRestaurant } from '../contexts/RestaurantContext';
+import { getThemeColors } from '../config/theme';
 import { orderService } from '../services/orderService';
 import api from '../config/api';
 
@@ -16,7 +17,8 @@ const OrdersScreen = ({ navigation, route }) => {
   const { count } = useCart();
   const { logout } = useAuth();
   const { notifications, notificationCount, onNotificationPress, markAsRead, clearNotification } = useNotifications();
-  const { restaurantId } = useRestaurant(); // MULTI-TENANT: Récupérer restaurantId pour filtrer les commandes
+  const { restaurant, restaurantId } = useRestaurant(); // MULTI-TENANT: Récupérer restaurantId pour filtrer les commandes
+  const theme = getThemeColors(restaurant);
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -96,9 +98,9 @@ const OrdersScreen = ({ navigation, route }) => {
   const FilterButton = ({ value, label }) => (
     <TouchableOpacity 
       onPress={() => setStatusFilter(value)} 
-      style={[styles.filterBtn, statusFilter === value && styles.filterBtnActive]}
+      style={[styles.filterBtn, statusFilter === value && [styles.filterBtnActive, { backgroundColor: theme.primary, borderColor: theme.primary }]]}
     >
-      <Text style={[styles.filterText, statusFilter === value && styles.filterTextActive]}>
+      <Text style={[styles.filterText, { color: (theme.text.secondary || '#666') }, statusFilter === value && [styles.filterTextActive, { color: (theme.background.white || '#fff') }]]}>
         {label}
       </Text>
     </TouchableOpacity>
@@ -196,12 +198,12 @@ const OrdersScreen = ({ navigation, route }) => {
   const Row = ({ label, value, strong }) => (
     <View style={styles.modalRow}> 
       <Text style={[styles.modalRowLabel, strong && { fontWeight: '800' }]}>{label}</Text>
-      <Text style={[styles.modalRowValue, strong && { color: '#22c55e' }]}>{value}</Text>
+      <Text style={[styles.modalRowValue, strong && { color: theme.primary }]}>{value}</Text>
     </View>
   );
 
   return (
-    <View style={styles.mainContainer}>
+    <View style={[styles.mainContainer, { backgroundColor: theme.background.light }]}>
       <Header
         onCart={() => {
           // D'après les logs : Cart est dans HomeStack, pas dans RootStack
@@ -271,7 +273,7 @@ const OrdersScreen = ({ navigation, route }) => {
       />
 
       <ScrollView
-        style={styles.container}
+        style={[styles.container, { backgroundColor: theme.background.light }]}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={fetchMine} />}
@@ -313,7 +315,7 @@ const OrdersScreen = ({ navigation, route }) => {
             if (filteredOrders.length === 0) {
               return (
                 <View style={styles.emptyContainer}>
-                  <Text style={styles.emptyText}>
+                  <Text style={[styles.emptyText, { color: theme.text.tertiary }]}>
                     {statusFilter === 'all' 
                       ? 'Aucune commande' 
                       : `Aucune commande ${getStatusLabel(statusFilter)}`}
@@ -328,17 +330,17 @@ const OrdersScreen = ({ navigation, route }) => {
               const isLoadingDetail = loadingDetails[o.id];
               
               return (
-                <View key={o.id} style={styles.orderCard}>
+                <View key={o.id} style={[styles.orderCard, { backgroundColor: (theme.background.white || '#fff') }]}>
                 <View style={styles.orderHeader}>
-                  <Text style={styles.orderNumber}>Commande #{o.orderNumber}</Text>
+                  <Text style={[styles.orderNumber, { color: theme.text.primary }]}>Commande #{o.orderNumber}</Text>
                   <StatusBadge status={o.status} type="order" />
                 </View>
-                <Text style={styles.restaurantName}>{o.restaurant?.name || 'Restaurant'}</Text>
-                <Text style={styles.orderDate}>{new Date(o.createdAt).toLocaleString()}</Text>
+                <Text style={[styles.restaurantName, { color: theme.text.primary }]}>{o.restaurant?.name || 'Restaurant'}</Text>
+                <Text style={[styles.orderDate, { color: (theme.text.secondary || '#666') }]}>{new Date(o.createdAt).toLocaleString()}</Text>
                 {o.status === 'preparing' && o.estimatedReadyTime && (
-                  <View style={styles.estimatedTimeContainer}>
+                  <View style={[styles.estimatedTimeContainer, { backgroundColor: '#fff3cd' }]}>
                     <Text style={styles.estimatedTimeLabel}>⏱️ Prêt dans environ :</Text>
-                    <Text style={styles.estimatedTimeValue}>
+                    <Text style={[styles.estimatedTimeValue, { color: theme.primary }]}>
                       {(() => {
                         const estimated = new Date(o.estimatedReadyTime);
                         const diffMs = estimated - currentTime;
@@ -367,14 +369,14 @@ const OrdersScreen = ({ navigation, route }) => {
                     </Text>
                   </View>
                 )}
-                <View style={styles.orderFooter}>
-                  <Text style={styles.orderTotal}>{Number(o.total || 0).toFixed(2)} €</Text>
+                <View style={[styles.orderFooter, { borderTopColor: theme.background.border }]}>
+                  <Text style={[styles.orderTotal, { color: theme.primary }]}>{Number(o.total || 0).toFixed(2)} €</Text>
                   <TouchableOpacity 
-                    style={styles.detailsButton} 
+                    style={[styles.detailsButton, { borderColor: theme.primary }]} 
                     onPress={() => handleToggleDetails(o.id)}
                     disabled={isLoadingDetail}
                   >
-                    <Text style={styles.detailsButtonText}>
+                    <Text style={[styles.detailsButtonText, { color: theme.primary }]}>
                       {isExpanded ? 'Masquer' : 'Détails'}
                     </Text>
                   </TouchableOpacity>
@@ -382,20 +384,20 @@ const OrdersScreen = ({ navigation, route }) => {
 
                 {/* Dropdown avec les détails */}
                 {isExpanded && (
-                  <View style={styles.orderDetailsDropdown}>
+                  <View style={[styles.orderDetailsDropdown, { borderTopColor: theme.background.border }]}>
                     {isLoadingDetail ? (
                       <View style={styles.detailsLoader}>
-                        <ActivityIndicator size="small" color="#22c55e" />
-                        <Text style={styles.detailsLoaderText}>Chargement...</Text>
+                        <ActivityIndicator size="small" color={theme.primary} />
+                        <Text style={[styles.detailsLoaderText, { color: (theme.text.secondary || '#666') }]}>Chargement...</Text>
                       </View>
                     ) : details ? (
                       <View style={styles.detailsContent}>
                         {/* Informations commande */}
                         <View style={styles.detailsSection}>
-                          <Text style={styles.detailsSectionTitle}>Informations</Text>
+                          <Text style={[styles.detailsSectionTitle, { color: theme.text.primary }]}>Informations</Text>
                           <View style={styles.detailsRow}>
-                            <Text style={styles.detailsLabel}>Date de commande</Text>
-                            <Text style={styles.detailsValue}>
+                            <Text style={[styles.detailsLabel, { color: (theme.text.secondary || '#666') }]}>Date de commande</Text>
+                            <Text style={[styles.detailsValue, { color: theme.text.primary }]}>
                               {details.createdAt ? new Date(details.createdAt).toLocaleDateString('fr-FR', {
                                 day: '2-digit',
                                 month: 'long',
@@ -406,8 +408,8 @@ const OrdersScreen = ({ navigation, route }) => {
                             </Text>
                           </View>
                           <View style={styles.detailsRow}>
-                            <Text style={styles.detailsLabel}>Type de livraison</Text>
-                            <Text style={styles.detailsValue}>
+                            <Text style={[styles.detailsLabel, { color: (theme.text.secondary || '#666') }]}>Type de livraison</Text>
+                            <Text style={[styles.detailsValue, { color: theme.text.primary }]}>
                               {details.orderType === 'delivery' ? 'Livraison' : 'À emporter'}
                             </Text>
                           </View>
@@ -415,7 +417,7 @@ const OrdersScreen = ({ navigation, route }) => {
 
                         {/* Articles commandés */}
                         <View style={styles.detailsSection}>
-                          <Text style={styles.detailsSectionTitle}>Articles commandés</Text>
+                          <Text style={[styles.detailsSectionTitle, { color: theme.text.primary }]}>Articles commandés</Text>
                           {(() => {
                             const items = details.items;
                             let itemsArray = [];
@@ -461,16 +463,16 @@ const OrdersScreen = ({ navigation, route }) => {
                                 
                                 return (
                                   <View key={`item-${idx}-${it.id || idx}`} style={styles.orderItemRow}>
-                                    <Text style={styles.orderItemQty}>x{quantity}</Text>
+                                    <Text style={[styles.orderItemQty, { color: theme.text.primary }]}>x{quantity}</Text>
                                     <View style={styles.orderItemInfo}>
-                                      <Text style={styles.orderItemName}>{it.name || 'Article'}</Text>
+                                      <Text style={[styles.orderItemName, { color: theme.text.primary }]}>{it.name || 'Article'}</Text>
                                       
                                       {/* Structure hiérarchique des prix */}
                                       <View style={styles.priceBreakdown}>
                                         {/* MENU : montant */}
                                         <View style={styles.priceBreakdownRow}>
-                                          <Text style={styles.priceBreakdownLabel}>MENU :</Text>
-                                          <Text style={styles.priceBreakdownValue}>{basePrice.toFixed(2)} €</Text>
+                                          <Text style={[styles.priceBreakdownLabel, { color: theme.text.primary }]}>MENU :</Text>
+                                          <Text style={[styles.priceBreakdownValue, { color: theme.primary }]}>{basePrice.toFixed(2)} €</Text>
                                         </View>
                                         
                                         {/* ACCOMPAGNEMENT */}
@@ -479,10 +481,10 @@ const OrdersScreen = ({ navigation, route }) => {
                                             <Text style={styles.priceBreakdownSectionTitle}>ACCOMPAGNEMENT</Text>
                                             {accList.map((acc, accIdx) => (
                                               <View key={`acc-${accIdx}`} style={styles.priceBreakdownSubItem}>
-                                                <Text style={styles.priceBreakdownSubItemText}>
+                                                <Text style={[styles.priceBreakdownSubItemText, { color: (theme.text.secondary || '#666') }]}>
                                                   - {acc.name}
                                                 </Text>
-                                                <Text style={styles.priceBreakdownSubItemPrice}>
+                                                <Text style={[styles.priceBreakdownSubItemPrice, { color: theme.primary }]}>
                                                   {acc.price > 0 ? `${acc.price.toFixed(2)} €` : 'Gratuit'}
                                                 </Text>
                                               </View>
@@ -495,10 +497,10 @@ const OrdersScreen = ({ navigation, route }) => {
                                           <View style={styles.priceBreakdownSection}>
                                             <Text style={styles.priceBreakdownSectionTitle}>Boisson</Text>
                                             <View style={styles.priceBreakdownSubItem}>
-                                              <Text style={styles.priceBreakdownSubItemText}>
+                                              <Text style={[styles.priceBreakdownSubItemText, { color: (theme.text.secondary || '#666') }]}>
                                                 - {drinkName}
                                               </Text>
-                                              <Text style={styles.priceBreakdownSubItemPrice}>
+                                              <Text style={[styles.priceBreakdownSubItemPrice, { color: theme.primary }]}>
                                                 {drinkPrice > 0 ? `${drinkPrice.toFixed(2)} €` : 'Gratuit'}
                                               </Text>
                                             </View>
@@ -507,17 +509,17 @@ const OrdersScreen = ({ navigation, route }) => {
                                       </View>
                                       
                                       {quantity > 1 && (
-                                        <Text style={styles.orderItemUnitPrice}>
+                                        <Text style={[styles.orderItemUnitPrice, { color: theme.text.tertiary }]}>
                                           {unitPrice.toFixed(2)} € × {quantity}
                                         </Text>
                                       )}
                                     </View>
                                     <View style={styles.orderItemPriceContainer}>
-                                      <Text style={styles.orderItemPrice}>
+                                      <Text style={[styles.orderItemPrice, { color: theme.primary }]}>
                                         {lineTotal.toFixed(2)} €
                                       </Text>
                                       {quantity > 1 && (
-                                        <Text style={styles.orderItemUnitPriceLabel}>
+                                        <Text style={[styles.orderItemUnitPriceLabel, { color: theme.text.tertiary }]}>
                                           ({unitPrice.toFixed(2)} € l'unité)
                                         </Text>
                                       )}
@@ -527,7 +529,7 @@ const OrdersScreen = ({ navigation, route }) => {
                               });
                             } else {
                               return (
-                                <Text style={styles.noItemsText}>Aucun article dans cette commande</Text>
+                                <Text style={[styles.noItemsText, { color: theme.text.tertiary }]}>Aucun article dans cette commande</Text>
                               );
                             }
                           })()}
@@ -535,13 +537,13 @@ const OrdersScreen = ({ navigation, route }) => {
 
                         {/* Récapitulatif financier */}
                         <View style={styles.detailsSection}>
-                          <Text style={styles.detailsSectionTitle}>Récapitulatif</Text>
+                          <Text style={[styles.detailsSectionTitle, { color: theme.text.primary }]}>Récapitulatif</Text>
                           <Row label="Sous-total HT" value={`${Number(details.subtotal||0).toFixed(2)} €`} />
                           <Row label="Frais de livraison" value={`${Number(details.deliveryFee||0).toFixed(2)} €`} />
                           <Row label="TVA (si applicable)" value={`${Number(details.tax||0).toFixed(2)} €`} />
-                          <View style={styles.totalRow}>
-                            <Text style={styles.totalLabel}>TOTAL TTC</Text>
-                            <Text style={styles.totalAmount}>
+                          <View style={[styles.totalRow, { borderTopColor: theme.primary }]}>
+                            <Text style={[styles.totalLabel, { color: theme.text.primary }]}>TOTAL TTC</Text>
+                            <Text style={[styles.totalAmount, { color: theme.primary }]}>
                               {Number(details.total||0).toFixed(2)} €
                             </Text>
                           </View>
@@ -550,8 +552,8 @@ const OrdersScreen = ({ navigation, route }) => {
                         {/* Notes */}
                         {details.notes && (
                           <View style={styles.detailsSection}>
-                            <Text style={styles.detailsSectionTitle}>Notes</Text>
-                            <Text style={styles.notesText}>{details.notes}</Text>
+                            <Text style={[styles.detailsSectionTitle, { color: theme.text.primary }]}>Notes</Text>
+                            <Text style={[styles.notesText, { color: (theme.text.secondary || '#666') }]}>{details.notes}</Text>
                           </View>
                         )}
                       </View>
@@ -579,12 +581,10 @@ const OrdersScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
     flexDirection: 'column',
   },
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   scrollContent: {
     flexGrow: 1,
@@ -593,7 +593,6 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   orderCard: {
-    backgroundColor: '#fff',
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
@@ -612,16 +611,13 @@ const styles = StyleSheet.create({
   orderNumber: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
   },
   restaurantName: {
     fontSize: 16,
-    color: '#333',
     marginBottom: 5,
   },
   orderDate: {
     fontSize: 14,
-    color: '#666',
     marginBottom: 10,
   },
   orderFooter: {
@@ -630,22 +626,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
   },
   orderTotal: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#22c55e',
   },
   detailsButton: {
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 5,
     borderWidth: 1,
-    borderColor: '#22c55e',
   },
   detailsButtonText: {
-    color: '#22c55e',
     fontWeight: 'bold',
   },
   banner: {
@@ -678,16 +670,13 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
   },
   filterBtnActive: {
-    backgroundColor: '#22c55e',
-    borderColor: '#22c55e',
+    // backgroundColor et borderColor seront appliqués dynamiquement avec theme.primary
   },
   filterText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#666',
   },
   filterTextActive: {
-    color: '#fff',
     fontWeight: '700',
   },
   emptyContainer: {
@@ -697,12 +686,10 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#999',
     textAlign: 'center',
   },
   // Styles pour le temps estimé
   estimatedTimeContainer: {
-    backgroundColor: '#fff3cd',
     borderWidth: 1,
     borderColor: '#ffc107',
     borderRadius: 8,
@@ -720,7 +707,6 @@ const styles = StyleSheet.create({
   },
   estimatedTimeValue: {
     fontSize: 16,
-    color: '#22c55e',
     fontWeight: '700',
   },
   // Styles pour le dropdown des détails
@@ -728,7 +714,6 @@ const styles = StyleSheet.create({
     marginTop: 15,
     paddingTop: 15,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
   },
   detailsLoader: {
     padding: 20,
@@ -738,7 +723,6 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   detailsLoaderText: {
-    color: '#666',
     fontSize: 14,
   },
   detailsContent: {
@@ -750,7 +734,6 @@ const styles = StyleSheet.create({
   detailsSectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#333',
     marginBottom: 12,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -763,12 +746,10 @@ const styles = StyleSheet.create({
   },
   detailsLabel: {
     fontSize: 14,
-    color: '#666',
     flex: 1,
   },
   detailsValue: {
     fontSize: 14,
-    color: '#333',
     fontWeight: '600',
     flex: 1,
     textAlign: 'right',
@@ -782,7 +763,6 @@ const styles = StyleSheet.create({
     borderBottomColor: '#f0f0f0',
   },
   orderItemQty: {
-    color: '#333',
     fontWeight: '700',
     fontSize: 14,
     width: 30,
@@ -794,13 +774,11 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   orderItemName: {
-    color: '#333',
     fontWeight: '700',
     fontSize: 15,
     marginBottom: 4,
   },
   orderItemOpts: {
-    color: '#666',
     fontSize: 12,
     marginTop: 2,
     lineHeight: 16,
@@ -810,7 +788,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   orderItemPrice: {
-    color: '#22c55e',
     fontWeight: '700',
     fontSize: 16,
     textAlign: 'right',
@@ -833,13 +810,11 @@ const styles = StyleSheet.create({
   priceBreakdownLabel: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#333',
     textTransform: 'uppercase',
   },
   priceBreakdownValue: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#22c55e',
   },
   priceBreakdownSection: {
     marginTop: 6,
@@ -862,29 +837,24 @@ const styles = StyleSheet.create({
   },
   priceBreakdownSubItemText: {
     fontSize: 11,
-    color: '#666',
     flex: 1,
   },
   priceBreakdownSubItemPrice: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#22c55e',
   },
   orderItemUnitPrice: {
-    color: '#999',
     fontSize: 12,
     fontStyle: 'italic',
     marginTop: 4,
   },
   orderItemUnitPriceLabel: {
-    color: '#999',
     fontSize: 10,
     marginTop: 2,
     fontStyle: 'italic',
   },
   noItemsText: {
     fontSize: 14,
-    color: '#999',
     fontStyle: 'italic',
     textAlign: 'center',
     padding: 20,
@@ -896,22 +866,18 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     marginTop: 8,
     borderTopWidth: 2,
-    borderTopColor: '#22c55e',
   },
   totalLabel: {
     fontSize: 16,
     fontWeight: '800',
-    color: '#333',
     textTransform: 'uppercase',
   },
   totalAmount: {
     fontSize: 20,
     fontWeight: '900',
-    color: '#22c55e',
   },
   notesText: {
     fontSize: 14,
-    color: '#666',
     lineHeight: 20,
     marginTop: 8,
   },
@@ -921,7 +887,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   detailsErrorText: {
-    color: '#ef4444',
+    color: 'theme.error',
     fontSize: 14,
   },
   // Styles réutilisés pour le récapitulatif (anciennement modalRow)
@@ -933,7 +899,6 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalContainer: {
-    backgroundColor: '#fff',
     borderRadius: 20,
     maxHeight: '90%',
     width: '95%',
@@ -952,7 +917,6 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 15,
     borderBottomWidth: 2,
-    borderBottomColor: '#22c55e',
     flexShrink: 0,
   },
   modalHeaderTop: {
@@ -964,14 +928,12 @@ const styles = StyleSheet.create({
   modalInvoiceTitle: {
     fontSize: 24,
     fontWeight: '900',
-    color: '#22c55e',
     letterSpacing: 1,
     marginBottom: 4,
   },
   modalOrderNumber: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#333',
   },
   modalInvoiceInfo: {
     flexDirection: 'row',
@@ -983,7 +945,6 @@ const styles = StyleSheet.create({
   },
   modalInvoiceLabel: {
     fontSize: 11,
-    color: '#999',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 4,
@@ -991,7 +952,6 @@ const styles = StyleSheet.create({
   },
   modalInvoiceValue: {
     fontSize: 14,
-    color: '#333',
     fontWeight: '600',
   },
   modalCloseButton: {
@@ -1028,13 +988,11 @@ const styles = StyleSheet.create({
   modalTableHeaderText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#666',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   modalTableDivider: {
     height: 2,
-    backgroundColor: '#eee',
     marginVertical: 12,
   },
   modalTableRow: {
@@ -1049,25 +1007,21 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   modalTableQty: {
-    color: '#333',
     fontWeight: '700',
     fontSize: 14,
     textAlign: 'center',
   },
   modalTableItemName: {
-    color: '#333',
     fontWeight: '700',
     fontSize: 15,
     marginBottom: 4,
   },
   modalTableItemOpts: {
-    color: '#666',
     fontSize: 12,
     marginTop: 2,
     lineHeight: 16,
   },
   modalTablePrice: {
-    color: '#22c55e',
     fontWeight: '700',
     fontSize: 15,
   },
@@ -1089,7 +1043,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   modalRowValue: {
-    color: '#333',
     fontWeight: '700',
     fontSize: 14,
   },
@@ -1100,37 +1053,30 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     marginTop: 8,
     borderTopWidth: 2,
-    borderTopColor: '#22c55e',
   },
   modalTotalLabel: {
     fontSize: 18,
     fontWeight: '900',
-    color: '#333',
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
   modalTotalAmount: {
     fontSize: 24,
     fontWeight: '900',
-    color: '#22c55e',
   },
   modalNotesBox: {
-    backgroundColor: '#fff3e0',
     borderRadius: 8,
     padding: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#22c55e',
   },
   modalNotesLabel: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#22c55e',
     marginBottom: 6,
     textTransform: 'uppercase',
   },
   modalNotesText: {
     fontSize: 14,
-    color: '#666',
     lineHeight: 20,
   },
   modalNoItems: {
@@ -1140,7 +1086,6 @@ const styles = StyleSheet.create({
   },
   modalNoItemsText: {
     fontSize: 14,
-    color: '#999',
     fontStyle: 'italic',
   },
 });

@@ -1,4 +1,4 @@
-import { MaterialIcons } from '@expo/vector-icons';
+﻿import { MaterialIcons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
   Image,
@@ -56,7 +56,7 @@ const Header = ({
             />
           )}
           {/* Nom du restaurant depuis le context */}
-          <Text style={styles.logoText}>{restaurant?.name || 'Restaurant'}</Text>
+          <Text style={[styles.logoText, { color: (theme.background.white || '#fff') }]}>{restaurant?.name || 'Restaurant'}</Text>
         </View>
 
         {/* Icônes droite */}
@@ -67,10 +67,10 @@ const Header = ({
               onPress={onCart}
               activeOpacity={0.7}
             >
-              <MaterialIcons name="shopping-cart" size={24} color="#fff" />
+              <MaterialIcons name="shopping-cart" size={24} color={(theme.background.white || '#fff')} />
               {cartCount > 0 && (
                 <View style={styles.badge}>
-                  <Text style={styles.badgeText}>
+                  <Text style={[styles.badgeText, { color: (theme.background.white || '#fff') }]}>
                     {cartCount > 99 ? '99+' : cartCount}
                   </Text>
                 </View>
@@ -87,7 +87,7 @@ const Header = ({
                   onPress={onReviews}
                   activeOpacity={0.7}
                 >
-                  <MaterialIcons name="rate-review" size={24} color="#fff" />
+                  <MaterialIcons name="rate-review" size={24} color={(theme.background.white || '#fff')} />
                 </TouchableOpacity>
               )}
               {onContacts && (
@@ -96,10 +96,10 @@ const Header = ({
                   onPress={onContacts}
                   activeOpacity={0.7}
                 >
-                  <MaterialIcons name="mail" size={24} color="#fff" />
+                  <MaterialIcons name="mail" size={24} color={(theme.background.white || '#fff')} />
                   {unreadMessagesCount > 0 && (
                     <View style={styles.badge}>
-                      <Text style={styles.badgeText}>
+                      <Text style={[styles.badgeText, { color: (theme.background.white || '#fff') }]}>
                         {unreadMessagesCount > 99 ? '99+' : unreadMessagesCount}
                       </Text>
                     </View>
@@ -120,26 +120,26 @@ const Header = ({
               }}
               activeOpacity={0.7}
             >
-              <MaterialIcons name="notifications" size={24} color="#fff" />
+              <MaterialIcons name="notifications" size={24} color={(theme.background.white || '#fff')} />
               {notificationCount > 0 && (
                 <View style={styles.badge}>
-                  <Text style={styles.badgeText}>
+                  <Text style={[styles.badgeText, { color: (theme.background.white || '#fff') }]}>
                     {notificationCount > 99 ? '99+' : notificationCount}
                   </Text>
                 </View>
               )}
             </TouchableOpacity>
             {notificationsOpen && (
-              <View style={styles.dropdown}>
+              <View style={[styles.dropdown, { backgroundColor: (theme.background.white || '#fff'), borderColor: theme.background.border }]}>
                 <View style={styles.dropdownHeader}>
-                  <Text style={styles.dropdownHeaderText}>Notifications</Text>
+                  <Text style={[styles.dropdownHeaderText, { color: theme.text.primary }]}>Notifications</Text>
                   <TouchableOpacity
                     onPress={() => {
                       setNotificationsOpen(false);
                     }}
                     style={{ padding: 4 }}
                   >
-                    <MaterialIcons name="close" size={18} color="#999" />
+                    <MaterialIcons name="close" size={18} color={theme.text.tertiary} />
                   </TouchableOpacity>
                 </View>
                 {notifications.length > 0 ? (
@@ -167,20 +167,20 @@ const Header = ({
                       >
                         <View style={{ flex: 1 }}>
                           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Text style={styles.dropdownText} numberOfLines={2}>
+                            <Text style={[styles.dropdownText, { color: theme.text.primary }]} numberOfLines={2}>
                               {notif.message || notif.title || 'Nouvelle notification'}
                             </Text>
                             {notif.grouped && notif.count > 1 && (
                               <View style={styles.groupedBadge}>
-                                <Text style={styles.groupedBadgeText}>{notif.count}</Text>
+                                <Text style={[styles.groupedBadgeText, { color: (theme.background.white || '#fff') }]}>{notif.count}</Text>
                               </View>
                             )}
                           </View>
                           {notif.time && (
-                            <Text style={styles.dropdownTime}>{notif.time}</Text>
+                            <Text style={[styles.dropdownTime, { color: theme.text.tertiary }]}>{notif.time}</Text>
                           )}
                           {notif.grouped && notif.notifications && notif.notifications.length > 1 && (
-                            <Text style={styles.groupedText}>
+                            <Text style={[styles.groupedText, { color: (theme.text.secondary || '#666') }]}>
                               {notif.notifications.length} notifications similaires
                             </Text>
                           )}
@@ -207,14 +207,14 @@ const Header = ({
                           style={styles.deleteButton}
                           activeOpacity={0.7}
                         >
-                          <MaterialIcons name="delete-outline" size={18} color="#ef4444" />
+                          <MaterialIcons name="delete-outline" size={18} color={theme.error} />
                         </TouchableOpacity>
                       )}
                     </View>
                   ))
                 ) : (
                   <View style={styles.dropdownItem}>
-                    <Text style={styles.dropdownText}>Aucune notification</Text>
+                    <Text style={[styles.dropdownText, { color: theme.text.primary }]}>Aucune notification</Text>
                   </View>
                 )}
               </View>
@@ -227,10 +227,10 @@ const Header = ({
               onPress={() => setMenuOpen((v) => !v)}
               activeOpacity={0.7}
             >
-              <MaterialIcons name="account-circle" size={24} color="#fff" />
+              <MaterialIcons name="account-circle" size={24} color={(theme.background.white || '#fff')} />
             </TouchableOpacity>
             {menuOpen && (
-              <View style={styles.dropdown}>
+              <View style={[styles.dropdown, { backgroundColor: (theme.background.white || '#fff'), borderColor: theme.background.border }]}>
                 <TouchableOpacity
                   style={styles.dropdownItem}
                   onPress={() => {
@@ -238,7 +238,7 @@ const Header = ({
                     onProfile && onProfile();
                   }}
                 >
-                  <Text style={styles.dropdownText}>Mon profil</Text>
+                  <Text style={[styles.dropdownText, { color: theme.text.primary }]}>Mon profil</Text>
                 </TouchableOpacity>
                 {onLogout && (
                   <TouchableOpacity
@@ -285,7 +285,6 @@ const styles = StyleSheet.create({
   logoText: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#fff',
   },
   iconsContainer: {
     flexDirection: 'row',
@@ -308,7 +307,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   badgeText: {
-    color: '#fff',
     fontSize: 11,
     fontWeight: 'bold',
   },
@@ -316,7 +314,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 40,
     right: 0,
-    backgroundColor: '#fff',
     borderRadius: 8,
     paddingVertical: 6,
     minWidth: 280,
@@ -328,7 +325,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 6,
     borderWidth: 1,
-    borderColor: '#eee',
     zIndex: 100,
   },
   dropdownHeader: {
@@ -344,7 +340,6 @@ const styles = StyleSheet.create({
   dropdownHeaderText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#333',
     textTransform: 'uppercase',
   },
   dropdownItem: {
@@ -361,18 +356,15 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   dropdownText: {
-    color: '#333',
     fontSize: 13,
     fontWeight: '500',
     marginBottom: 4,
   },
   dropdownTime: {
-    color: '#999',
     fontSize: 11,
     fontStyle: 'italic',
   },
   groupedBadge: {
-    backgroundColor: '#22c55e',
     borderRadius: 12,
     paddingHorizontal: 8,
     paddingVertical: 2,
@@ -382,12 +374,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   groupedBadgeText: {
-    color: '#fff',
     fontSize: 10,
     fontWeight: 'bold',
   },
   groupedText: {
-    color: '#666',
     fontSize: 10,
     fontStyle: 'italic',
     marginTop: 4,

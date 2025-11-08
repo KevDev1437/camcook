@@ -4,13 +4,12 @@ import StatusBadge from '../components/admin/StatusBadge';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import Hero from '../components/Hero';
-import { MaterialIcons } from '@expo/vector-icons';
+import api from '../config/api';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useNotifications } from '../context/NotificationContext';
 import { useRestaurant } from '../contexts/RestaurantContext';
 import { orderService } from '../services/orderService';
-import api from '../config/api';
 
 const OrdersScreen = ({ navigation, route }) => {
   const { count } = useCart();
@@ -579,12 +578,12 @@ const OrdersScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'theme.background.light',
     flexDirection: 'column',
   },
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'theme.background.light',
   },
   scrollContent: {
     flexGrow: 1,
@@ -593,7 +592,7 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   orderCard: {
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
@@ -612,16 +611,16 @@ const styles = StyleSheet.create({
   orderNumber: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: 'theme.text.primary',
   },
   restaurantName: {
     fontSize: 16,
-    color: '#333',
+    color: 'theme.text.primary',
     marginBottom: 5,
   },
   orderDate: {
     fontSize: 14,
-    color: '#666',
+    color: 'theme.text.secondary',
     marginBottom: 10,
   },
   orderFooter: {
@@ -630,7 +629,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: 'theme.background.border',
   },
   orderTotal: {
     fontSize: 18,
@@ -684,10 +683,10 @@ const styles = StyleSheet.create({
   filterText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#666',
+    color: 'theme.text.secondary',
   },
   filterTextActive: {
-    color: '#fff',
+    color: 'theme.background.white',
     fontWeight: '700',
   },
   emptyContainer: {
@@ -697,12 +696,12 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#999',
+    color: 'theme.text.tertiary',
     textAlign: 'center',
   },
   // Styles pour le temps estimé
   estimatedTimeContainer: {
-    backgroundColor: '#fff3cd',
+    backgroundColor: 'theme.background.white3cd',
     borderWidth: 1,
     borderColor: '#ffc107',
     borderRadius: 8,
@@ -728,7 +727,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     paddingTop: 15,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: 'theme.background.border',
   },
   detailsLoader: {
     padding: 20,
@@ -738,7 +737,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   detailsLoaderText: {
-    color: '#666',
+    color: 'theme.text.secondary',
     fontSize: 14,
   },
   detailsContent: {
@@ -750,7 +749,7 @@ const styles = StyleSheet.create({
   detailsSectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#333',
+    color: 'theme.text.primary',
     marginBottom: 12,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -763,12 +762,12 @@ const styles = StyleSheet.create({
   },
   detailsLabel: {
     fontSize: 14,
-    color: '#666',
+    color: 'theme.text.secondary',
     flex: 1,
   },
   detailsValue: {
     fontSize: 14,
-    color: '#333',
+    color: 'theme.text.primary',
     fontWeight: '600',
     flex: 1,
     textAlign: 'right',
@@ -782,7 +781,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#f0f0f0',
   },
   orderItemQty: {
-    color: '#333',
+    color: 'theme.text.primary',
     fontWeight: '700',
     fontSize: 14,
     width: 30,
@@ -794,13 +793,13 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   orderItemName: {
-    color: '#333',
+    color: 'theme.text.primary',
     fontWeight: '700',
     fontSize: 15,
     marginBottom: 4,
   },
   orderItemOpts: {
-    color: '#666',
+    color: 'theme.text.secondary',
     fontSize: 12,
     marginTop: 2,
     lineHeight: 16,
@@ -833,7 +832,7 @@ const styles = StyleSheet.create({
   priceBreakdownLabel: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#333',
+    color: 'theme.text.primary',
     textTransform: 'uppercase',
   },
   priceBreakdownValue: {
@@ -862,7 +861,7 @@ const styles = StyleSheet.create({
   },
   priceBreakdownSubItemText: {
     fontSize: 11,
-    color: '#666',
+    color: 'theme.text.secondary',
     flex: 1,
   },
   priceBreakdownSubItemPrice: {
@@ -871,20 +870,20 @@ const styles = StyleSheet.create({
     color: '#22c55e',
   },
   orderItemUnitPrice: {
-    color: '#999',
+    color: 'theme.text.tertiary',
     fontSize: 12,
     fontStyle: 'italic',
     marginTop: 4,
   },
   orderItemUnitPriceLabel: {
-    color: '#999',
+    color: 'theme.text.tertiary',
     fontSize: 10,
     marginTop: 2,
     fontStyle: 'italic',
   },
   noItemsText: {
     fontSize: 14,
-    color: '#999',
+    color: 'theme.text.tertiary',
     fontStyle: 'italic',
     textAlign: 'center',
     padding: 20,
@@ -901,7 +900,7 @@ const styles = StyleSheet.create({
   totalLabel: {
     fontSize: 16,
     fontWeight: '800',
-    color: '#333',
+    color: 'theme.text.primary',
     textTransform: 'uppercase',
   },
   totalAmount: {
@@ -911,7 +910,7 @@ const styles = StyleSheet.create({
   },
   notesText: {
     fontSize: 14,
-    color: '#666',
+    color: 'theme.text.secondary',
     lineHeight: 20,
     marginTop: 8,
   },
@@ -921,7 +920,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   detailsErrorText: {
-    color: '#ef4444',
+    color: 'theme.error',
     fontSize: 14,
   },
   // Styles réutilisés pour le récapitulatif (anciennement modalRow)
@@ -933,7 +932,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     borderRadius: 20,
     maxHeight: '90%',
     width: '95%',
@@ -971,7 +970,7 @@ const styles = StyleSheet.create({
   modalOrderNumber: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#333',
+    color: 'theme.text.primary',
   },
   modalInvoiceInfo: {
     flexDirection: 'row',
@@ -983,7 +982,7 @@ const styles = StyleSheet.create({
   },
   modalInvoiceLabel: {
     fontSize: 11,
-    color: '#999',
+    color: 'theme.text.tertiary',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 4,
@@ -991,7 +990,7 @@ const styles = StyleSheet.create({
   },
   modalInvoiceValue: {
     fontSize: 14,
-    color: '#333',
+    color: 'theme.text.primary',
     fontWeight: '600',
   },
   modalCloseButton: {
@@ -1028,13 +1027,13 @@ const styles = StyleSheet.create({
   modalTableHeaderText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#666',
+    color: 'theme.text.secondary',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   modalTableDivider: {
     height: 2,
-    backgroundColor: '#eee',
+    backgroundColor: 'theme.background.border',
     marginVertical: 12,
   },
   modalTableRow: {
@@ -1049,19 +1048,19 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   modalTableQty: {
-    color: '#333',
+    color: 'theme.text.primary',
     fontWeight: '700',
     fontSize: 14,
     textAlign: 'center',
   },
   modalTableItemName: {
-    color: '#333',
+    color: 'theme.text.primary',
     fontWeight: '700',
     fontSize: 15,
     marginBottom: 4,
   },
   modalTableItemOpts: {
-    color: '#666',
+    color: 'theme.text.secondary',
     fontSize: 12,
     marginTop: 2,
     lineHeight: 16,
@@ -1089,7 +1088,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   modalRowValue: {
-    color: '#333',
+    color: 'theme.text.primary',
     fontWeight: '700',
     fontSize: 14,
   },
@@ -1105,7 +1104,7 @@ const styles = StyleSheet.create({
   modalTotalLabel: {
     fontSize: 18,
     fontWeight: '900',
-    color: '#333',
+    color: 'theme.text.primary',
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
@@ -1115,7 +1114,7 @@ const styles = StyleSheet.create({
     color: '#22c55e',
   },
   modalNotesBox: {
-    backgroundColor: '#fff3e0',
+    backgroundColor: 'theme.background.white3e0',
     borderRadius: 8,
     padding: 12,
     borderLeftWidth: 4,
@@ -1130,7 +1129,7 @@ const styles = StyleSheet.create({
   },
   modalNotesText: {
     fontSize: 14,
-    color: '#666',
+    color: 'theme.text.secondary',
     lineHeight: 20,
   },
   modalNoItems: {
@@ -1140,7 +1139,7 @@ const styles = StyleSheet.create({
   },
   modalNoItemsText: {
     fontSize: 14,
-    color: '#999',
+    color: 'theme.text.tertiary',
     fontStyle: 'italic',
   },
 });

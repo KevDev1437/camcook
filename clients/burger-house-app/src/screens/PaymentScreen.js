@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  Platform,
-} from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useStripe } from '@stripe/stripe-react-native';
-import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext';
-import { useRestaurant } from '../contexts/RestaurantContext';
-import * as paymentService from '../services/paymentService';
-import { orderService } from '../services/orderService';
-import Header from '../components/Header';
+import React, { useEffect, useState } from 'react';
+import {
+    ActivityIndicator,
+    Alert,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 import Footer from '../components/Footer';
+import Header from '../components/Header';
+import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 import { useNotifications } from '../context/NotificationContext';
+import { useRestaurant } from '../contexts/RestaurantContext';
+import { orderService } from '../services/orderService';
+import * as paymentService from '../services/paymentService';
 
 const PaymentScreen = ({ navigation, route }) => {
   const { initPaymentSheet, presentPaymentSheet, isPlatformPaySupported } = useStripe();
@@ -336,7 +336,7 @@ const PaymentScreen = ({ navigation, route }) => {
               <Text style={styles.paymentOptionTitle}>Carte bancaire</Text>
               <Text style={styles.paymentOptionSubtitle}>Visa, Mastercard, American Express</Text>
             </View>
-            <MaterialIcons name="chevron-right" size={24} color="#999" />
+            <MaterialIcons name="chevron-right" size={24} color="theme.text.tertiary" />
           </TouchableOpacity>
 
           {/* Apple Pay (iOS uniquement) */}
@@ -357,7 +357,7 @@ const PaymentScreen = ({ navigation, route }) => {
                   {applePayAvailable ? 'Paiement rapide et sécurisé' : 'Non disponible sur cet appareil'}
                 </Text>
               </View>
-              <MaterialIcons name="chevron-right" size={24} color="#999" />
+              <MaterialIcons name="chevron-right" size={24} color="theme.text.tertiary" />
             </TouchableOpacity>
           )}
 
@@ -379,7 +379,7 @@ const PaymentScreen = ({ navigation, route }) => {
                   {googlePayAvailable ? 'Paiement rapide et sécurisé' : 'Non disponible sur cet appareil'}
                 </Text>
               </View>
-              <MaterialIcons name="chevron-right" size={24} color="#999" />
+              <MaterialIcons name="chevron-right" size={24} color="theme.text.tertiary" />
             </TouchableOpacity>
           )}
         </View>
@@ -392,7 +392,7 @@ const PaymentScreen = ({ navigation, route }) => {
         )}
 
         <View style={styles.infoBox}>
-          <MaterialIcons name="info" size={20} color="#666" />
+          <MaterialIcons name="info" size={20} color="theme.text.secondary" />
           <Text style={styles.infoText}>
             Votre paiement est sécurisé et crypté. Aucune information bancaire n'est stockée sur nos serveurs.
           </Text>
@@ -406,7 +406,7 @@ const PaymentScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'theme.background.light',
   },
   content: {
     flex: 1,
@@ -418,12 +418,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
+    color: 'theme.text.primary',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 18,
-    color: '#666',
+    color: 'theme.text.secondary',
   },
   paymentMethods: {
     marginBottom: 20,
@@ -431,13 +431,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: 'theme.text.primary',
     marginBottom: 16,
   },
   paymentOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
@@ -463,12 +463,12 @@ const styles = StyleSheet.create({
   paymentOptionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: 'theme.text.primary',
     marginBottom: 4,
   },
   paymentOptionSubtitle: {
     fontSize: 14,
-    color: '#666',
+    color: 'theme.text.secondary',
   },
   loadingContainer: {
     alignItems: 'center',
@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 14,
-    color: '#666',
+    color: 'theme.text.secondary',
   },
   infoBox: {
     flexDirection: 'row',
@@ -491,7 +491,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 12,
     fontSize: 13,
-    color: '#666',
+    color: 'theme.text.secondary',
     lineHeight: 20,
   },
 });

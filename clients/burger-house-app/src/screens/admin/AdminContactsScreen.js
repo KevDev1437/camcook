@@ -187,7 +187,7 @@ const AdminContactsScreen = ({ navigation }) => {
                   </View>
                 </>
               ) : (
-                <Text style={{ color: '#333' }}>Aucun message sélectionné.</Text>
+                <Text style={{ color: 'theme.text.primary' }}>Aucun message sélectionné.</Text>
               )}
             </View>
           </View>
@@ -198,28 +198,28 @@ const AdminContactsScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: { flex: 1, backgroundColor: 'theme.background.light' },
   content: { flex: 1 },
   contentContainer: { padding: 16, paddingBottom: 80 },
   headerRow: { marginBottom: 8 },
-  title: { fontSize: 22, fontWeight: '700', marginBottom: 10, color: '#333' },
+  title: { fontSize: 22, fontWeight: '700', marginBottom: 10, color: 'theme.text.primary' },
   filtersRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap', marginBottom: 8 },
-  filterBtn: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, borderWidth: 1, borderColor: '#ddd', backgroundColor: '#fff', marginRight: 8, marginBottom: 4 },
+  filterBtn: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, borderWidth: 1, borderColor: '#ddd', backgroundColor: 'theme.background.white', marginRight: 8, marginBottom: 4 },
   filterBtnActive: { borderColor: '#22c55e', backgroundColor: '#22c55e15' },
-  filterText: { color: '#333', fontWeight: '600' },
+  filterText: { color: 'theme.text.primary', fontWeight: '600' },
   filterTextActive: { color: '#22c55e' },
-  searchInput: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e0e0e0', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: '#333' },
-  card: { backgroundColor: '#fff', borderRadius: 12, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: '#eee' },
+  searchInput: { backgroundColor: 'theme.background.white', borderWidth: 1, borderColor: '#e0e0e0', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: 'theme.text.primary' },
+  card: { backgroundColor: 'theme.background.white', borderRadius: 12, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: 'theme.background.border' },
   cardHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 8, gap: 8 },
   nameEmail: { fontSize: 15, fontWeight: '700', color: '#111' },
-  typeText: { fontSize: 12, color: '#666' },
-  messageText: { color: '#333', lineHeight: 20 },
+  typeText: { fontSize: 12, color: 'theme.text.secondary' },
+  messageText: { color: 'theme.text.primary', lineHeight: 20 },
   actionsRow: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10, gap: 10 },
   actionBtn: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 },
-  actionText: { color: '#fff', fontWeight: '700' },
+  actionText: { color: 'theme.background.white', fontWeight: '700' },
   markReadBtn: { backgroundColor: '#3b82f6' },
   archiveBtn: { backgroundColor: '#6b7280' },
-  resetBtn: { backgroundColor: '#f59e0b' },
+  resetBtn: { backgroundColor: 'theme.warning' },
 });
 
 export default AdminContactsScreen;

@@ -1,4 +1,4 @@
-import { MaterialIcons } from '@expo/vector-icons';
+﻿import { MaterialIcons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import {
     Linking,
@@ -134,7 +134,7 @@ const Footer = ({
             onPress={handlePhone}
             activeOpacity={0.7}
           >
-            <MaterialIcons name="phone" size={14} color="#fff" />
+            <MaterialIcons name="phone" size={14} color={(theme.background.white || '#fff')} />
             <Text style={styles.linkText}>{contact.phone}</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -142,12 +142,12 @@ const Footer = ({
             onPress={handleEmail}
             activeOpacity={0.7}
           >
-            <MaterialIcons name="email" size={14} color="#fff" />
+            <MaterialIcons name="email" size={14} color={(theme.background.white || '#fff')} />
             <Text style={styles.linkText}>{contact.email}</Text>
           </TouchableOpacity>
           {contact.address ? (
             <View style={[styles.link, { marginTop: 2 }]}>
-              <MaterialIcons name="place" size={14} color="#fff" />
+              <MaterialIcons name="place" size={14} color={(theme.background.white || '#fff')} />
               <Text style={styles.linkText}>{contact.address}</Text>
             </View>
           ) : null}
@@ -180,32 +180,32 @@ const Footer = ({
               style={[styles.socialButton, { backgroundColor: theme.primary }]}
               activeOpacity={0.7}
             >
-              <MaterialIcons name="facebook" size={20} color="#fff" />
+              <MaterialIcons name="facebook" size={20} color={(theme.background.white || '#fff')} />
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.socialButton, { backgroundColor: theme.primary }]}
               activeOpacity={0.7}
             >
-              <MaterialIcons name="camera-alt" size={20} color="#fff" />
+              <MaterialIcons name="camera-alt" size={20} color={(theme.background.white || '#fff')} />
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.socialButton, { backgroundColor: theme.primary }]}
               activeOpacity={0.7}
             >
-              <MaterialIcons name="video-camera-front" size={20} color="#fff" />
+              <MaterialIcons name="video-camera-front" size={20} color={(theme.background.white || '#fff')} />
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.socialButton, { backgroundColor: theme.primary }]}
               activeOpacity={0.7}
             >
-              <MaterialIcons name="language" size={20} color="#fff" />
+              <MaterialIcons name="language" size={20} color={(theme.background.white || '#fff')} />
             </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
 
       {/* Bottom bar - Copyright */}
-      <View style={styles.bottomBar}>
+      <View style={[styles.bottomBar, { borderTopColor: theme.text.primary }]}>
         <Text style={styles.copyright}>
           © 2025 {restaurant?.name || 'Restaurant'}. Tous droits réservés.
         </Text>
@@ -264,7 +264,6 @@ const styles = StyleSheet.create({
   },
   bottomBar: {
     borderTopWidth: 1,
-    borderTopColor: '#333',
     paddingHorizontal: 16,
     paddingVertical: 12,
     flexDirection: 'row',

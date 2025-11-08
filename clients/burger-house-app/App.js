@@ -1,15 +1,15 @@
-import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import { StripeProvider } from '@stripe/stripe-react-native';
+import React from 'react';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { STRIPE_PUBLISHABLE_KEY } from './src/config/stripe';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { CartProvider } from './src/context/CartContext';
 import { NotificationProvider } from './src/context/NotificationContext';
 import { RestaurantProvider } from './src/contexts/RestaurantContext';
+import AdminNavigator from './src/navigation/AdminNavigator';
 import AuthNavigator from './src/navigation/AuthNavigator';
 import MainNavigator from './src/navigation/MainNavigator';
-import AdminNavigator from './src/navigation/AdminNavigator';
-import { STRIPE_PUBLISHABLE_KEY } from './src/config/stripe';
 
 function AppContent() {
   const { isAuthenticated, loading, user } = useAuth();
@@ -70,6 +70,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
   },
 });

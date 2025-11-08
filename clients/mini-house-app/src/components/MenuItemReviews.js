@@ -1,12 +1,16 @@
-import React from 'react';
+﻿import React from 'react';
 import { MaterialIcons } from '@expo/vector-icons';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useRestaurant } from '../contexts/RestaurantContext';
+import { getThemeColors } from '../config/theme';
 
 const MenuItemReviews = ({ reviews, isExpanded, onToggle }) => {
+  const { restaurant } = useRestaurant();
+  const theme = getThemeColors(restaurant);
   return (
-    <View style={styles.reviewsSection}>
+    <View style={[styles.reviewsSection, { backgroundColor: (theme.background.white || '#fff') }]}>
       <TouchableOpacity onPress={onToggle}>
-        <Text style={styles.sectionTitle}>
+        <Text style={[styles.sectionTitle, { color: theme.text.primary }]}>
           {isExpanded ? '▼' : '▶'} Avis ({reviews.length})
         </Text>
       </TouchableOpacity>
@@ -15,9 +19,9 @@ const MenuItemReviews = ({ reviews, isExpanded, onToggle }) => {
         <View style={styles.reviewsContent}>
           <View style={styles.reviewsList}>
             {reviews.map(review => (
-              <View key={review.id} style={styles.reviewCard}>
+              <View key={review.id} style={[styles.reviewCard, { borderLeftColor: theme.primary }]}>
                 <View style={styles.reviewHeader}>
-                  <Text style={styles.reviewAuthor}>{review.userName}</Text>
+                  <Text style={[styles.reviewAuthor, { color: theme.text.primary }]}>{review.userName}</Text>
                   <View style={styles.starsContainer}>
                     {[...Array(5)].map((_, i) => (
                       <MaterialIcons
@@ -29,8 +33,8 @@ const MenuItemReviews = ({ reviews, isExpanded, onToggle }) => {
                     ))}
                   </View>
                 </View>
-                <Text style={styles.reviewText}>{review.text}</Text>
-                <Text style={styles.reviewDate}>{review.date}</Text>
+                <Text style={[styles.reviewText, { color: (theme.text.secondary || '#666') }]}>{review.text}</Text>
+                <Text style={[styles.reviewDate, { color: theme.text.tertiary }]}>{review.date}</Text>
               </View>
             ))}
           </View>
@@ -42,7 +46,6 @@ const MenuItemReviews = ({ reviews, isExpanded, onToggle }) => {
 
 const styles = StyleSheet.create({
   reviewsSection: {
-    backgroundColor: '#fff',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
@@ -52,7 +55,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
   },
   reviewsContent: {
     marginTop: 12,
@@ -64,7 +66,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#22c55e',
   },
   reviewHeader: {
     flexDirection: 'row',
@@ -75,20 +76,17 @@ const styles = StyleSheet.create({
   reviewAuthor: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#333',
   },
   starsContainer: {
     flexDirection: 'row',
   },
   reviewText: {
     fontSize: 13,
-    color: '#666',
     lineHeight: 18,
     marginBottom: 8,
   },
   reviewDate: {
     fontSize: 11,
-    color: '#999',
   },
 });
 

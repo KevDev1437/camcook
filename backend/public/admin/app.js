@@ -507,7 +507,7 @@ function displayRestaurants(restaurants, meta) {
                     <div class="actions">
                         <button class="action-btn action-btn-view" onclick="viewRestaurantStats(${restaurant.id})">📊 Stats</button>
                         <button class="action-btn action-btn-edit" onclick="editRestaurantLogo(${restaurant.id}, '${(restaurant.logo || '').replace(/'/g, "\\'")}')">🖼️ Logo</button>
-                        <button class="action-btn action-btn-edit" onclick="editRestaurantTheme(${restaurant.id}, '${(restaurant.settings?.theme?.primary || '#FF6B6B').replace(/'/g, "\\'")}', '${(restaurant.settings?.theme?.secondary || '#4ECDC4').replace(/'/g, "\\'")}')">🎨 Couleurs</button>
+                        <button class="action-btn action-btn-edit" onclick="editRestaurantTheme(${restaurant.id}, this)" data-theme='${JSON.stringify(restaurant.settings?.theme || {})}'>🎨 Couleurs</button>
                         <button class="action-btn action-btn-edit" onclick="editRestaurantSubscription(${restaurant.id})">✏️ Abonnement</button>
                         <button class="action-btn action-btn-toggle" onclick="toggleRestaurantStatus(${restaurant.id}, ${restaurant.isActive})">
                             ${restaurant.isActive ? '⏸️ Désactiver' : '▶️ Activer'}
@@ -1243,33 +1243,201 @@ async function editRestaurantLogo(restaurantId, currentLogo) {
     }
 }
 
-async function editRestaurantTheme(restaurantId, currentPrimaryColor, currentSecondaryColor) {
-    // Créer un modal simple pour modifier les couleurs
+window.editRestaurantTheme = async function(restaurantId, buttonElement) {
+    console.log('editRestaurantTheme called with restaurantId:', restaurantId);
+    
+    // Fonction pour normaliser une couleur (s'assurer qu'elle est en format hexadécimal valide)
+    const normalizeColor = (color, defaultValue) => {
+        if (!color || typeof color !== 'string') return defaultValue;
+        // Si la couleur commence par #, la retourner telle quelle
+        if (color.startsWith('#')) {
+            // S'assurer que c'est en format #RRGGBB (6 caractères après #)
+            if (color.length === 4) {
+                // Convertir #RGB en #RRGGBB
+                return '#' + color[1] + color[1] + color[2] + color[2] + color[3] + color[3];
+            }
+            return color.length === 7 ? color : defaultValue;
+        }
+        return defaultValue;
+    };
+    
+    // Récupérer le thème depuis le data attribute
+    let currentTheme = {};
+    
+    if (buttonElement && buttonElement.dataset.theme) {
+        try {
+            currentTheme = JSON.parse(buttonElement.dataset.theme);
+            console.log('Theme loaded from data attribute:', currentTheme);
+        } catch (e) {
+            console.error('Error parsing theme data:', e);
+        }
+    } else {
+        console.log('No theme data found in button element');
+    }
+    
+    // Valeurs par défaut
+    const defaults = {
+        primary: '#FF6B6B',
+        secondary: '#4ECDC4',
+        error: '#ef4444',
+        success: '#10b981',
+        warning: '#f59e0b',
+        text: { primary: '#333333', secondary: '#666666', tertiary: '#999999' },
+        background: { light: '#f5f5f5', lighter: '#fafafa', border: '#eeeeee', white: '#ffffff' }
+    };
+    
+    // Construire le thème avec normalisation des couleurs
+    const theme = {
+        primary: normalizeColor(currentTheme.primary, defaults.primary),
+        secondary: normalizeColor(currentTheme.secondary, defaults.secondary),
+        error: normalizeColor(currentTheme.error, defaults.error),
+        success: normalizeColor(currentTheme.success, defaults.success),
+        warning: normalizeColor(currentTheme.warning, defaults.warning),
+        text: {
+            primary: normalizeColor(currentTheme.text?.primary, defaults.text.primary),
+            secondary: normalizeColor(currentTheme.text?.secondary, defaults.text.secondary),
+            tertiary: normalizeColor(currentTheme.text?.tertiary, defaults.text.tertiary),
+        },
+        background: {
+            light: normalizeColor(currentTheme.background?.light, defaults.background.light),
+            lighter: normalizeColor(currentTheme.background?.lighter, defaults.background.lighter),
+            border: normalizeColor(currentTheme.background?.border, defaults.background.border),
+            white: normalizeColor(currentTheme.background?.white, defaults.background.white),
+        }
+    };
+    
+    console.log('Normalized theme:', theme);
+    
+    // Créer un modal avec onglets pour organiser les couleurs
     const modal = document.createElement('div');
     modal.className = 'modal';
     modal.innerHTML = `
-        <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-content" style="max-width: 700px; max-height: 90vh; overflow-y: auto;">
             <div class="modal-header">
                 <h3>🎨 Modifier les couleurs du thème</h3>
                 <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label for="themePrimaryColor">Couleur primaire</label>
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <input type="color" id="themePrimaryColor" value="${currentPrimaryColor || '#FF6B6B'}" style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
-                        <input type="text" id="themePrimaryColorText" value="${currentPrimaryColor || '#FF6B6B'}" placeholder="#FF6B6B" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                    </div>
-                    <small class="form-hint">Couleur principale de l'app (boutons, header, liens, etc.)</small>
+                <!-- Onglets -->
+                <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid ${theme.background.border};">
+                    <button class="theme-tab-btn active" onclick="switchThemeTab('basic')" data-tab="basic">Couleurs principales</button>
+                    <button class="theme-tab-btn" onclick="switchThemeTab('status')" data-tab="status">Statuts</button>
+                    <button class="theme-tab-btn" onclick="switchThemeTab('text')" data-tab="text">Textes</button>
+                    <button class="theme-tab-btn" onclick="switchThemeTab('background')" data-tab="background">Arrière-plans</button>
                 </div>
-                <div class="form-group">
-                    <label for="themeSecondaryColor">Couleur secondaire</label>
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <input type="color" id="themeSecondaryColor" value="${currentSecondaryColor || '#4ECDC4'}" style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
-                        <input type="text" id="themeSecondaryColorText" value="${currentSecondaryColor || '#4ECDC4'}" placeholder="#4ECDC4" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                
+                <!-- Onglet: Couleurs principales -->
+                <div id="themeTab-basic" class="theme-tab-content active">
+                    <div class="form-group">
+                        <label for="themePrimaryColor">Couleur primaire</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="color" id="themePrimaryColor" value="${theme.primary}" style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                            <input type="text" id="themePrimaryColorText" value="${theme.primary}" placeholder="#FF6B6B" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        <small class="form-hint">Couleur principale de l'app (boutons, header, liens, etc.)</small>
                     </div>
-                    <small class="form-hint">Couleur secondaire de l'app (accents, éléments secondaires)</small>
+                    <div class="form-group">
+                        <label for="themeSecondaryColor">Couleur secondaire</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="color" id="themeSecondaryColor" value="${theme.secondary}" style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                            <input type="text" id="themeSecondaryColorText" value="${theme.secondary}" placeholder="#4ECDC4" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        <small class="form-hint">Couleur secondaire de l'app (accents, éléments secondaires)</small>
+                    </div>
                 </div>
+                
+                <!-- Onglet: Statuts -->
+                <div id="themeTab-status" class="theme-tab-content" style="display: none;">
+                    <div class="form-group">
+                        <label for="themeErrorColor">Couleur d'erreur</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="color" id="themeErrorColor" value="${theme.error}" style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                            <input type="text" id="themeErrorColorText" value="${theme.error}" placeholder="#ef4444" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        <small class="form-hint">Couleur pour les erreurs, suppressions, annulations</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="themeSuccessColor">Couleur de succès</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="color" id="themeSuccessColor" value="${theme.success}" style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                            <input type="text" id="themeSuccessColorText" value="${theme.success}" placeholder="#10b981" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        <small class="form-hint">Couleur pour les actions réussies, confirmations</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="themeWarningColor">Couleur d'avertissement</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="color" id="themeWarningColor" value="${theme.warning}" style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                            <input type="text" id="themeWarningColorText" value="${theme.warning}" placeholder="#f59e0b" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        <small class="form-hint">Couleur pour les avertissements, notifications importantes</small>
+                    </div>
+                </div>
+                
+                <!-- Onglet: Textes -->
+                <div id="themeTab-text" class="theme-tab-content" style="display: none;">
+                    <div class="form-group">
+                        <label for="themeTextPrimaryColor">Texte principal</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="color" id="themeTextPrimaryColor" value="${theme.text.primary}" style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                            <input type="text" id="themeTextPrimaryColorText" value="${theme.text.primary}" placeholder="#333" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        <small class="form-hint">Couleur pour les titres et textes principaux</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="themeTextSecondaryColor">Texte secondaire</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="color" id="themeTextSecondaryColor" value="${theme.text.secondary}" style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                            <input type="text" id="themeTextSecondaryColorText" value="${theme.text.secondary}" placeholder="#666" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        <small class="form-hint">Couleur pour les sous-titres et descriptions</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="themeTextTertiaryColor">Texte tertiaire</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="color" id="themeTextTertiaryColor" value="${theme.text.tertiary}" style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                            <input type="text" id="themeTextTertiaryColorText" value="${theme.text.tertiary}" placeholder="#999" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        <small class="form-hint">Couleur pour les textes désactivés, placeholders</small>
+                    </div>
+                </div>
+                
+                <!-- Onglet: Arrière-plans -->
+                <div id="themeTab-background" class="theme-tab-content" style="display: none;">
+                    <div class="form-group">
+                        <label for="themeBackgroundLightColor">Arrière-plan clair</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="color" id="themeBackgroundLightColor" value="${theme.background.light}" style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                            <input type="text" id="themeBackgroundLightColorText" value="${theme.background.light}" placeholder="#f5f5f5" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        <small class="form-hint">Arrière-plan principal des pages</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="themeBackgroundLighterColor">Arrière-plan très clair</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="color" id="themeBackgroundLighterColor" value="${theme.background.lighter}" style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                            <input type="text" id="themeBackgroundLighterColorText" value="${theme.background.lighter}" placeholder="#fafafa" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        <small class="form-hint">Arrière-plan des inputs et cartes</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="themeBackgroundBorderColor">Couleur des bordures</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="color" id="themeBackgroundBorderColor" value="${theme.background.border}" style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                            <input type="text" id="themeBackgroundBorderColorText" value="${theme.background.border}" placeholder="#eee" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        <small class="form-hint">Couleur pour les bordures et séparateurs</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="themeBackgroundWhiteColor">Arrière-plan blanc</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="color" id="themeBackgroundWhiteColor" value="${theme.background.white}" style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                            <input type="text" id="themeBackgroundWhiteColorText" value="${theme.background.white}" placeholder="#fff" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        <small class="form-hint">Couleur pour les cartes, modals et éléments blancs</small>
+                    </div>
+                </div>
+                
                 <div id="themeError" class="error-message" style="display: none; margin-top: 10px;"></div>
             </div>
             <div class="modal-footer">
@@ -1281,51 +1449,91 @@ async function editRestaurantTheme(restaurantId, currentPrimaryColor, currentSec
     
     document.body.appendChild(modal);
     
-    // Synchroniser les inputs color et text
-    const primaryColorInput = document.getElementById('themePrimaryColor');
-    const primaryColorText = document.getElementById('themePrimaryColorText');
-    const secondaryColorInput = document.getElementById('themeSecondaryColor');
-    const secondaryColorText = document.getElementById('themeSecondaryColorText');
+    // Fonction pour changer d'onglet
+    window.switchThemeTab = function(tabName) {
+        // Masquer tous les onglets
+        document.querySelectorAll('.theme-tab-content').forEach(tab => {
+            tab.style.display = 'none';
+        });
+        document.querySelectorAll('.theme-tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Afficher l'onglet sélectionné
+        document.getElementById(`themeTab-${tabName}`).style.display = 'block';
+        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+    };
     
-    primaryColorInput.addEventListener('input', (e) => {
-        primaryColorText.value = e.target.value.toUpperCase();
-    });
+    // Synchroniser tous les inputs color et text
+    const colorInputs = [
+        { id: 'themePrimaryColor', textId: 'themePrimaryColorText' },
+        { id: 'themeSecondaryColor', textId: 'themeSecondaryColorText' },
+        { id: 'themeErrorColor', textId: 'themeErrorColorText' },
+        { id: 'themeSuccessColor', textId: 'themeSuccessColorText' },
+        { id: 'themeWarningColor', textId: 'themeWarningColorText' },
+        { id: 'themeTextPrimaryColor', textId: 'themeTextPrimaryColorText' },
+        { id: 'themeTextSecondaryColor', textId: 'themeTextSecondaryColorText' },
+        { id: 'themeTextTertiaryColor', textId: 'themeTextTertiaryColorText' },
+        { id: 'themeBackgroundLightColor', textId: 'themeBackgroundLightColorText' },
+        { id: 'themeBackgroundLighterColor', textId: 'themeBackgroundLighterColorText' },
+        { id: 'themeBackgroundBorderColor', textId: 'themeBackgroundBorderColorText' },
+        { id: 'themeBackgroundWhiteColor', textId: 'themeBackgroundWhiteColorText' },
+    ];
     
-    primaryColorText.addEventListener('input', (e) => {
-        const value = e.target.value.trim();
-        if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
-            primaryColorInput.value = value;
-        }
-    });
-    
-    secondaryColorInput.addEventListener('input', (e) => {
-        secondaryColorText.value = e.target.value.toUpperCase();
-    });
-    
-    secondaryColorText.addEventListener('input', (e) => {
-        const value = e.target.value.trim();
-        if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
-            secondaryColorInput.value = value;
+    colorInputs.forEach(({ id, textId }) => {
+        const colorInput = document.getElementById(id);
+        const textInput = document.getElementById(textId);
+        
+        if (colorInput && textInput) {
+            colorInput.addEventListener('input', (e) => {
+                textInput.value = e.target.value.toUpperCase();
+            });
+            
+            textInput.addEventListener('input', (e) => {
+                const value = e.target.value.trim();
+                if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+                    colorInput.value = value;
+                }
+            });
         }
     });
 }
 
-async function saveRestaurantTheme(restaurantId) {
-    const primaryColor = document.getElementById('themePrimaryColor').value;
-    const secondaryColor = document.getElementById('themeSecondaryColor').value;
+window.saveRestaurantTheme = async function(restaurantId) {
     const errorDiv = document.getElementById('themeError');
+    
+    // Récupérer toutes les couleurs
+    const themeData = {
+        primaryColor: document.getElementById('themePrimaryColor')?.value,
+        secondaryColor: document.getElementById('themeSecondaryColor')?.value,
+        errorColor: document.getElementById('themeErrorColor')?.value,
+        successColor: document.getElementById('themeSuccessColor')?.value,
+        warningColor: document.getElementById('themeWarningColor')?.value,
+        textPrimaryColor: document.getElementById('themeTextPrimaryColor')?.value,
+        textSecondaryColor: document.getElementById('themeTextSecondaryColor')?.value,
+        textTertiaryColor: document.getElementById('themeTextTertiaryColor')?.value,
+        backgroundLightColor: document.getElementById('themeBackgroundLightColor')?.value,
+        backgroundLighterColor: document.getElementById('themeBackgroundLighterColor')?.value,
+        backgroundBorderColor: document.getElementById('themeBackgroundBorderColor')?.value,
+        backgroundWhiteColor: document.getElementById('themeBackgroundWhiteColor')?.value,
+    };
     
     // Validation
     const hexColorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
-    if (!hexColorRegex.test(primaryColor)) {
-        errorDiv.textContent = 'Couleur primaire invalide. Format attendu: #RRGGBB (ex: #FF6B6B)';
-        errorDiv.style.display = 'block';
-        return;
+    for (const [key, value] of Object.entries(themeData)) {
+        if (value && !hexColorRegex.test(value)) {
+            errorDiv.textContent = `${key} invalide. Format attendu: #RRGGBB (ex: #FF6B6B)`;
+            errorDiv.style.display = 'block';
+            return;
+        }
     }
-    if (!hexColorRegex.test(secondaryColor)) {
-        errorDiv.textContent = 'Couleur secondaire invalide. Format attendu: #RRGGBB (ex: #4ECDC4)';
-        errorDiv.style.display = 'block';
-        return;
+    
+    // Convertir en majuscules et filtrer les valeurs vides
+    const payload = {};
+    for (const [key, value] of Object.entries(themeData)) {
+        if (value) {
+            payload[key] = value.toUpperCase();
+        }
     }
     
     errorDiv.style.display = 'none';
@@ -1337,10 +1545,7 @@ async function saveRestaurantTheme(restaurantId) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${currentToken}`
             },
-            body: JSON.stringify({
-                primaryColor: primaryColor.toUpperCase(),
-                secondaryColor: secondaryColor.toUpperCase()
-            })
+            body: JSON.stringify(payload)
         });
         
         const data = await response.json();

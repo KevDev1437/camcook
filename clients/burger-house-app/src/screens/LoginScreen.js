@@ -72,7 +72,7 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'theme.background.light',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     maxWidth: 420,
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     borderRadius: 12,
     padding: 20,
     elevation: 2,
@@ -97,11 +97,11 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '700',
     marginBottom: 4,
-    color: '#333',
+    color: 'theme.text.primary',
   },
   subtitle: {
     fontSize: 14,
-    color: '#666',
+    color: 'theme.text.secondary',
     marginBottom: 16,
   },
   input: {
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     marginBottom: 12,
     fontSize: 16,
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
   },
   button: {
     backgroundColor: '#22c55e',
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonText: {
-    color: '#fff',
+    color: 'theme.background.white',
     fontWeight: '700',
     fontSize: 16,
   },
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   registerText: {
-    color: '#666',
+    color: 'theme.text.secondary',
   },
   registerLink: {
     color: '#22c55e',

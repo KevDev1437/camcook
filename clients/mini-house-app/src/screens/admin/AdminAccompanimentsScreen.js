@@ -1,14 +1,18 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, ActivityIndicator, RefreshControl } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Header from '../../components/Header';
 import api from '../../config/api';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import { useRestaurant } from '../../contexts/RestaurantContext';
+import { getThemeColors } from '../../config/theme';
 
 const AdminAccompanimentsScreen = ({ navigation }) => {
   const { count } = useCart();
   const { logout } = useAuth();
+  const { restaurant } = useRestaurant();
+  const theme = getThemeColors(restaurant);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [savingId, setSavingId] = useState(null);
@@ -313,8 +317,8 @@ const AdminAccompanimentsScreen = ({ navigation }) => {
           showAdminActions={true}
         />
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#22c55e" />
-          <Text style={styles.loadingText}>Chargement...</Text>
+          <ActivityIndicator size="large" color={theme.primary} />
+          <Text style={[styles.loadingText, { color: (theme.text.secondary || '#666') }]}>Chargement...</Text>
         </View>
       </View>
     );
@@ -344,11 +348,11 @@ const AdminAccompanimentsScreen = ({ navigation }) => {
 
         {/* Section Accompagnements */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Accompagnements</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text.primary }]}>Accompagnements</Text>
           
           {/* Formulaire d'ajout */}
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Ajouter un accompagnement</Text>
+          <View style={[styles.card, { backgroundColor: (theme.background.white || '#fff'), borderColor: theme.background.border }]}>
+            <Text style={[styles.cardTitle, { color: theme.text.primary }]}>Ajouter un accompagnement</Text>
             <View style={styles.addRow}>
               <View style={styles.addInputContainer}>
                 <Text style={styles.addLabel}>Nom</Text>
@@ -370,14 +374,14 @@ const AdminAccompanimentsScreen = ({ navigation }) => {
                 />
               </View>
               <TouchableOpacity 
-                style={[styles.addButton, savingId === 'add-accomp' && styles.addButtonDisabled]} 
+                style={[styles.addButton, { backgroundColor: theme.primary }, savingId === 'add-accomp' && styles.addButtonDisabled]} 
                 onPress={addAccomp}
                 disabled={savingId === 'add-accomp'}
               >
                 {savingId === 'add-accomp' ? (
-                  <ActivityIndicator color="#fff" size="small" />
+                  <ActivityIndicator color={(theme.background.white || '#fff')} size="small" />
                 ) : (
-                  <MaterialIcons name="add" size={24} color="#fff" />
+                  <MaterialIcons name="add" size={24} color={(theme.background.white || '#fff')} />
                 )}
               </TouchableOpacity>
             </View>
@@ -385,15 +389,15 @@ const AdminAccompanimentsScreen = ({ navigation }) => {
 
           {/* Liste des accompagnements */}
           {accompaniments.length === 0 ? (
-            <Text style={styles.emptyText}>Aucun accompagnement</Text>
+            <Text style={[styles.emptyText, { color: theme.text.tertiary }]}>Aucun accompagnement</Text>
           ) : (
             accompaniments.map((acc) => {
               const edited = accompEditor[acc.id] || { name: acc.name || '', price: String(acc.price || 0) };
               const isSaving = savingId === `accomp-${acc.id}`;
               
               return (
-                <View key={acc.id} style={styles.card}>
-                  <Text style={styles.cardTitle}>{acc.name || `Accompagnement ${acc.id}`}</Text>
+                <View key={acc.id} style={[styles.card, { backgroundColor: (theme.background.white || '#fff'), borderColor: theme.background.border }]}>
+                  <Text style={[styles.cardTitle, { color: theme.text.primary }]}>{acc.name || `Accompagnement ${acc.id}`}</Text>
                   
                   <View style={styles.editRow}>
                     <View style={styles.editCol}>
@@ -419,25 +423,25 @@ const AdminAccompanimentsScreen = ({ navigation }) => {
                   
                   <View style={styles.actionRow}>
                     <TouchableOpacity
-                      style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
+                      style={[styles.saveButton, { backgroundColor: theme.primary }, isSaving && styles.saveButtonDisabled]}
                       onPress={() => saveAccomp(acc.id)}
                       disabled={isSaving}
                     >
                       {isSaving ? (
-                        <ActivityIndicator color="#fff" size="small" />
+                        <ActivityIndicator color={(theme.background.white || '#fff')} size="small" />
                       ) : (
                         <>
-                          <MaterialIcons name="save" size={18} color="#fff" />
-                          <Text style={styles.saveButtonText}>Sauvegarder</Text>
+                          <MaterialIcons name="save" size={18} color={(theme.background.white || '#fff')} />
+                          <Text style={[styles.saveButtonText, { color: (theme.background.white || '#fff') }]}>Sauvegarder</Text>
                         </>
                       )}
                     </TouchableOpacity>
                     <TouchableOpacity
-                      style={styles.deleteButton}
+                      style={[styles.deleteButton, { backgroundColor: theme.error }]}
                       onPress={() => deleteAccomp(acc.id)}
                     >
-                      <MaterialIcons name="delete" size={18} color="#fff" />
-                      <Text style={styles.deleteButtonText}>Supprimer</Text>
+                      <MaterialIcons name="delete" size={18} color={(theme.background.white || '#fff')} />
+                      <Text style={[styles.deleteButtonText, { color: (theme.background.white || '#fff') }]}>Supprimer</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -448,11 +452,11 @@ const AdminAccompanimentsScreen = ({ navigation }) => {
 
         {/* Section Boissons */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Boissons</Text>
+          <Text style={[styles.sectionTitle, { color: theme.text.primary }]}>Boissons</Text>
           
           {/* Formulaire d'ajout */}
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Ajouter une boisson</Text>
+          <View style={[styles.card, { backgroundColor: (theme.background.white || '#fff'), borderColor: theme.background.border }]}>
+            <Text style={[styles.cardTitle, { color: theme.text.primary }]}>Ajouter une boisson</Text>
             <View style={styles.addRow}>
               <View style={styles.addInputContainer}>
                 <Text style={styles.addLabel}>Nom</Text>
@@ -474,14 +478,14 @@ const AdminAccompanimentsScreen = ({ navigation }) => {
                 />
               </View>
               <TouchableOpacity 
-                style={[styles.addButton, savingId === 'add-drink' && styles.addButtonDisabled]} 
+                style={[styles.addButton, { backgroundColor: theme.primary }, savingId === 'add-drink' && styles.addButtonDisabled]} 
                 onPress={addDrink}
                 disabled={savingId === 'add-drink'}
               >
                 {savingId === 'add-drink' ? (
-                  <ActivityIndicator color="#fff" size="small" />
+                  <ActivityIndicator color={(theme.background.white || '#fff')} size="small" />
                 ) : (
-                  <MaterialIcons name="add" size={24} color="#fff" />
+                  <MaterialIcons name="add" size={24} color={(theme.background.white || '#fff')} />
                 )}
               </TouchableOpacity>
             </View>
@@ -489,15 +493,15 @@ const AdminAccompanimentsScreen = ({ navigation }) => {
 
           {/* Liste des boissons */}
           {drinks.length === 0 ? (
-            <Text style={styles.emptyText}>Aucune boisson</Text>
+            <Text style={[styles.emptyText, { color: theme.text.tertiary }]}>Aucune boisson</Text>
           ) : (
             drinks.map((drink) => {
               const edited = drinkEditor[drink.id] || { name: drink.name || '', price: String(drink.price || 0) };
               const isSaving = savingId === `drink-${drink.id}`;
               
               return (
-                <View key={drink.id} style={styles.card}>
-                  <Text style={styles.cardTitle}>{drink.name || `Boisson ${drink.id}`}</Text>
+                <View key={drink.id} style={[styles.card, { backgroundColor: (theme.background.white || '#fff'), borderColor: theme.background.border }]}>
+                  <Text style={[styles.cardTitle, { color: theme.text.primary }]}>{drink.name || `Boisson ${drink.id}`}</Text>
                   
                   <View style={styles.editRow}>
                     <View style={styles.editCol}>
@@ -523,25 +527,25 @@ const AdminAccompanimentsScreen = ({ navigation }) => {
                   
                   <View style={styles.actionRow}>
                     <TouchableOpacity
-                      style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
+                      style={[styles.saveButton, { backgroundColor: theme.primary }, isSaving && styles.saveButtonDisabled]}
                       onPress={() => saveDrink(drink.id)}
                       disabled={isSaving}
                     >
                       {isSaving ? (
-                        <ActivityIndicator color="#fff" size="small" />
+                        <ActivityIndicator color={(theme.background.white || '#fff')} size="small" />
                       ) : (
                         <>
-                          <MaterialIcons name="save" size={18} color="#fff" />
-                          <Text style={styles.saveButtonText}>Sauvegarder</Text>
+                          <MaterialIcons name="save" size={18} color={(theme.background.white || '#fff')} />
+                          <Text style={[styles.saveButtonText, { color: (theme.background.white || '#fff') }]}>Sauvegarder</Text>
                         </>
                       )}
                     </TouchableOpacity>
                     <TouchableOpacity
-                      style={styles.deleteButton}
+                      style={[styles.deleteButton, { backgroundColor: theme.error }]}
                       onPress={() => deleteDrink(drink.id)}
                     >
-                      <MaterialIcons name="delete" size={18} color="#fff" />
-                      <Text style={styles.deleteButtonText}>Supprimer</Text>
+                      <MaterialIcons name="delete" size={18} color={(theme.background.white || '#fff')} />
+                      <Text style={[styles.deleteButtonText, { color: (theme.background.white || '#fff') }]}>Supprimer</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -556,25 +560,22 @@ const AdminAccompanimentsScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: { flex: 1 },
   content: { flex: 1 },
   contentContainer: { padding: 16, paddingBottom: 80 },
-  title: { fontSize: 24, fontWeight: '800', marginBottom: 8, color: '#333' },
-  description: { fontSize: 14, color: '#666', marginBottom: 24, fontStyle: 'italic' },
+  title: { fontSize: 24, fontWeight: '800', marginBottom: 8 },
+  description: { fontSize: 14, marginBottom: 24, fontStyle: 'italic' },
   section: { marginBottom: 24 },
-  sectionTitle: { fontSize: 20, fontWeight: '700', marginBottom: 12, color: '#333' },
+  sectionTitle: { fontSize: 20, fontWeight: '700', marginBottom: 12 },
   card: {
-    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#eee',
   },
   cardTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#333',
     marginBottom: 12,
   },
   addRow: {
@@ -588,21 +589,16 @@ const styles = StyleSheet.create({
   addLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#555',
     marginBottom: 6,
   },
   addInput: {
-    backgroundColor: '#fafafa',
     borderWidth: 1,
-    borderColor: '#eee',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 16,
-    color: '#333',
   },
   addButton: {
-    backgroundColor: '#22c55e',
     width: 44,
     height: 44,
     borderRadius: 8,
@@ -624,25 +620,20 @@ const styles = StyleSheet.create({
   editLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#555',
     marginBottom: 6,
   },
   input: {
-    backgroundColor: '#fafafa',
     borderWidth: 1,
-    borderColor: '#eee',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 16,
-    color: '#333',
   },
   actionRow: {
     flexDirection: 'row',
     gap: 10,
   },
   saveButton: {
-    backgroundColor: '#22c55e',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -655,12 +646,10 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   saveButtonText: {
-    color: '#fff',
     fontWeight: '700',
     fontSize: 14,
   },
   deleteButton: {
-    backgroundColor: '#ef4444',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -670,13 +659,11 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   deleteButtonText: {
-    color: '#fff',
     fontWeight: '700',
     fontSize: 14,
   },
   emptyText: {
     fontSize: 14,
-    color: '#999',
     fontStyle: 'italic',
     textAlign: 'center',
     paddingVertical: 20,
@@ -689,7 +676,6 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    color: '#666',
     fontSize: 16,
   },
 });

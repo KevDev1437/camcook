@@ -1,12 +1,12 @@
-import React, {useState, useEffect} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  ActivityIndicator,
-  Alert,
+    ActivityIndicator,
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import restaurantService from '../services/restaurantService';
 
@@ -137,29 +137,29 @@ const RestaurantDetailScreen = ({route, navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'theme.background.light',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'theme.background.light',
   },
   header: {
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: 'theme.background.border',
   },
   restaurantName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: 'theme.text.primary',
     marginBottom: 5,
   },
   restaurantDescription: {
     fontSize: 16,
-    color: '#666',
+    color: 'theme.text.secondary',
     marginBottom: 10,
   },
   headerInfo: {
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   },
   restaurantTime: {
     fontSize: 14,
-    color: '#666',
+    color: 'theme.text.secondary',
   },
   deliveryInfo: {
     flexDirection: 'row',
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
   },
   deliveryBadge: {
     fontSize: 12,
-    color: '#666',
+    color: 'theme.text.secondary',
     backgroundColor: '#f0f0f0',
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -195,16 +195,16 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 15,
-    color: '#333',
+    color: 'theme.text.primary',
   },
   noDataText: {
     textAlign: 'center',
-    color: '#999',
+    color: 'theme.text.tertiary',
     fontSize: 16,
     marginTop: 20,
   },
   menuItem: {
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     borderRadius: 10,
     padding: 15,
     marginBottom: 10,
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   menuItemName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: 'theme.text.primary',
     marginRight: 8,
   },
   popularBadge: {
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
   },
   menuItemDescription: {
     fontSize: 14,
-    color: '#666',
+    color: 'theme.text.secondary',
     marginBottom: 5,
   },
   menuItemPrice: {
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
   },
   menuItemOptions: {
     fontSize: 12,
-    color: '#999',
+    color: 'theme.text.tertiary',
     fontStyle: 'italic',
   },
   addButton: {
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   addButtonText: {
-    color: '#fff',
+    color: 'theme.background.white',
     fontWeight: 'bold',
   },
 });

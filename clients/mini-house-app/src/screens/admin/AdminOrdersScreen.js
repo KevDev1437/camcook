@@ -1,15 +1,19 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Modal, RefreshControl, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import StatusBadge from '../../components/admin/StatusBadge';
 import Header from '../../components/Header';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { useNotifications } from '../../context/NotificationContext';
+import { useRestaurant } from '../../contexts/RestaurantContext';
+import { getThemeColors } from '../../config/theme';
 import { adminService } from '../../services/adminService';
 
 const AdminOrdersScreen = ({ navigation }) => {
   const { count } = useCart();
   const { logout } = useAuth();
+  const { restaurant } = useRestaurant();
+  const theme = getThemeColors(restaurant);
   // Le contexte filtre déjà les messages pour les admins
   const { 
     notifications: generalNotifications, // Déjà filtrées (sans messages)
@@ -100,13 +104,13 @@ const AdminOrdersScreen = ({ navigation }) => {
   };
 
   const FilterButton = ({ value, label }) => (
-    <TouchableOpacity onPress={() => setStatusFilter(value)} style={[styles.filterBtn, statusFilter === value && styles.filterBtnActive]}>
-      <Text style={[styles.filterText, statusFilter === value && styles.filterTextActive]}>{label}</Text>
+    <TouchableOpacity onPress={() => setStatusFilter(value)} style={[styles.filterBtn, { backgroundColor: (theme.background.white || '#fff') }, statusFilter === value && { borderColor: theme.primary, backgroundColor: theme.primary + '15' }]}>
+      <Text style={[styles.filterText, { color: theme.text.primary }, statusFilter === value && { color: theme.primary }]}>{label}</Text>
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background.light }]}>
   <Header 
     onNotifications={() => navigation.navigate('AdminOrders')}
     notificationCount={generalNotificationCount}
@@ -138,7 +142,7 @@ const AdminOrdersScreen = ({ navigation }) => {
         contentContainerStyle={styles.contentContainer}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={fetchOrders} />}
       >
-        <Text style={styles.title}>Commandes</Text>
+        <Text style={[styles.title, { color: theme.text.primary }]}>Commandes</Text>
 
         {/* New order banner */}
         {newBanner && (
@@ -159,10 +163,10 @@ const AdminOrdersScreen = ({ navigation }) => {
         </View>
 
         {loading ? (
-          <ActivityIndicator color="#22c55e" />
+          <ActivityIndicator color={theme.primary} />
         ) : (
           orders.map((o) => (
-            <View key={o.id} style={styles.card}>
+            <View key={o.id} style={[styles.card, { backgroundColor: (theme.background.white || '#fff'), borderColor: theme.background.border }]}>
               <View style={styles.cardHeader}>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.orderNum}>#{o.orderNumber}</Text>
@@ -172,15 +176,15 @@ const AdminOrdersScreen = ({ navigation }) => {
                     </Text>
                   )}
                   {o.customer && (
-                    <Text style={{ fontSize: 11, color: '#666', marginBottom: 2 }}>
+                    <Text style={{ fontSize: 11, color: theme.text.secondary, marginBottom: 2 }}>
                       👤 Client: {o.customer.name || o.customer.email || 'Inconnu'}
                     </Text>
                   )}
-                  <Text style={styles.orderMeta}>{new Date(o.createdAt).toLocaleString()} • {(Number(o.total)||0).toFixed(2)} € • {o.orderType === 'delivery' ? 'Livraison' : 'À emporter'}</Text>
+                  <Text style={[styles.orderMeta, { color: (theme.text.secondary || '#666') }]}>{new Date(o.createdAt).toLocaleString()} • {(Number(o.total)||0).toFixed(2)} € • {o.orderType === 'delivery' ? 'Livraison' : 'À emporter'}</Text>
                   {o.status === 'preparing' && o.estimatedReadyTime && (
                     <View style={styles.estimatedTimeContainer}>
                       <Text style={styles.estimatedTimeLabel}>⏱️ Prêt dans environ :</Text>
-                      <Text style={styles.estimatedTimeValue}>
+                      <Text style={[styles.estimatedTimeValue, { color: theme.primary }]}>
                         {(() => {
                           const estimated = new Date(o.estimatedReadyTime);
                           const diffMs = estimated - currentTime;
@@ -211,7 +215,7 @@ const AdminOrdersScreen = ({ navigation }) => {
                   )}
                   {/* Informations de paiement */}
                   <View style={{ flexDirection: 'row', marginTop: 4, alignItems: 'center' }}>
-                    <Text style={{ fontSize: 12, color: '#666', marginRight: 8 }}>
+                    <Text style={{ fontSize: 12, color: theme.text.secondary, marginRight: 8 }}>
                       Paiement: {
                         o.paymentStatus === 'paid' ? '✅ Payé' :
                         o.paymentStatus === 'pending' ? '⏳ En attente' :
@@ -221,7 +225,7 @@ const AdminOrdersScreen = ({ navigation }) => {
                       }
                     </Text>
                     {o.paymentMethod && (
-                      <Text style={{ fontSize: 12, color: '#666' }}>
+                      <Text style={{ fontSize: 12, color: theme.text.secondary }}>
                         • {
                           o.paymentMethod === 'stripe_card' ? '💳 Carte' :
                           o.paymentMethod === 'stripe_apple_pay' ? '🍎 Apple Pay' :
@@ -240,14 +244,14 @@ const AdminOrdersScreen = ({ navigation }) => {
 
               {/* Items */}
               {Array.isArray(o.items) && o.items.length > 0 && (
-                <View style={styles.itemsBox}>
+                <View style={[styles.itemsBox, { backgroundColor: theme.background.lighter }]}>
                   {o.items.map((it, idx) => (
                     <View key={idx} style={styles.itemRow}>
-                      <Text style={styles.itemQty}>x{it.quantity || 1}</Text>
+                      <Text style={[styles.itemQty, { color: theme.text.primary }]}>x{it.quantity || 1}</Text>
                       <View style={{ flex: 1 }}>
-                        <Text style={styles.itemName}>{it.name || 'Article'}</Text>
+                        <Text style={[styles.itemName, { color: theme.text.primary }]}>{it.name || 'Article'}</Text>
                         {it.options && (
-                          <Text style={styles.itemOpts}>
+                          <Text style={[styles.itemOpts, { color: (theme.text.secondary || '#666') }]}>
                             {(() => {
                               const acc = Array.isArray(it.options.accompagnements) ? it.options.accompagnements : [];
                               const drink = it.options.boisson ? ` • Boisson: ${it.options.boisson}` : '';
@@ -257,7 +261,7 @@ const AdminOrdersScreen = ({ navigation }) => {
                           </Text>
                         )}
                       </View>
-                      <Text style={styles.itemPrice}>{Number(it.price || it.unitPrice || 0).toFixed(2)} €</Text>
+                      <Text style={[styles.itemPrice, { color: theme.primary }]}>{Number(it.price || it.unitPrice || 0).toFixed(2)} €</Text>
                     </View>
                   ))}
                 </View>
@@ -266,38 +270,38 @@ const AdminOrdersScreen = ({ navigation }) => {
               {/* Actions */}
               <View style={styles.actionsRow}>
                 {o.status === 'pending' && (
-                  <TouchableOpacity style={[styles.actionBtn, styles.approveBtn]} onPress={() => updateStatus(o.id, 'confirmed')}>
-                    <Text style={styles.actionText}>Confirmer</Text>
+                  <TouchableOpacity style={[styles.actionBtn, { backgroundColor: theme.success }]} onPress={() => updateStatus(o.id, 'confirmed')}>
+                    <Text style={[styles.actionText, { color: (theme.background.white || '#fff') }]}>Confirmer</Text>
                   </TouchableOpacity>
                 )}
                 {o.status === 'pending' && (
-                  <TouchableOpacity style={[styles.actionBtn, styles.rejectBtn]} onPress={() => updateStatus(o.id, 'rejected')}>
-                    <Text style={styles.actionText}>Refuser</Text>
+                  <TouchableOpacity style={[styles.actionBtn, { backgroundColor: theme.error }]} onPress={() => updateStatus(o.id, 'rejected')}>
+                    <Text style={[styles.actionText, { color: (theme.background.white || '#fff') }]}>Refuser</Text>
                   </TouchableOpacity>
                 )}
                 {o.status === 'confirmed' && (
                   <TouchableOpacity style={[styles.actionBtn, styles.processBtn]} onPress={() => handleStartPreparation(o.id)}>
-                    <Text style={styles.actionText}>Commencer</Text>
+                    <Text style={[styles.actionText, { color: (theme.background.white || '#fff') }]}>Commencer</Text>
                   </TouchableOpacity>
                 )}
                 {o.status === 'preparing' && (
                   <TouchableOpacity style={[styles.actionBtn, styles.processBtn]} onPress={() => updateStatus(o.id, 'ready')}>
-                    <Text style={styles.actionText}>Prête</Text>
+                    <Text style={[styles.actionText, { color: (theme.background.white || '#fff') }]}>Prête</Text>
                   </TouchableOpacity>
                 )}
                 {o.status === 'ready' && o.orderType === 'delivery' && (
                   <TouchableOpacity style={[styles.actionBtn, styles.processBtn]} onPress={() => updateStatus(o.id, 'on_delivery')}>
-                    <Text style={styles.actionText}>En livraison</Text>
+                    <Text style={[styles.actionText, { color: (theme.background.white || '#fff') }]}>En livraison</Text>
                   </TouchableOpacity>
                 )}
                 {(o.status === 'ready' || o.status === 'on_delivery') && (
-                  <TouchableOpacity style={[styles.actionBtn, styles.approveBtn]} onPress={() => updateStatus(o.id, 'completed')}>
-                    <Text style={styles.actionText}>Terminer</Text>
+                  <TouchableOpacity style={[styles.actionBtn, { backgroundColor: theme.success }]} onPress={() => updateStatus(o.id, 'completed')}>
+                    <Text style={[styles.actionText, { color: (theme.background.white || '#fff') }]}>Terminer</Text>
                   </TouchableOpacity>
                 )}
                 {o.status !== 'completed' && o.status !== 'cancelled' && o.status !== 'rejected' && (
-                  <TouchableOpacity style={[styles.actionBtn, styles.rejectBtn]} onPress={() => updateStatus(o.id, 'cancelled')}>
-                    <Text style={styles.actionText}>Annuler</Text>
+                  <TouchableOpacity style={[styles.actionBtn, { backgroundColor: theme.error }]} onPress={() => updateStatus(o.id, 'cancelled')}>
+                    <Text style={[styles.actionText, { color: (theme.background.white || '#fff') }]}>Annuler</Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -314,14 +318,14 @@ const AdminOrdersScreen = ({ navigation }) => {
         onRequestClose={() => setTimeModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Temps estimé de préparation</Text>
-            <Text style={styles.modalSubtitle}>
+          <View style={[styles.modalContent, { backgroundColor: (theme.background.white || '#fff') }]}>
+            <Text style={[styles.modalTitle, { color: theme.text.primary }]}>Temps estimé de préparation</Text>
+            <Text style={[styles.modalSubtitle, { color: (theme.text.secondary || '#666') }]}>
               Dans combien de minutes la commande sera-t-elle prête ?
             </Text>
             
             <TextInput
-              style={styles.timeInput}
+              style={[styles.timeInput, { borderColor: theme.primary }]}
               placeholder="30"
               keyboardType="numeric"
               value={estimatedMinutes}
@@ -335,13 +339,13 @@ const AdminOrdersScreen = ({ navigation }) => {
                 style={[styles.modalButton, styles.modalButtonCancel]}
                 onPress={() => setTimeModalVisible(false)}
               >
-                <Text style={styles.modalButtonTextCancel}>Annuler</Text>
+                <Text style={[styles.modalButtonTextCancel, { color: (theme.text.secondary || '#666') }]}>Annuler</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalButton, styles.modalButtonConfirm]}
+                style={[styles.modalButton, { backgroundColor: theme.primary }]}
                 onPress={confirmStartPreparation}
               >
-                <Text style={styles.modalButtonTextConfirm}>Confirmer</Text>
+                <Text style={[styles.modalButtonTextConfirm, { color: (theme.background.white || '#fff') }]}>Confirmer</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -352,33 +356,31 @@ const AdminOrdersScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: { flex: 1 },
   content: { flex: 1 },
   contentContainer: { padding: 16, paddingBottom: 80 },
-  title: { fontSize: 22, fontWeight: '700', marginBottom: 8, color: '#333' },
+  title: { fontSize: 22, fontWeight: '700', marginBottom: 8 },
   filtersRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap', marginBottom: 8 },
-  filterBtn: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, borderWidth: 1, borderColor: '#ddd', backgroundColor: '#fff' },
-  filterBtnActive: { borderColor: '#22c55e', backgroundColor: '#22c55e15' },
-  filterText: { color: '#333', fontWeight: '600' },
-  filterTextActive: { color: '#22c55e' },
+  filterBtn: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, borderWidth: 1, borderColor: '#ddd' },
+  filterText: { fontWeight: '600' },
   banner: { backgroundColor: '#fff8e1', borderWidth: 1, borderColor: '#ffecb3', padding: 10, borderRadius: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   bannerText: { color: '#8d6e63', fontWeight: '700' },
   bannerClose: { color: '#8d6e63', fontWeight: '700' },
-  card: { backgroundColor: '#fff', borderRadius: 12, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: '#eee' },
+  card: { borderRadius: 12, padding: 12, marginBottom: 12, borderWidth: 1 },
   cardHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 8, gap: 8 },
   orderNum: { fontSize: 16, fontWeight: '800', color: '#111' },
-  orderMeta: { fontSize: 12, color: '#666' },
-  itemsBox: { backgroundColor: '#fafafa', borderRadius: 8, padding: 8, borderWidth: 1, borderColor: '#f0f0f0', marginTop: 6 },
+  orderMeta: { fontSize: 12 },
+  itemsBox: { borderRadius: 8, padding: 8, borderWidth: 1, borderColor: '#f0f0f0', marginTop: 6 },
   itemRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 6, gap: 8 },
-  itemQty: { color: '#333', width: 26, fontWeight: '700' },
-  itemName: { color: '#333', fontWeight: '700' },
-  itemOpts: { color: '#666', fontSize: 12 },
-  itemPrice: { color: '#22c55e', fontWeight: '700', minWidth: 70, textAlign: 'right' },
+  itemQty: { width: 26, fontWeight: '700' },
+  itemName: { fontWeight: '700' },
+  itemOpts: { fontSize: 12 },
+  itemPrice: { fontWeight: '700', minWidth: 70, textAlign: 'right' },
   actionsRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 10, marginTop: 10 },
   actionBtn: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 },
-  actionText: { color: '#fff', fontWeight: '700' },
-  approveBtn: { backgroundColor: '#10b981' },
-  rejectBtn: { backgroundColor: '#ef4444' },
+  actionText: { fontWeight: '700' },
+  approveBtn: { },
+  rejectBtn: { },
   processBtn: { backgroundColor: '#3b82f6' },
   // Modal styles
   modalOverlay: {
@@ -388,7 +390,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#fff',
     borderRadius: 20,
     padding: 24,
     width: '85%',
@@ -397,19 +398,16 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#333',
     marginBottom: 8,
     textAlign: 'center',
   },
   modalSubtitle: {
     fontSize: 14,
-    color: '#666',
     marginBottom: 20,
     textAlign: 'center',
   },
   timeInput: {
     borderWidth: 2,
-    borderColor: '#22c55e',
     borderRadius: 10,
     padding: 15,
     fontSize: 18,
@@ -419,7 +417,6 @@ const styles = StyleSheet.create({
   },
   modalHint: {
     fontSize: 12,
-    color: '#999',
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -436,22 +433,17 @@ const styles = StyleSheet.create({
   modalButtonCancel: {
     backgroundColor: '#f0f0f0',
   },
-  modalButtonConfirm: {
-    backgroundColor: '#22c55e',
-  },
   modalButtonTextCancel: {
-    color: '#666',
     fontWeight: '700',
     fontSize: 16,
   },
   modalButtonTextConfirm: {
-    color: '#fff',
     fontWeight: '700',
     fontSize: 16,
   },
   // Styles pour le temps estimé
   estimatedTimeContainer: {
-    backgroundColor: '#fff3cd',
+    backgroundColor: '#f0f0f0',
     borderWidth: 1,
     borderColor: '#ffc107',
     borderRadius: 8,
@@ -469,7 +461,6 @@ const styles = StyleSheet.create({
   },
   estimatedTimeValue: {
     fontSize: 16,
-    color: '#22c55e',
     fontWeight: '700',
   },
 });

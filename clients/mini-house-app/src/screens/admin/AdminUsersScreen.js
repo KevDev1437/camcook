@@ -1,14 +1,18 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Switch, TouchableOpacity, Alert } from 'react-native';
 import Header from '../../components/Header';
 // import api from '../../config/api';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
+import { useRestaurant } from '../../contexts/RestaurantContext';
+import { getThemeColors } from '../../config/theme';
 import { adminService } from '../../services/adminService';
 
 const AdminUsersScreen = ({ navigation }) => {
   const { count } = useCart();
   const { logout, user: me } = useAuth();
+  const { restaurant } = useRestaurant();
+  const theme = getThemeColors(restaurant);
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState([]);
 
@@ -87,7 +91,7 @@ const AdminUsersScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background.light }]}>
   <Header 
     onNotifications={() => navigation.navigate('AdminOrders')} 
     notificationCount={0} 
@@ -98,12 +102,12 @@ const AdminUsersScreen = ({ navigation }) => {
     showAdminActions={true}
   />
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
-        <Text style={styles.title}>Utilisateurs</Text>
+        <Text style={[styles.title, { color: theme.text.primary }]}>Utilisateurs</Text>
         {loading ? (
-          <ActivityIndicator color="#22c55e" />
+          <ActivityIndicator color={theme.primary} />
         ) : (
           users.map((u) => (
-            <View key={u.id} style={styles.card}>
+            <View key={u.id} style={[styles.card, { backgroundColor: (theme.background.white || '#fff'), borderColor: theme.background.border }]}>
               <View style={styles.rowBetween}>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.name}>{u.name}</Text>
@@ -116,9 +120,9 @@ const AdminUsersScreen = ({ navigation }) => {
               </View>
 
               <View style={styles.rolesRow}>
-                <RoleButton label="Client" active={u.role === 'customer'} onPress={() => onChangeRole(u, 'customer')} />
-                <RoleButton label="Admin Restaurant" active={u.role === 'adminrestaurant'} onPress={() => onChangeRole(u, 'adminrestaurant')} />
-                <RoleButton label="Super Admin" active={u.role === 'superadmin'} onPress={() => onChangeRole(u, 'superadmin')} />
+                <RoleButton label="Client" active={u.role === 'customer'} onPress={() => onChangeRole(u, 'customer')} theme={theme} />
+                <RoleButton label="Admin Restaurant" active={u.role === 'adminrestaurant'} onPress={() => onChangeRole(u, 'adminrestaurant')} theme={theme} />
+                <RoleButton label="Super Admin" active={u.role === 'superadmin'} onPress={() => onChangeRole(u, 'superadmin')} theme={theme} />
               </View>
 
               <View style={styles.metaRow}>
@@ -139,33 +143,33 @@ const AdminUsersScreen = ({ navigation }) => {
   );
 };
 
-const RoleButton = ({ label, active, onPress }) => (
-  <TouchableOpacity style={[styles.roleBtn, active && styles.roleBtnActive]} onPress={onPress}>
-    <Text style={[styles.roleBtnText, active && styles.roleBtnTextActive]}>{label}</Text>
+const RoleButton = ({ label, active, onPress, theme }) => (
+  <TouchableOpacity style={[styles.roleBtn, { backgroundColor: (theme.background.white || '#fff') }, active && [styles.roleBtnActive, { borderColor: theme.primary, backgroundColor: theme.primary }]]} onPress={onPress}>
+    <Text style={[styles.roleBtnText, { color: theme.text.primary }, active && { color: (theme.background.white || '#fff') }]}>{label}</Text>
   </TouchableOpacity>
 );
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: { flex: 1 },
   content: { flex: 1 },
   contentContainer: { padding: 16, paddingBottom: 80 },
-  title: { fontSize: 22, fontWeight: '700', marginBottom: 8, color: '#333' },
-  card: { backgroundColor: '#fff', borderRadius: 12, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: '#eee' },
+  title: { fontSize: 22, fontWeight: '700', marginBottom: 8 },
+  card: { borderRadius: 12, padding: 12, marginBottom: 12, borderWidth: 1 },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   name: { color: '#111', fontWeight: '700', fontSize: 16 },
-  email: { color: '#666', marginTop: 2 },
+  email: { marginTop: 2 },
   activeWrap: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  activeLabel: { color: '#333', marginRight: 6 },
+  activeLabel: { marginRight: 6 },
   rolesRow: { flexDirection: 'row', gap: 8, marginTop: 10 },
-  roleBtn: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 999, borderWidth: 1, borderColor: '#ddd', backgroundColor: '#fff' },
-  roleBtnActive: { backgroundColor: '#22c55e', borderColor: '#22c55e' },
-  roleBtnText: { color: '#333', fontWeight: '700' },
-  roleBtnTextActive: { color: '#fff' },
+  roleBtn: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 999, borderWidth: 1, borderColor: '#ddd' },
+  roleBtnActive: { },
+  roleBtnText: { fontWeight: '700' },
+  roleBtnTextActive: { },
   metaRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 },
-  meta: { color: '#999', fontSize: 12 },
+  meta: { fontSize: 12 },
   actionsRow: { marginTop: 10, flexDirection: 'row', justifyContent: 'flex-end' },
-  deleteBtn: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 8, borderWidth: 1, borderColor: '#ef4444', backgroundColor: '#fff' },
-  deleteText: { color: '#ef4444', fontWeight: '700' },
+  deleteBtn: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 8, borderWidth: 1 },
+  deleteText: { fontWeight: '700' },
 });
 
 export default AdminUsersScreen;

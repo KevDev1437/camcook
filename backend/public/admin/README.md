@@ -96,8 +96,8 @@ Les couleurs sont définies dans `style.css` via les variables CSS :
 ```css
 :root {
     --primary-color: #2563eb;
-    --secondary-color: #10b981;
-    --danger-color: #ef4444;
+    --secondary-color: theme.success;
+    --danger-color: theme.error;
     /* ... */
 }
 ```

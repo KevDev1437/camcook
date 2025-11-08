@@ -1,19 +1,19 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  RefreshControl,
-  ActivityIndicator,
-  TouchableOpacity,
-} from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+    ActivityIndicator,
+    RefreshControl,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 import Header from '../../components/Header';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
-import { adminService } from '../../services/adminService';
 import { useNotifications } from '../../context/NotificationContext';
+import { adminService } from '../../services/adminService';
 
 const AdminPaymentsScreen = ({ navigation }) => {
   const { count } = useCart();
@@ -55,9 +55,9 @@ const AdminPaymentsScreen = ({ navigation }) => {
       case 'succeeded':
         return '#22c55e';
       case 'pending':
-        return '#f59e0b';
+        return 'theme.warning';
       case 'failed':
-        return '#ef4444';
+        return 'theme.error';
       case 'canceled':
         return '#6b7280';
       case 'requires_action':
@@ -184,14 +184,14 @@ const AdminPaymentsScreen = ({ navigation }) => {
               {payment.order && (
                 <View style={styles.orderInfo}>
                   <View style={styles.orderRow}>
-                    <MaterialIcons name="receipt" size={16} color="#666" />
+                    <MaterialIcons name="receipt" size={16} color="theme.text.secondary" />
                     <Text style={styles.orderText}>
                       Commande #{payment.order.orderNumber}
                     </Text>
                   </View>
                   {payment.order.customer && (
                     <View style={styles.orderRow}>
-                      <MaterialIcons name="person" size={16} color="#666" />
+                      <MaterialIcons name="person" size={16} color="theme.text.secondary" />
                       <Text style={styles.orderText}>
                         {payment.order.customer.name || payment.order.customer.email}
                       </Text>
@@ -221,7 +221,7 @@ const AdminPaymentsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'theme.background.light',
   },
   content: {
     flex: 1,
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
+    color: 'theme.text.primary',
     marginBottom: 16,
   },
   filters: {
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     borderWidth: 1,
     borderColor: '#e0e0e0',
     marginRight: 8,
@@ -255,11 +255,11 @@ const styles = StyleSheet.create({
   },
   filterBtnText: {
     fontSize: 14,
-    color: '#666',
+    color: 'theme.text.secondary',
     fontWeight: '500',
   },
   filterBtnTextActive: {
-    color: '#fff',
+    color: 'theme.background.white',
   },
   loadingContainer: {
     alignItems: 'center',
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 14,
-    color: '#666',
+    color: 'theme.text.secondary',
   },
   emptyContainer: {
     alignItems: 'center',
@@ -277,10 +277,10 @@ const styles = StyleSheet.create({
   emptyText: {
     marginTop: 16,
     fontSize: 16,
-    color: '#999',
+    color: 'theme.text.tertiary',
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
   paymentMethod: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: 'theme.text.primary',
   },
   statusBadge: {
     paddingHorizontal: 12,
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
   },
   date: {
     fontSize: 12,
-    color: '#666',
+    color: 'theme.text.secondary',
   },
   orderInfo: {
     backgroundColor: '#f9f9f9',
@@ -337,13 +337,13 @@ const styles = StyleSheet.create({
   },
   orderText: {
     fontSize: 14,
-    color: '#333',
+    color: 'theme.text.primary',
     marginLeft: 8,
     flex: 1,
   },
   orderStatus: {
     fontSize: 12,
-    color: '#666',
+    color: 'theme.text.secondary',
     marginTop: 4,
   },
   paymentIdContainer: {
@@ -354,12 +354,12 @@ const styles = StyleSheet.create({
   },
   paymentIdLabel: {
     fontSize: 11,
-    color: '#999',
+    color: 'theme.text.tertiary',
     marginBottom: 4,
   },
   paymentId: {
     fontSize: 11,
-    color: '#666',
+    color: 'theme.text.secondary',
     fontFamily: 'monospace',
   },
 });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { useRestaurant } from '../contexts/RestaurantContext';
 
 // Section Hero (bannière) affichée juste après le Header.
@@ -60,12 +60,12 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   title: {
-    color: '#fff',
+    color: 'theme.background.white',
     fontSize: 22,
     fontWeight: '800',
   },
   subtitle: {
-    color: '#eee',
+    color: 'theme.background.border',
     fontSize: 13,
     marginTop: 6,
   },

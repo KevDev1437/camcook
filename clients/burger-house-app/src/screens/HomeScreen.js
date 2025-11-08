@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+    ActivityIndicator,
+    Alert,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
@@ -231,12 +231,12 @@ const styles = StyleSheet.create({
   mainTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: 'theme.text.primary',
     textAlign: 'center',
   },
   noDataText: {
     textAlign: 'center',
-    color: '#999',
+    color: 'theme.text.tertiary',
     fontSize: 14,
     marginVertical: 40,
   },
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#fff',
+    color: 'theme.background.white',
     textAlign: 'center',
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 1, height: 1 },

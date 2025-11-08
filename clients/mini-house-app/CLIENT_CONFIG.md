@@ -7,12 +7,12 @@
 - **Email:** mini@gmail.com
 - **Slug:** mini-house
 - **Bundle ID:** com.camcook.mini-house
-- **Couleur primaire:** #c11a1a
-- **Couleur secondaire:** #17e8da
+- **Couleur primaire:** #f31212
+- **Couleur secondaire:** #1dd7cb
 
 ## Date de création
 
-2025-11-08 10:23:37
+2025-11-08 13:35:38
 
 ## Notes
 

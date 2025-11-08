@@ -1,10 +1,14 @@
-import { StyleSheet, Text, View } from 'react-native';
+﻿import { StyleSheet, Text, View } from 'react-native';
+import { useRestaurant } from '../contexts/RestaurantContext';
+import { getThemeColors } from '../config/theme';
 
 /**
  * Composant pour afficher une carte d'avis
  * @param {Object} review - Objet avis contenant id, userName, rating, text, date
  */
 const ReviewCard = ({ review }) => {
+  const { restaurant } = useRestaurant();
+  const theme = getThemeColors(restaurant);
   const renderStars = (rating) => {
     return (
       <Text style={styles.stars}>
@@ -15,13 +19,13 @@ const ReviewCard = ({ review }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { borderLeftColor: theme.primary }]}>
       <View style={styles.header}>
-        <Text style={styles.author}>{review.userName}</Text>
+        <Text style={[styles.author, { color: theme.text.primary }]}>{review.userName}</Text>
         <View>{renderStars(review.rating)}</View>
       </View>
-      <Text style={styles.text}>{review.text}</Text>
-      <Text style={styles.date}>{review.date}</Text>
+      <Text style={[styles.text, { color: (theme.text.secondary || '#666') }]}>{review.text}</Text>
+      <Text style={[styles.date, { color: theme.text.tertiary }]}>{review.date}</Text>
     </View>
   );
 };
@@ -33,7 +37,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 10,
     borderLeftWidth: 4,
-    borderLeftColor: '#22c55e',
   },
   header: {
     flexDirection: 'row',
@@ -44,7 +47,6 @@ const styles = StyleSheet.create({
   author: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#333',
   },
   stars: {
     fontSize: 12,
@@ -52,13 +54,11 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 13,
-    color: '#666',
     lineHeight: 18,
     marginBottom: 6,
   },
   date: {
     fontSize: 11,
-    color: '#999',
   },
 });
 

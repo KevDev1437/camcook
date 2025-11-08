@@ -1,4 +1,4 @@
-import { MaterialIcons } from '@expo/vector-icons';
+﻿import { MaterialIcons } from '@expo/vector-icons';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import {
     ActivityIndicator,
@@ -22,12 +22,16 @@ import api from '../config/api';
 import { AuthContext } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useNotifications } from '../context/NotificationContext';
+import { useRestaurant } from '../contexts/RestaurantContext';
+import { getThemeColors } from '../config/theme';
 
 const MenuItemDetailScreen = ({ route, navigation }) => {
   const { menuItemId, restaurantId } = route.params;
   const { user, logout } = useContext(AuthContext);
   const { addItem, count } = useCart();
   const { notifications, notificationCount, onNotificationPress, markAsRead, clearNotification } = useNotifications();
+  const { restaurant } = useRestaurant();
+  const theme = getThemeColors(restaurant);
 
   // États
   const [menuItem, setMenuItem] = useState(null);
@@ -376,7 +380,7 @@ const MenuItemDetailScreen = ({ route, navigation }) => {
           showCart={true} 
         />
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#22c55e" />
+          <ActivityIndicator size="large" color={theme.primary} />
         </View>
         <Footer />
       </View>
@@ -491,8 +495,8 @@ const MenuItemDetailScreen = ({ route, navigation }) => {
         
         {/* Section Accompagnements (données backend) */}
         {accompOption && accompagnementsChoices.length > 0 && (
-          <View style={styles.extraSection}>
-            <Text style={styles.extraTitle}>Accompagnements</Text>
+          <View style={[styles.extraSection, { backgroundColor: (theme.background.white || '#fff') }]}>
+            <Text style={[styles.extraTitle, { color: theme.text.primary }]}>Accompagnements</Text>
             <View style={styles.extraList}>
               {accompagnementsChoices.map((choice, idx) => {
                 const optKey = accompOption?.id ?? 'accompagnements';
@@ -509,12 +513,12 @@ const MenuItemDetailScreen = ({ route, navigation }) => {
                     style={styles.extraCheckboxRow}
                     onPress={() => toggleAccompagnement(choice)}
                   >
-                    <View style={[styles.extraCheckbox, selected && styles.extraCheckboxChecked]}>
-                      {selected && <MaterialIcons name="check" size={14} color="#fff" />}
+                    <View style={[styles.extraCheckbox, { backgroundColor: (theme.background.white || '#fff') }, selected && styles.extraCheckboxChecked]}>
+                      {selected && <MaterialIcons name="check" size={14} color={(theme.background.white || '#fff')} />}
                     </View>
-                    <Text style={styles.extraLabel}>
+                    <Text style={[styles.extraLabel, { color: theme.text.primary }]}>
                       {label} 
-                      {choicePrice > 0 && <Text style={styles.extraPrice}>+{choicePrice.toFixed(2)} €</Text>}
+                      {choicePrice > 0 && <Text style={[styles.extraPrice, { color: theme.primary }]}>+{choicePrice.toFixed(2)} €</Text>}
                     </Text>
                   </TouchableOpacity>
                 );
@@ -525,8 +529,8 @@ const MenuItemDetailScreen = ({ route, navigation }) => {
 
         {/* Section Boissons (backend, afficher toutes les boissons) */}
         {boissonOption && drinksChoices.length > 0 && (
-          <View style={styles.extraSection}>
-            <Text style={styles.extraTitle}>Boissons</Text>
+          <View style={[styles.extraSection, { backgroundColor: (theme.background.white || '#fff') }]}>
+            <Text style={[styles.extraTitle, { color: theme.text.primary }]}>Boissons</Text>
             <View style={styles.extraList}>
               {drinksChoices.map((choice, idx) => {
                 const optKey = boissonOption?.id ?? 'boisson';
@@ -543,12 +547,12 @@ const MenuItemDetailScreen = ({ route, navigation }) => {
                     style={styles.extraCheckboxRow}
                     onPress={() => toggleDrink(choice)}
                   >
-                    <View style={[styles.extraCheckbox, selected && styles.extraCheckboxChecked]}>
-                      {selected && <MaterialIcons name="check" size={14} color="#fff" />}
+                    <View style={[styles.extraCheckbox, { backgroundColor: (theme.background.white || '#fff') }, selected && styles.extraCheckboxChecked]}>
+                      {selected && <MaterialIcons name="check" size={14} color={(theme.background.white || '#fff')} />}
                     </View>
-                    <Text style={styles.extraLabel}>
+                    <Text style={[styles.extraLabel, { color: theme.text.primary }]}>
                       {label} 
-                      {choicePrice > 0 && <Text style={styles.extraPrice}>+{choicePrice.toFixed(2)} €</Text>}
+                      {choicePrice > 0 && <Text style={[styles.extraPrice, { color: theme.primary }]}>+{choicePrice.toFixed(2)} €</Text>}
                     </Text>
                   </TouchableOpacity>
                 );
@@ -559,16 +563,16 @@ const MenuItemDetailScreen = ({ route, navigation }) => {
 
         {/* Sélecteur de portion à éditer (si quantité > 1) */}
         {quantity > 1 && (
-          <View style={styles.extraSection}>
-            <Text style={styles.extraTitle}>Portion à éditer</Text>
+          <View style={[styles.extraSection, { backgroundColor: (theme.background.white || '#fff') }]}>
+            <Text style={[styles.extraTitle, { color: theme.text.primary }]}>Portion à éditer</Text>
             <View style={styles.portionChips}>
               {Array.from({ length: quantity }).map((_, i) => (
                 <TouchableOpacity
                   key={`portion-${i}`}
-                  style={[styles.portionChip, i === currentPortionIndex && styles.portionChipActive]}
+                  style={[styles.portionChip, i === currentPortionIndex && { backgroundColor: '#ffefe8', borderColor: theme.primary }]}
                   onPress={() => setCurrentPortionIndex(i)}
                 >
-                  <Text style={[styles.portionChipText, i === currentPortionIndex && styles.portionChipTextActive]}>{i + 1}</Text>
+                  <Text style={[styles.portionChipText, { color: theme.text.primary }, i === currentPortionIndex && { color: theme.primary }]}>{i + 1}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -576,8 +580,8 @@ const MenuItemDetailScreen = ({ route, navigation }) => {
         )}
 
         {/* Checklist Menu */}
-        <View style={styles.extraSection}>
-          <Text style={styles.extraTitle}>Checklist Menu</Text>
+        <View style={[styles.extraSection, { backgroundColor: (theme.background.white || '#fff') }]}>
+          <Text style={[styles.extraTitle, { color: theme.text.primary }]}>Checklist Menu</Text>
           <View style={styles.checklistContainer}>
             {Array.from({ length: Math.max(1, quantity) }).map((_, idx) => {
               const opts = selectedOptionsList[idx] || {};
@@ -588,21 +592,21 @@ const MenuItemDetailScreen = ({ route, navigation }) => {
               return (
                 <View key={`portion-check-${idx}`}>
                   <View style={styles.checklistRow}>
-                    <Text style={styles.checklistBullet}>-</Text>
-                    <Text style={styles.checklistText}>{menuItem?.name}</Text>
+                    <Text style={[styles.checklistBullet, { color: theme.text.primary }]}>-</Text>
+                    <Text style={[styles.checklistText, { color: theme.text.primary }]}>{menuItem?.name}</Text>
                   </View>
                   {acc.map((label, i) => (
                     <View key={`p${idx}-acc-${i}`} style={styles.checklistRow}>
-                      <Text style={styles.checklistBullet}>-</Text>
-                      <Text style={styles.checklistText}>{String(label)}</Text>
+                      <Text style={[styles.checklistBullet, { color: theme.text.primary }]}>-</Text>
+                      <Text style={[styles.checklistText, { color: theme.text.primary }]}>{String(label)}</Text>
                     </View>
                   ))}
                   {drinkArr.map((drink, i) => {
                     const drinkLabel = getChoiceLabel(drink);
                     return (
                       <View key={`p${idx}-drink-${i}`} style={styles.checklistRow}>
-                        <Text style={styles.checklistBullet}>-</Text>
-                        <Text style={styles.checklistText}>{drinkLabel}</Text>
+                        <Text style={[styles.checklistBullet, { color: theme.text.primary }]}>-</Text>
+                        <Text style={[styles.checklistText, { color: theme.text.primary }]}>{drinkLabel}</Text>
                       </View>
                     );
                   })}
@@ -625,7 +629,7 @@ const MenuItemDetailScreen = ({ route, navigation }) => {
         {/* Action utilitaire: Réinitialiser la sélection */}
         <View style={styles.toolsRow}>
           <TouchableOpacity onPress={clearSelections} style={styles.resetBtn}>
-            <Text style={styles.resetText}>Réinitialiser la sélection</Text>
+            <Text style={[styles.resetText, { color: theme.primary }]}>Réinitialiser la sélection</Text>
           </TouchableOpacity>
         </View>
 
@@ -679,7 +683,6 @@ const styles = StyleSheet.create({
   },
   // Styles compléments additionnels
   extraSection: {
-    backgroundColor: '#fff',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
@@ -689,7 +692,6 @@ const styles = StyleSheet.create({
   extraTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
     marginBottom: 8,
   },
   extraList: {
@@ -709,18 +711,11 @@ const styles = StyleSheet.create({
     marginRight: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
-  },
-  extraCheckboxChecked: {
-    backgroundColor: '#22c55e',
-    borderColor: '#22c55e',
   },
   extraLabel: {
     fontSize: 14,
-    color: '#333',
   },
   extraPrice: {
-    color: '#22c55e',
     fontWeight: '600',
   },
   checklistContainer: {
@@ -734,12 +729,10 @@ const styles = StyleSheet.create({
   checklistBullet: {
     width: 14,
     textAlign: 'center',
-    color: '#333',
     marginRight: 6,
   },
   checklistText: {
     fontSize: 14,
-    color: '#333',
   },
   toolsRow: {
     paddingHorizontal: 16,
@@ -752,7 +745,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   resetText: {
-    color: '#22c55e',
     fontWeight: '600',
   },
   // Portion chips
@@ -768,18 +760,9 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     marginRight: 8,
     marginBottom: 8,
-    backgroundColor: '#fff',
-  },
-  portionChipActive: {
-    backgroundColor: '#ffefe8',
-    borderColor: '#22c55e',
   },
   portionChipText: {
-    color: '#333',
     fontWeight: '600',
-  },
-  portionChipTextActive: {
-    color: '#22c55e',
   },
 });
 

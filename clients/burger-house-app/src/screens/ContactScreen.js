@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
@@ -228,26 +228,26 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f9f9f9' },
   scrollContent: { flexGrow: 1 },
   content: { paddingHorizontal: 16, paddingVertical: 20 },
-  title: { fontSize: 22, fontWeight: 'bold', color: '#333', marginBottom: 6 },
-  subtitle: { fontSize: 13, color: '#666', marginBottom: 16 },
+  title: { fontSize: 22, fontWeight: 'bold', color: 'theme.text.primary', marginBottom: 6 },
+  subtitle: { fontSize: 13, color: 'theme.text.secondary', marginBottom: 16 },
   toggleRow: { flexDirection: 'row', gap: 8, marginBottom: 16, flexWrap: 'wrap' },
-  toggleBtn: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 20, backgroundColor: '#eee' },
+  toggleBtn: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 20, backgroundColor: 'theme.background.border' },
   toggleBtnActive: { backgroundColor: '#dcfce7', borderWidth: 1, borderColor: '#22c55e' },
   toggleText: { color: '#555', fontSize: 12 },
   toggleTextActive: { color: '#22c55e', fontWeight: '600' },
   labelRow: { marginBottom: 6 },
-  labelText: { fontSize: 13, color: '#333', fontWeight: '600' },
+  labelText: { fontSize: 13, color: 'theme.text.primary', fontWeight: '600' },
   required: { color: '#ff3b30' },
-  input: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e0e0e0', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, marginBottom: 12, fontSize: 14, color: '#333' },
+  input: { backgroundColor: 'theme.background.white', borderWidth: 1, borderColor: '#e0e0e0', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, marginBottom: 12, fontSize: 14, color: 'theme.text.primary' },
   textarea: { height: 140, textAlignVertical: 'top' },
   submitBtn: { backgroundColor: '#22c55e', borderRadius: 8, paddingVertical: 12, alignItems: 'center', marginTop: 4 },
-  submitText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  submitText: { color: 'theme.background.white', fontSize: 16, fontWeight: '600' },
   faqSection: { marginTop: 24 },
-  faqTitle: { fontSize: 18, fontWeight: 'bold', color: '#333', marginBottom: 12 },
-  faqItem: { backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#e0e0e0', marginBottom: 10 },
+  faqTitle: { fontSize: 18, fontWeight: 'bold', color: 'theme.text.primary', marginBottom: 12 },
+  faqItem: { backgroundColor: 'theme.background.white', borderRadius: 8, borderWidth: 1, borderColor: '#e0e0e0', marginBottom: 10 },
   faqQuestionRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 12 },
   faqArrow: { width: 18, textAlign: 'center', marginRight: 8, color: '#22c55e' },
-  faqQuestionText: { flex: 1, fontSize: 14, color: '#333', fontWeight: '600' },
+  faqQuestionText: { flex: 1, fontSize: 14, color: 'theme.text.primary', fontWeight: '600' },
   faqAnswer: { paddingHorizontal: 12, paddingBottom: 12, fontSize: 13, color: '#555' },
 });
 

@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, ActivityIndicator, Switch } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Header from '../../components/Header';
 import api from '../../config/api';
 import { useAuth } from '../../context/AuthContext';
@@ -229,7 +229,7 @@ const AdminProfileScreen = ({ navigation }) => {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <MaterialIcons name="arrow-back" size={24} color="#333" />
+          <MaterialIcons name="arrow-back" size={24} color="theme.text.primary" />
           <Text style={styles.backButtonText}>Retour</Text>
         </TouchableOpacity>
       )}
@@ -398,7 +398,7 @@ const AdminProfileScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'theme.background.light',
   },
   content: {
     flex: 1,
@@ -415,17 +415,17 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    color: '#666',
+    color: 'theme.text.secondary',
     fontSize: 14,
   },
   header: {
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     borderRadius: 12,
     padding: 24,
     alignItems: 'center',
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: 'theme.background.border',
   },
   avatar: {
     width: 100,
@@ -439,17 +439,17 @@ const styles = StyleSheet.create({
   avatarText: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#fff',
+    color: 'theme.background.white',
   },
   userName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: 'theme.text.primary',
     marginBottom: 6,
   },
   userEmail: {
     fontSize: 14,
-    color: '#666',
+    color: 'theme.text.secondary',
     marginBottom: 12,
   },
   badge: {
@@ -459,22 +459,22 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   badgeText: {
-    color: '#fff',
+    color: 'theme.background.white',
     fontSize: 12,
     fontWeight: 'bold',
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: 'theme.background.border',
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: 'theme.text.primary',
     marginBottom: 16,
   },
   inputGroup: {
@@ -487,14 +487,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#fafafa',
+    backgroundColor: 'theme.background.lighter',
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: 'theme.background.border',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 12,
     fontSize: 16,
-    color: '#333',
+    color: 'theme.text.primary',
   },
   saveButton: {
     backgroundColor: '#22c55e',
@@ -507,7 +507,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   saveButtonText: {
-    color: '#fff',
+    color: 'theme.background.white',
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -522,27 +522,27 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   changePasswordButtonText: {
-    color: '#fff',
+    color: 'theme.background.white',
     fontSize: 16,
     fontWeight: 'bold',
   },
   infoText: {
     fontSize: 14,
-    color: '#666',
+    color: 'theme.text.secondary',
     marginBottom: 8,
   },
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 12,
-    backgroundColor: '#fff',
+    backgroundColor: 'theme.background.white',
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: 'theme.background.border',
   },
   backButtonText: {
     marginLeft: 8,
     fontSize: 16,
-    color: '#333',
+    color: 'theme.text.primary',
     fontWeight: '600',
   },
   settingsRow: {
@@ -555,7 +555,7 @@ const styles = StyleSheet.create({
   settingsLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: 'theme.text.primary',
     flex: 1,
   },
   themeContainer: {
@@ -568,7 +568,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ddd',
-    backgroundColor: '#fafafa',
+    backgroundColor: 'theme.background.lighter',
   },
   themeButtonActive: {
     backgroundColor: '#22c55e',
@@ -576,11 +576,11 @@ const styles = StyleSheet.create({
   },
   themeButtonText: {
     fontSize: 14,
-    color: '#666',
+    color: 'theme.text.secondary',
     fontWeight: '600',
   },
   themeButtonTextActive: {
-    color: '#fff',
+    color: 'theme.background.white',
   },
 });
 
