@@ -70,8 +70,8 @@ export const RESTAURANT_ID = 3;
 ### Couleurs du thème
 
 Les couleurs peuvent être configurées dans `src/config/restaurant.config.js` ou via les variables d'environnement:
-- `PRIMARY_COLOR`: #f10e0e
-- `SECONDARY_COLOR`: #0cedde
+- `PRIMARY_COLOR`: #ff6b6b
+- `SECONDARY_COLOR`: #4ecdc4
 
 ## 🔧 Développement
 
@@ -101,4 +101,4 @@ Application propriétaire - Burger House
 
 ---
 
-**Généré automatiquement le:** 2025-11-08 09:55:29
+**Généré automatiquement le:** 2025-11-08 15:39:29

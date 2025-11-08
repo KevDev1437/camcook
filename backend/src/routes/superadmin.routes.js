@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { protect, authorize } = require('../middleware/auth');
+const { validate, schemas } = require('../middleware/validation');
 const {
   getAllRestaurants,
   getRestaurantStats,
@@ -34,10 +35,10 @@ router.get('/restaurants', protect, authorize('superadmin'), getAllRestaurants);
 router.get('/restaurants/:restaurantId/stats', protect, authorize('superadmin'), getRestaurantStats);
 
 // Créer un nouveau restaurant
-router.post('/restaurants', protect, authorize('superadmin'), createRestaurant);
+router.post('/restaurants', protect, authorize('superadmin'), validate(schemas.createRestaurant), createRestaurant);
 
 // Modifier l'abonnement d'un restaurant
-router.put('/restaurants/:restaurantId/subscription', protect, authorize('superadmin'), updateRestaurantSubscription);
+router.put('/restaurants/:restaurantId/subscription', protect, authorize('superadmin'), validate(schemas.updateRestaurantSubscription), updateRestaurantSubscription);
 
 // Activer/désactiver un restaurant
 router.put('/restaurants/:restaurantId/toggle-status', protect, authorize('superadmin'), toggleRestaurantStatus);

@@ -16,6 +16,7 @@
 
 const { Op } = require('sequelize');
 const { Order, Restaurant } = require('../models');
+const logger = require('../utils/logger');
 
 /**
  * Normaliser les options d'une commande (accompagnements et boissons)
@@ -145,9 +146,9 @@ exports.create = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Create order error:', error?.message || error);
     const msg = error?.errors?.[0]?.message || error?.message || 'Erreur création commande';
     const status = (error?.name || '').includes('Validation') ? 400 : 500;
+    logger.error('Create order error', error, { userId: req.user?.id, restaurantId: req.restaurantId });
     res.status(status).json({ success: false, error: msg });
   }
 };
@@ -159,6 +160,14 @@ exports.create = async (req, res) => {
  */
 exports.myOrders = async (req, res) => {
   try {
+    // SÉCURITÉ : Vérifier que restaurantId est requis pour adminrestaurant
+    if (!req.restaurantId && req.user?.role === 'adminrestaurant') {
+      return res.status(400).json({
+        success: false,
+        error: 'Restaurant ID required for restaurant owners'
+      });
+    }
+
     const userId = req.user?.id;
     const userRole = req.user?.role;
     
@@ -227,7 +236,7 @@ exports.myOrders = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('My orders error:', error);
+    logger.error('My orders error', error, { userId: req.user?.id, restaurantId: req.restaurantId });
     res.status(500).json({ success: false, error: 'Erreur récupération commandes' });
   }
 };
@@ -304,7 +313,7 @@ exports.getRestaurantOrders = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Get restaurant orders error:', error);
+    logger.error('Get restaurant orders error', error, { userId: req.user?.id, restaurantId: req.restaurantId });
     res.status(500).json({ success: false, error: 'Erreur récupération commandes du restaurant' });
   }
 };
@@ -316,6 +325,14 @@ exports.getRestaurantOrders = async (req, res) => {
  */
 exports.getById = async (req, res) => {
   try {
+    // SÉCURITÉ : Vérifier que restaurantId est requis pour adminrestaurant
+    if (!req.restaurantId && req.user?.role === 'adminrestaurant') {
+      return res.status(400).json({
+        success: false,
+        error: 'Restaurant ID required for restaurant owners'
+      });
+    }
+
     const { id } = req.params;
     const userId = req.user?.id;
     const userRole = req.user?.role;
@@ -361,7 +378,7 @@ exports.getById = async (req, res) => {
 
     res.status(200).json({ success: true, data: order });
   } catch (error) {
-    console.error('Get order error:', error);
+    logger.error('Get order error', error, { userId: req.user?.id, restaurantId: req.restaurantId, orderId: id });
     res.status(500).json({ success: false, error: 'Erreur récupération commande' });
   }
 };
@@ -442,7 +459,7 @@ exports.updateOrderStatus = async (req, res) => {
       data: order
     });
   } catch (error) {
-    console.error('Update order status error:', error);
+    logger.error('Update order status error', error, { userId: req.user?.id, restaurantId: req.restaurantId, orderId: id });
     res.status(500).json({ success: false, error: 'Erreur lors de la mise à jour du statut' });
   }
 };
@@ -526,7 +543,7 @@ exports.getAllOrders = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('Get all orders error:', error);
+    logger.error('Get all orders error', error, { userId: req.user?.id, restaurantId: req.restaurantId });
     res.status(500).json({ success: false, error: 'Erreur récupération commandes' });
   }
 };

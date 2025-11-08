@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const helmet = require('helmet');
 const { connectDB } = require('./config/database');
 const { generalLimiter } = require('./middleware/rateLimiter');
 const { securityLogger } = require('./middleware/securityLogger');
@@ -11,6 +12,30 @@ dotenv.config();
 
 // Initialize express app
 const app = express();
+
+// ============================================
+// SÉCURITÉ : Headers HTTP sécurisés (Helmet)
+// ============================================
+// Protection contre XSS, clickjacking, MIME sniffing, etc.
+// Doit être appliqué AVANT les autres middlewares
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+  crossOriginEmbedderPolicy: false, // Pour permettre les images externes
+}));
+
+// Headers ajoutés par Helmet :
+// - X-Content-Type-Options: nosniff
+// - X-Frame-Options: DENY
+// - X-XSS-Protection: 1; mode=block
+// - Strict-Transport-Security
+// - Content-Security-Policy
 
 // Initialize models
 require('./models/index');
@@ -90,15 +115,59 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'CamCook API is running' });
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    success: false,
-    message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
-});
+// Error handling middleware (doit être le dernier middleware)
+const errorHandler = require('./middleware/errorHandler');
+app.use(errorHandler);
+
+// ============================================
+// VÉRIFICATION DE SÉCURITÉ : JWT Secrets
+// ============================================
+// Vérifie que les secrets JWT sont forts avant de démarrer le serveur
+// Empêche le démarrage si les secrets sont faibles ou manquants
+console.log('\n🔒 Vérification des secrets JWT...');
+
+if (!process.env.JWT_SECRET) {
+  console.error('❌ ERREUR CRITIQUE : JWT_SECRET n\'est pas défini dans .env');
+  console.error('📝 Ajoutez JWT_SECRET=votre_secret_fort dans le fichier .env');
+  process.exit(1);
+}
+
+if (process.env.JWT_SECRET.length < 32) {
+  console.error('❌ ERREUR CRITIQUE : JWT_SECRET doit faire au moins 32 caractères');
+  console.error('⚠️  Secret actuel : ' + process.env.JWT_SECRET.length + ' caractères');
+  console.error('');
+  console.error('💡 Générez un secret fort avec cette commande :');
+  console.error('   node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"');
+  console.error('');
+  process.exit(1);
+}
+
+if (!process.env.JWT_REFRESH_SECRET) {
+  console.error('❌ ERREUR CRITIQUE : JWT_REFRESH_SECRET n\'est pas défini dans .env');
+  console.error('📝 Ajoutez JWT_REFRESH_SECRET=votre_secret_fort dans le fichier .env');
+  process.exit(1);
+}
+
+if (process.env.JWT_REFRESH_SECRET.length < 32) {
+  console.error('❌ ERREUR CRITIQUE : JWT_REFRESH_SECRET doit faire au moins 32 caractères');
+  console.error('⚠️  Secret actuel : ' + process.env.JWT_REFRESH_SECRET.length + ' caractères');
+  console.error('');
+  console.error('💡 Générez un secret fort avec cette commande :');
+  console.error('   node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"');
+  console.error('');
+  process.exit(1);
+}
+
+// Vérifier que les secrets sont différents
+if (process.env.JWT_SECRET === process.env.JWT_REFRESH_SECRET) {
+  console.error('❌ ERREUR CRITIQUE : JWT_SECRET et JWT_REFRESH_SECRET doivent être différents');
+  process.exit(1);
+}
+
+console.log('✅ JWT_SECRET : ' + process.env.JWT_SECRET.length + ' caractères (OK)');
+console.log('✅ JWT_REFRESH_SECRET : ' + process.env.JWT_REFRESH_SECRET.length + ' caractères (OK)');
+console.log('✅ Secrets différents (OK)');
+console.log('');
 
 const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || '0.0.0.0'; // Écouter sur toutes les interfaces réseau

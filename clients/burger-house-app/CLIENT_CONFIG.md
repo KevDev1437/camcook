@@ -7,12 +7,12 @@
 - **Email:** burger@gmail.com
 - **Slug:** burger-house
 - **Bundle ID:** com.camcook.burger-house
-- **Couleur primaire:** #f10e0e
-- **Couleur secondaire:** #0cedde
+- **Couleur primaire:** #ff6b6b
+- **Couleur secondaire:** #4ecdc4
 
 ## Date de création
 
-2025-11-08 09:55:29
+2025-11-08 15:39:29
 
 ## Notes
 

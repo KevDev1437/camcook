@@ -1,5 +1,6 @@
 const { Op } = require('sequelize');
 const { Order, Review, User, MenuItem } = require('../models');
+const logger = require('../utils/logger');
 
 // Map front statuses to internal order statuses
 const mapOrderStatus = (status) => {
@@ -27,6 +28,14 @@ const mapOrderStatus = (status) => {
 
 exports.listOrders = async (req, res) => {
   try {
+    // SÉCURITÉ : Vérifier que restaurantId est requis pour adminrestaurant
+    if (!req.restaurantId && req.user?.role === 'adminrestaurant') {
+      return res.status(400).json({
+        success: false,
+        error: 'Restaurant ID required for restaurant owners'
+      });
+    }
+
     const { status, q, page = 1, limit = 20 } = req.query;
     const userRole = req.user?.role;
     const where = {};
@@ -69,7 +78,7 @@ exports.listOrders = async (req, res) => {
       meta: { total: count, page: pageNum, limit: pageSize, pages: Math.ceil(count / pageSize) },
     });
   } catch (error) {
-    console.error('Admin listOrders error:', error);
+    logger.error('Admin listOrders error', error, { userId: req.user?.id, restaurantId: req.restaurantId });
     res.status(500).json({ success: false, error: 'Erreur lors du listing des commandes' });
   }
 };
@@ -105,13 +114,21 @@ exports.updateOrderStatus = async (req, res) => {
     await order.update(updateData);
     res.status(200).json({ success: true, data: order });
   } catch (error) {
-    console.error('Admin updateOrderStatus error:', error);
+    logger.error('Admin updateOrderStatus error', error, { userId: req.user?.id, restaurantId: req.restaurantId, orderId: id });
     res.status(500).json({ success: false, error: 'Erreur mise à jour statut commande' });
   }
 };
 
 exports.listReviews = async (req, res) => {
   try {
+    // SÉCURITÉ : Vérifier que restaurantId est requis pour adminrestaurant
+    if (!req.restaurantId && req.user?.role === 'adminrestaurant') {
+      return res.status(400).json({
+        success: false,
+        error: 'Restaurant ID required for restaurant owners'
+      });
+    }
+
     const { status = 'pending', q, page = 1, limit = 20 } = req.query;
     const userRole = req.user?.role;
     const where = {};
@@ -150,7 +167,7 @@ exports.listReviews = async (req, res) => {
     });
     res.status(200).json({ success: true, data: rows, meta: { total: count, page: pageNum, limit: pageSize, pages: Math.ceil(count / pageSize) } });
   } catch (error) {
-    console.error('Admin listReviews error:', error);
+    logger.error('Admin listReviews error', error, { userId: req.user?.id, restaurantId: req.restaurantId });
     res.status(500).json({ success: false, error: 'Erreur listing avis' });
   }
 };
@@ -174,13 +191,21 @@ exports.updateReviewStatus = async (req, res) => {
     await review.update({ status });
     res.status(200).json({ success: true, data: review });
   } catch (error) {
-    console.error('Admin updateReviewStatus error:', error);
+    logger.error('Admin updateReviewStatus error', error, { userId: req.user?.id, restaurantId: req.restaurantId, reviewId: id });
     res.status(500).json({ success: false, error: 'Erreur maj statut avis' });
   }
 };
 
 exports.listUsers = async (req, res) => {
   try {
+    // SÉCURITÉ : Vérifier que restaurantId est requis pour adminrestaurant
+    if (!req.restaurantId && req.user?.role === 'adminrestaurant') {
+      return res.status(400).json({
+        success: false,
+        error: 'Restaurant ID required for restaurant owners'
+      });
+    }
+
     const { role, q, page = 1, limit = 20 } = req.query;
     const userRole = req.user?.role;
     const where = {};
@@ -231,7 +256,7 @@ exports.listUsers = async (req, res) => {
     });
     res.status(200).json({ success: true, data: rows, meta: { total: count, page: pageNum, limit: pageSize, pages: Math.ceil(count / pageSize) } });
   } catch (error) {
-    console.error('Admin listUsers error:', error);
+    logger.error('Admin listUsers error', error, { userId: req.user?.id, restaurantId: req.restaurantId });
     res.status(500).json({ success: false, error: 'Erreur listing utilisateurs' });
   }
 };
@@ -248,7 +273,7 @@ exports.updateUser = async (req, res) => {
     await user.update(updates);
     res.status(200).json({ success: true, data: user });
   } catch (error) {
-    console.error('Admin updateUser error:', error);
+    logger.error('Admin updateUser error', error, { userId: req.user?.id, targetUserId: id });
     res.status(500).json({ success: false, error: 'Erreur maj utilisateur' });
   }
 };
@@ -265,7 +290,7 @@ exports.deleteUser = async (req, res) => {
     await user.destroy(); // Soft delete grâce à paranoid: true
     res.status(200).json({ success: true, data: { id: user.id, deletedAt: user.deletedAt || new Date() } });
   } catch (error) {
-    console.error('Admin deleteUser error:', error);
+    logger.error('Admin deleteUser error', error, { userId: req.user?.id, targetUserId: id });
     res.status(500).json({ success: false, error: 'Erreur suppression utilisateur' });
   }
 };
@@ -289,7 +314,7 @@ exports.getActiveCustomersCount = async (req, res) => {
     
     res.status(200).json({ success: true, data: { count: parseInt(count, 10) || 0 } });
   } catch (error) {
-    console.error('Admin getActiveCustomersCount error:', error);
+    logger.error('Admin getActiveCustomersCount error', error, { userId: req.user?.id });
     res.status(500).json({ success: false, error: 'Erreur lors du comptage des clients actifs' });
   }
 };

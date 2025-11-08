@@ -3,6 +3,7 @@ const router = express.Router();
 const restaurantContext = require('../middleware/restaurantContext');
 const { protect, authorize } = require('../middleware/auth');
 const { validateImageUpload, uploadLimiter } = require('../middleware/uploadValidator');
+const { validate, schemas } = require('../middleware/validation');
 const {
   getMenuByRestaurant,
   getMenuItemById,
@@ -21,7 +22,8 @@ router.post('/',
   protect, 
   authorize('adminrestaurant', 'superadmin'), 
   uploadLimiter, 
-  validateImageUpload, 
+  validateImageUpload,
+  validate(schemas.createMenuItem),
   createMenuItem
 );
 
