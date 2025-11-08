@@ -169,3 +169,5 @@ HAVING COUNT(*) > 1;
 
 Pour toute question ou problème, consultez la documentation Sequelize : https://sequelize.org/docs/v6/other-topics/migrations/
 
+
+

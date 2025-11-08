@@ -9,7 +9,7 @@
  * 
  * SÉCURITÉ :
  * - Les owners ne peuvent voir/modifier QUE les accompagnements de LEUR restaurant
- * - Les admins peuvent tout voir (pas de filtre si userRole === 'admin')
+ * - Les superadmins peuvent tout voir (pas de filtre si userRole === 'superadmin')
  */
 
 const { Accompaniment } = require('../models');
@@ -71,7 +71,7 @@ exports.getAccompanimentById = async (req, res) => {
     
     // Si c'est un restaurant owner, filtrer par restaurantId
     // Les admins peuvent voir tous les accompagnements
-    if (userRole === 'restaurant' && req.restaurantId) {
+    if (userRole === 'adminrestaurant' && req.restaurantId) {
       where.restaurantId = req.restaurantId;
     } else if (userRole !== 'admin' && req.restaurantId) {
       // Si restaurantContext est appliqué, filtrer par restaurantId
@@ -135,7 +135,7 @@ exports.createAccompaniment = async (req, res) => {
     // Ajouter restaurantId si disponible (restaurantContext appliqué)
     if (req.restaurantId) {
       createData.restaurantId = req.restaurantId;
-    } else if (userRole === 'restaurant') {
+    } else if (userRole === 'adminrestaurant') {
       // Si owner sans restaurantContext, erreur
       return res.status(400).json({
         success: false,
@@ -179,7 +179,7 @@ exports.updateAccompaniment = async (req, res) => {
     const where = { id };
     
     // Si c'est un restaurant owner, vérifier que l'accompaniment appartient à son restaurant
-    if (userRole === 'restaurant' && req.restaurantId) {
+    if (userRole === 'adminrestaurant' && req.restaurantId) {
       where.restaurantId = req.restaurantId;
     } else if (userRole !== 'admin' && req.restaurantId) {
       // Si restaurantContext est appliqué, vérifier l'appartenance
@@ -252,7 +252,7 @@ exports.deleteAccompaniment = async (req, res) => {
     const where = { id };
     
     // Si c'est un restaurant owner, vérifier que l'accompaniment appartient à son restaurant
-    if (userRole === 'restaurant' && req.restaurantId) {
+    if (userRole === 'adminrestaurant' && req.restaurantId) {
       where.restaurantId = req.restaurantId;
     } else if (userRole !== 'admin' && req.restaurantId) {
       // Si restaurantContext est appliqué, vérifier l'appartenance

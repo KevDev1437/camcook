@@ -10,7 +10,7 @@ router.get('/', restaurantContext.optional, getSiteInfo);
 // Contact form endpoint (public) - restaurantContext optionnel (ajoute restaurantId si disponible)
 router.post('/contact', restaurantContext.optional, sendContactMessage);
 
-// Routes protégées (admin) - restaurantContext optionnel
-router.put('/', restaurantContext.optional, protect, authorize('admin'), upsertSiteInfo);
+// Routes protégées (superadmin) - restaurantContext optionnel
+router.put('/', restaurantContext.optional, protect, authorize('superadmin'), upsertSiteInfo);
 
 module.exports = router;

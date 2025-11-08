@@ -9,7 +9,7 @@
  * 
  * SÉCURITÉ :
  * - Les owners ne peuvent voir/modifier QUE les messages de LEUR restaurant
- * - Les admins peuvent tout voir (pas de filtre si userRole === 'admin')
+ * - Les superadmins peuvent tout voir (pas de filtre si userRole === 'superadmin')
  */
 
 const { Op } = require('sequelize');
@@ -37,7 +37,7 @@ exports.list = async (req, res) => {
     const where = {};
     
     // Filtrer par restaurantId si l'utilisateur est un restaurant owner
-    if (userRole === 'restaurant' && req.restaurantId) {
+    if (userRole === 'adminrestaurant' && req.restaurantId) {
       // Un owner ne peut voir QUE les messages de SON restaurant
       where.restaurantId = req.restaurantId;
     } else if (userRole !== 'admin' && req.restaurantId) {
@@ -101,7 +101,7 @@ exports.getById = async (req, res) => {
     const where = { id };
     
     // Si c'est un restaurant owner, vérifier que le message appartient à son restaurant
-    if (userRole === 'restaurant' && req.restaurantId) {
+    if (userRole === 'adminrestaurant' && req.restaurantId) {
       where.restaurantId = req.restaurantId;
     } else if (userRole !== 'admin' && req.restaurantId) {
       // Si restaurantContext est appliqué, vérifier l'appartenance
@@ -198,7 +198,7 @@ exports.updateStatus = async (req, res) => {
     const where = { id };
     
     // Si c'est un restaurant owner, vérifier que le message appartient à son restaurant
-    if (userRole === 'restaurant' && req.restaurantId) {
+    if (userRole === 'adminrestaurant' && req.restaurantId) {
       where.restaurantId = req.restaurantId;
     } else if (userRole !== 'admin' && req.restaurantId) {
       // Si restaurantContext est appliqué, vérifier l'appartenance
@@ -234,7 +234,7 @@ exports.delete = async (req, res) => {
     const where = { id };
     
     // Si c'est un restaurant owner, vérifier que le message appartient à son restaurant
-    if (userRole === 'restaurant' && req.restaurantId) {
+    if (userRole === 'adminrestaurant' && req.restaurantId) {
       where.restaurantId = req.restaurantId;
     } else if (userRole !== 'admin' && req.restaurantId) {
       // Si restaurantContext est appliqué, vérifier l'appartenance

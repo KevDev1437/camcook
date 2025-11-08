@@ -42,8 +42,9 @@ const User = sequelize.define('User', {
     }
   },
   role: {
-    type: DataTypes.ENUM('customer', 'restaurant', 'admin'),
-    defaultValue: 'customer'
+    type: DataTypes.ENUM('customer', 'adminrestaurant', 'superadmin'),
+    defaultValue: 'customer',
+    comment: 'Rôle utilisateur : customer (client), adminrestaurant (owner restaurant), superadmin (admin plateforme)'
   },
   avatar: {
     type: DataTypes.TEXT,
@@ -63,6 +64,15 @@ const User = sequelize.define('User', {
     type: DataTypes.JSON,
     allowNull: true,
     comment: 'User preferences (e.g., theme, notifications)'
+  },
+  defaultRestaurantId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    comment: 'Restaurant par défaut pour les clients (White Label isolation)',
+    references: {
+      model: 'restaurants',
+      key: 'id'
+    }
   }
 }, {
   tableName: 'users',

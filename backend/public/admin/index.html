@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin Dashboard - CamCook SaaS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Login Section (affiché si pas connecté) -->
+    <div id="loginSection" class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <h1>🎯 Super Admin</h1>
+                <p>CamCook SaaS Platform</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" placeholder="admin@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Mot de passe</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required>
+                </div>
+                <div id="loginError" class="error-message" style="display: none;"></div>
+                <button type="submit" class="btn-primary">Se connecter</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard (affiché si connecté) -->
+    <div id="dashboardSection" class="dashboard" style="display: none;">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1>🎯 Super Admin Dashboard</h1>
+                <p class="subtitle">Gestion de la plateforme CamCook SaaS</p>
+            </div>
+            <div class="header-actions">
+                <span id="userEmail" class="user-info"></span>
+                <button id="logoutBtn" class="btn-logout">Déconnexion</button>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="dashboard-nav">
+            <button class="nav-btn active" data-section="stats">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Dashboard</span>
+            </button>
+            <button class="nav-btn" data-section="restaurants">
+                <span class="nav-icon">🏪</span>
+                <span class="nav-text">Restaurants</span>
+            </button>
+            <button class="nav-btn" data-section="create">
+                <span class="nav-icon">➕</span>
+                <span class="nav-text">Créer Restaurant</span>
+            </button>
+            <button class="nav-btn" data-section="generate-app">
+                <span class="nav-icon">📱</span>
+                <span class="nav-text">Générer App</span>
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="dashboard-content">
+            <!-- Section Stats Globales -->
+            <section id="statsSection" class="content-section">
+                <div class="section-header">
+                    <h2>Statistiques Globales</h2>
+                    <button id="refreshStatsBtn" class="btn-refresh">🔄 Actualiser</button>
+                </div>
+                <div class="stats-grid" id="globalStats">
+                    <!-- Cards générées dynamiquement -->
+                    <div class="stat-card loading">
+                        <div class="stat-loader"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Liste Restaurants -->
+            <section id="restaurantsSection" class="content-section" style="display: none;">
+                <div class="section-header">
+                    <h2>Liste des Restaurants</h2>
+                    <button id="refreshRestaurantsBtn" class="btn-refresh">🔄 Actualiser</button>
+                </div>
+                
+                <div class="filters">
+                    <div class="filter-group">
+                        <input type="text" id="searchInput" placeholder="🔍 Rechercher par nom, email ou slug..." class="filter-input">
+                    </div>
+                    <div class="filter-group">
+                        <select id="statusFilter" class="filter-select">
+                            <option value="">Tous les statuts</option>
+                            <option value="active">Actifs</option>
+                            <option value="inactive">Inactifs</option>
+                            <option value="trial">En trial</option>
+                            <option value="cancelled">Annulés</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <select id="planFilter" class="filter-select">
+                            <option value="">Tous les plans</option>
+                            <option value="free">Free</option>
+                            <option value="starter">Starter</option>
+                            <option value="pro">Pro</option>
+                            <option value="enterprise">Enterprise</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <select id="activeFilter" class="filter-select">
+                            <option value="">Tous</option>
+                            <option value="true">Actifs uniquement</option>
+                            <option value="false">Inactifs uniquement</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="restaurants-table" id="restaurantsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nom</th>
+                                <th>Email</th>
+                                <th>Owner</th>
+                                <th>Plan</th>
+                                <th>Statut</th>
+                                <th>Actif</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="restaurantsTableBody">
+                            <tr>
+                                <td colspan="8" class="loading-row">
+                                    <div class="table-loader">Chargement...</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination" id="pagination">
+                    <!-- Pagination générée dynamiquement -->
+                </div>
+            </section>
+
+            <!-- Section Créer Restaurant -->
+            <section id="createSection" class="content-section" style="display: none;">
+                <div class="section-header">
+                    <h2>Créer un Nouveau Restaurant</h2>
+                </div>
+                <form id="createRestaurantForm" class="restaurant-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="restaurantName">Nom du restaurant *</label>
+                            <input type="text" id="restaurantName" placeholder="Burger House" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="restaurantEmail">Email *</label>
+                            <input type="email" id="restaurantEmail" placeholder="contact@restaurant.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="restaurantPhone">Téléphone *</label>
+                            <input type="tel" id="restaurantPhone" placeholder="+33123456789" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="restaurantOwnerId">Propriétaire du restaurant *</label>
+                            <div style="display: flex; gap: 10px; align-items: flex-start;">
+                                <select id="restaurantOwnerId" required style="flex: 1;">
+                                    <option value="">-- Sélectionner un utilisateur existant --</option>
+                                </select>
+                                <button type="button" id="createNewOwnerBtn" class="btn-secondary" style="white-space: nowrap;">+ Nouveau</button>
+                            </div>
+                            <small class="form-hint">Sélectionnez un utilisateur existant ou créez-en un nouveau. Son rôle sera automatiquement mis à jour en "adminrestaurant".</small>
+                        </div>
+                        
+                        <!-- Formulaire pour créer un nouvel owner (caché par défaut) -->
+                        <div id="newOwnerForm" style="display: none; background: #f5f5f5; padding: 15px; border-radius: 8px; margin-top: 10px;">
+                            <h3 style="margin-top: 0; margin-bottom: 15px;">Créer un nouveau propriétaire</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="newOwnerName">Nom *</label>
+                                    <input type="text" id="newOwnerName" placeholder="Jean Dupont">
+                                </div>
+                                <div class="form-group">
+                                    <label for="newOwnerEmail">Email *</label>
+                                    <input type="email" id="newOwnerEmail" placeholder="jean@example.com">
+                                </div>
+                                <div class="form-group">
+                                    <label for="newOwnerPhone">Téléphone *</label>
+                                    <input type="tel" id="newOwnerPhone" placeholder="+33123456789">
+                                </div>
+                                <div class="form-group">
+                                    <label for="newOwnerPassword">Mot de passe *</label>
+                                    <input type="password" id="newOwnerPassword" placeholder="Minimum 6 caractères" minlength="6">
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <button type="button" id="createOwnerBtn" class="btn-primary">Créer l'utilisateur</button>
+                                <button type="button" id="cancelNewOwnerBtn" class="btn-secondary">Annuler</button>
+                            </div>
+                            <div id="createOwnerError" class="error-message" style="display: none; margin-top: 10px;"></div>
+                            <div id="createOwnerSuccess" class="success-message" style="display: none; margin-top: 10px;"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="restaurantStreet">Rue *</label>
+                            <input type="text" id="restaurantStreet" placeholder="123 Rue de la Gastronomie" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="restaurantCity">Ville *</label>
+                            <input type="text" id="restaurantCity" placeholder="Paris" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="restaurantPostalCode">Code postal</label>
+                            <input type="text" id="restaurantPostalCode" placeholder="75001">
+                        </div>
+                        <div class="form-group">
+                            <label for="restaurantDescription">Description</label>
+                            <textarea id="restaurantDescription" rows="3" placeholder="Description du restaurant..."></textarea>
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label for="restaurantLogo">Logo du restaurant (URL)</label>
+                            <input type="url" id="restaurantLogo" placeholder="https://example.com/logo.png">
+                            <small class="form-hint">URL de l'image du logo. Le logo sera affiché dans l'app mobile et le dashboard admin.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="restaurantSubscriptionPlan">Plan d'abonnement</label>
+                            <select id="restaurantSubscriptionPlan">
+                                <option value="free">Free</option>
+                                <option value="starter" selected>Starter</option>
+                                <option value="pro">Pro</option>
+                                <option value="enterprise">Enterprise</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="createRestaurantError" class="error-message" style="display: none;"></div>
+                    <div id="createRestaurantSuccess" class="success-message" style="display: none;"></div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Créer le restaurant</button>
+                        <button type="button" id="resetFormBtn" class="btn-secondary">Réinitialiser</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Section Générer App -->
+            <section id="generate-appSection" class="content-section" style="display: none;">
+                <div class="section-header">
+                    <h2>Générer une App White Label</h2>
+                </div>
+                <div class="info-box" style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+                    <h3 style="margin-top: 0; color: #1976d2;">📱 Génération d'App White Label</h3>
+                    <p style="margin-bottom: 10px;">Cette fonction génère automatiquement une app mobile complète pour un restaurant existant.</p>
+                    <p style="margin: 0;"><strong>L'app sera créée dans le dossier <code>clients/{slug}-app/</code></strong></p>
+                </div>
+                <form id="generateAppForm" class="restaurant-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="generateRestaurantId">Restaurant *</label>
+                            <select id="generateRestaurantId" required>
+                                <option value="">-- Sélectionner un restaurant --</option>
+                            </select>
+                            <small class="form-hint">Sélectionnez le restaurant pour lequel générer l'app mobile.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="generatePrimaryColor">Couleur primaire</label>
+                            <input type="color" id="generatePrimaryColor" value="#FF6B6B">
+                            <small class="form-hint">Couleur principale de l'app (optionnel)</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="generateSecondaryColor">Couleur secondaire</label>
+                            <input type="color" id="generateSecondaryColor" value="#4ECDC4">
+                            <small class="form-hint">Couleur secondaire de l'app (optionnel)</small>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e0e0e0;">
+                        <h3 style="margin-top: 0; margin-bottom: 15px; color: #333;">🔧 Configuration Environnement</h3>
+                        <div class="form-grid">
+                            <div class="form-group" style="grid-column: 1 / -1;">
+                                <label for="generateApiUrl">URL de l'API (Production)</label>
+                                <input type="text" id="generateApiUrl" placeholder="https://api.votredomaine.com/api" value="http://localhost:5000/api">
+                                <small class="form-hint">
+                                    <strong>Développement :</strong> Laissez <code>http://localhost:5000/api</code> (déjà configuré par défaut)<br>
+                                    <strong>Production :</strong> Remplacez par l'URL de votre serveur backend (ex: <code>https://api.votredomaine.com/api</code>)
+                                </small>
+                            </div>
+                            <div class="form-group" style="grid-column: 1 / -1;">
+                                <label for="generateStripeKey">Clé publique Stripe (Publishable Key)</label>
+                                <input type="text" id="generateStripeKey" placeholder="pk_test_... ou pk_live_...">
+                                <small class="form-hint">Clé publique Stripe pour les paiements. Format: pk_test_... (test) ou pk_live_... (production). <a href="https://dashboard.stripe.com/apikeys" target="_blank">Trouver ma clé</a></small>
+                            </div>
+                            <div class="form-group" style="grid-column: 1 / -1;">
+                                <label for="generateWifiIp">IP WiFi locale (développement uniquement)</label>
+                                <input type="text" id="generateWifiIp" placeholder="192.168.1.100">
+                                <small class="form-hint">IP WiFi locale pour le développement avec Expo Go sur appareil physique. Laissez vide pour utiliser la détection automatique.</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e0e0e0;">
+                        <h3 style="margin-top: 0; margin-bottom: 15px; color: #333;">⚙️ Options</h3>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="checkbox" id="autoInstallDeps" style="width: auto; margin: 0;">
+                                <span>Installer automatiquement les dépendances npm après la génération</span>
+                            </label>
+                            <small class="form-hint">Cochez cette option pour exécuter automatiquement <code>npm install</code> dans le dossier de l'app générée.</small>
+                        </div>
+                    </div>
+                    <div id="generateAppError" class="error-message" style="display: none;"></div>
+                    <div id="generateAppSuccess" class="success-message" style="display: none;"></div>
+                    <div id="generateAppOutput" style="display: none; background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 12px; max-height: 300px; overflow-y: auto; margin-top: 15px; white-space: pre-wrap;"></div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary" id="generateAppBtn">🚀 Générer l'App</button>
+                        <button type="button" id="resetGenerateFormBtn" class="btn-secondary">Réinitialiser</button>
+                    </div>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal pour les détails d'un restaurant -->
+    <div id="restaurantModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Détails du Restaurant</h2>
+                <button class="modal-close" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Contenu généré dynamiquement -->
+            </div>
+            <div class="modal-footer">
+                <button id="closeModalBtnFooter" class="btn-secondary">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
+

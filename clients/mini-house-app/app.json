@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "Mini house",
+    "slug": "mini-house",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.camcook.mini-house"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.camcook.mini-house"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "restaurantId": 4,
+      "restaurantName": "Mini house",
+      "apiUrl": "http://localhost:5000/api",
+      "wifiIp": "192.168.129.10",
+      "stripePublishableKey": "pk_test_51SPUUy3EXjOp1iU8XUZ4HWJKV96T3WoocdZG1iGZL3OkHRNNeRN0uei0oRn3ERdHz5NSpn7Y2OnBvTcSOFjwtJbb005gIoWzRV"
+    }
+  }
+}

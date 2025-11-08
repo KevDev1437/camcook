@@ -19,7 +19,7 @@ router.get('/:id', restaurantContext.required, getMenuItemById);
 router.post('/', 
   restaurantContext.required, 
   protect, 
-  authorize('restaurant', 'admin'), 
+  authorize('adminrestaurant', 'superadmin'), 
   uploadLimiter, 
   validateImageUpload, 
   createMenuItem
@@ -28,7 +28,7 @@ router.post('/',
 router.put('/:id', 
   restaurantContext.required, 
   protect, 
-  authorize('restaurant', 'admin'), 
+  authorize('adminrestaurant', 'superadmin'), 
   uploadLimiter, 
   validateImageUpload, 
   updateMenuItem
@@ -37,7 +37,7 @@ router.put('/:id',
 router.delete('/:id', 
   restaurantContext.required, 
   protect, 
-  authorize('restaurant', 'admin'), 
+  authorize('adminrestaurant', 'superadmin'), 
   deleteMenuItem
 );
 

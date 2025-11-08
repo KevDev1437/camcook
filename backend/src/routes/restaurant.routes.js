@@ -1,5 +1,5 @@
 const express = require('express');
-const { protect, authorize } = require('../middleware/auth');
+const { protect, protectOptional, authorize } = require('../middleware/auth');
 const restaurantContext = require('../middleware/restaurantContext');
 const {
   getRestaurantInfo,
@@ -12,8 +12,10 @@ const {
 const router = express.Router();
 
 // Public routes - avec restaurantContext requis
-router.get('/info', restaurantContext.required, getRestaurantInfo);
-router.get('/menu', restaurantContext.required, getRestaurantMenu);
+// protectOptional : si l'utilisateur est connecté, req.user sera disponible pour restaurantContext
+// Cela permet aux adminrestaurant de charger automatiquement leur restaurant
+router.get('/info', protectOptional, restaurantContext.required, getRestaurantInfo);
+router.get('/menu', protectOptional, restaurantContext.required, getRestaurantMenu);
 router.get('/:id/menu', restaurantContext.required, getRestaurantMenu); // Alternative pour compatibilité
 
 // Route publique pour obtenir un restaurant par son slug
@@ -26,7 +28,7 @@ router.get('/list', restaurantContext.optional, listRestaurants);
 router.put('/', 
   restaurantContext.required,
   protect,
-  authorize('restaurant', 'admin'),
+  authorize('adminrestaurant', 'superadmin'),
   updateRestaurant
 );
 

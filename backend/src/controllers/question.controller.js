@@ -371,7 +371,7 @@ exports.answerQuestion = async (req, res) => {
 
     // Vérification multi-tenant : vérifier que le menuItem de la question appartient au restaurant actuel
     // Un restaurant owner ne peut répondre qu'aux questions de SON restaurant
-    if (userRole === 'restaurant' && req.restaurantId && question.menuItem && question.menuItem.restaurantId !== req.restaurantId) {
+    if (userRole === 'adminrestaurant' && req.restaurantId && question.menuItem && question.menuItem.restaurantId !== req.restaurantId) {
       return res.status(403).json({
         success: false,
         message: 'Access denied. This question belongs to another restaurant.'

@@ -99,8 +99,51 @@ const restaurantContext = (options = {}) => {
 
   return async (req, res, next) => {
     try {
-      // Identifier le restaurantId
-      const restaurantId = identifyRestaurantId(req);
+      // Identifier le restaurantId depuis les headers/query/env (app White Label)
+      const appRestaurantId = identifyRestaurantId(req);
+      
+      let restaurantId = null;
+      
+      // IMPORTANT : Pour les routes auth (login/register), on garde TOUJOURS le restaurantId de l'app
+      // La vérification que l'utilisateur peut se connecter à cette app se fera dans auth.controller.js
+      const isAuthRoute = req.path.includes('/auth/login') || req.path.includes('/auth/register');
+      
+      if (isAuthRoute) {
+        // Pour les routes auth, garder le restaurantId de l'app pour la vérification
+        restaurantId = appRestaurantId;
+        
+        // Logger pour debug
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`[RESTAURANT_CONTEXT] Auth route - Garde restaurantId de l'app: ${restaurantId} pour vérification`);
+        }
+      } else if (req.user && req.user.role === 'adminrestaurant') {
+        // MULTI-TENANT : Pour les autres routes, si l'utilisateur est un adminrestaurant, 
+        // trouver automatiquement son restaurant
+        // Cela garantit que chaque owner voit uniquement les données de SON restaurant
+        const userRestaurant = await Restaurant.findOne({
+          where: { ownerId: req.user.id },
+          attributes: ['id']
+        });
+        
+        if (userRestaurant) {
+          restaurantId = userRestaurant.id;
+          
+          // Logger pour debug
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`[RESTAURANT_CONTEXT] AdminRestaurant détecté - Restaurant ID automatique: ${restaurantId} pour ${req.method} ${req.path}`);
+          }
+        } else {
+          // Si l'adminrestaurant n'a pas de restaurant, erreur
+          return res.status(403).json({
+            success: false,
+            message: 'Restaurant not found for this owner',
+            details: `User ${req.user.id} (${req.user.email}) is an adminrestaurant but has no associated restaurant`
+          });
+        }
+      } else {
+        // Pour les autres utilisateurs (customers, superadmin), utiliser la logique normale
+        restaurantId = appRestaurantId;
+      }
 
       // Si restaurantId est requis mais non trouvé
       if (required && !restaurantId) {
@@ -173,6 +216,15 @@ const restaurantContext = (options = {}) => {
         });
       }
 
+      // MULTI-TENANT : Vérifier que l'adminrestaurant accède bien à SON restaurant
+      if (req.user && req.user.role === 'adminrestaurant' && restaurant.ownerId !== req.user.id) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied',
+          details: `You can only access your own restaurant. This restaurant (ID: ${restaurant.id}) belongs to another owner.`
+        });
+      }
+
       // Vérifier que le restaurant est actif
       if (!restaurant.isActive) {
         return res.status(403).json({
@@ -232,4 +284,5 @@ restaurantContext.required = restaurantContext({ required: true });
 restaurantContext.optional = restaurantContext({ required: false });
 
 module.exports = restaurantContext;
+
 

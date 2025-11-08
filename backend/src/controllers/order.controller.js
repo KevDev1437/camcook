@@ -11,7 +11,7 @@
  * SÉCURITÉ :
  * - Un restaurant owner ne peut voir QUE les commandes de SON restaurant
  * - Avant toute opération sur une commande, vérifier que order.restaurantId === req.restaurantId
- * - Les admins peuvent tout voir (userRole === 'admin')
+ * - Les superadmins peuvent tout voir (userRole === 'superadmin')
  */
 
 const { Op } = require('sequelize');
@@ -171,15 +171,26 @@ exports.myOrders = async (req, res) => {
     // Construire les conditions de recherche
     const where = {};
     
+    // MULTI-TENANT : Filtrer par restaurantId si disponible (pour isolation White Label)
     // Si c'est un restaurant owner, filtrer par restaurantId
-    if (userRole === 'restaurant' && req.restaurantId) {
+    if (userRole === 'adminrestaurant' && req.restaurantId) {
       // Un owner ne peut voir QUE les commandes de SON restaurant
       where.restaurantId = req.restaurantId;
     } else if (userRole === 'customer') {
-      // Un customer voit ses propres commandes
+      // MULTI-TENANT : Un customer voit ses propres commandes
+      // MAIS dans une app White Label, on filtre aussi par restaurantId pour isoler les données
       where.customerId = userId;
-    } else if (userRole === 'admin') {
+      
+      // Si restaurantId est disponible (app White Label), filtrer aussi par restaurant
+      if (req.restaurantId) {
+        where.restaurantId = req.restaurantId;
+      }
+    } else if (userRole === 'superadmin') {
       // Un admin voit toutes les commandes (pas de filtre)
+      // Mais si restaurantId est fourni, on peut filtrer pour un contexte spécifique
+      if (req.restaurantId) {
+        where.restaurantId = req.restaurantId;
+      }
     } else {
       // Par défaut, si restaurantId est disponible, filtrer par restaurant
       if (req.restaurantId) {
@@ -244,7 +255,7 @@ exports.getRestaurantOrders = async (req, res) => {
     }
 
     // Vérifier que l'utilisateur est le propriétaire du restaurant ou un admin
-    if (userRole === 'restaurant') {
+    if (userRole === 'adminrestaurant') {
       // Vérifier que l'utilisateur est le propriétaire de ce restaurant
       const restaurant = await Restaurant.findByPk(req.restaurantId);
       if (!restaurant || restaurant.ownerId !== userId) {
@@ -325,7 +336,7 @@ exports.getById = async (req, res) => {
       if (String(order.customerId) !== String(userId)) {
         return res.status(403).json({ success: false, error: 'Accès refusé' });
       }
-    } else if (userRole === 'restaurant') {
+    } else if (userRole === 'adminrestaurant') {
       // Un restaurant owner ne peut voir que les commandes de SON restaurant
       if (req.restaurantId && String(order.restaurantId) !== String(req.restaurantId)) {
         return res.status(403).json({
@@ -407,7 +418,7 @@ exports.updateOrderStatus = async (req, res) => {
     }
 
     // Vérifier que l'utilisateur est le propriétaire du restaurant ou un admin
-    if (userRole === 'restaurant') {
+    if (userRole === 'adminrestaurant') {
       const restaurant = await Restaurant.findByPk(req.restaurantId);
       if (!restaurant || restaurant.ownerId !== userId) {
         return res.status(403).json({
@@ -451,7 +462,7 @@ exports.getAllOrders = async (req, res) => {
     }
 
     // Si c'est un restaurant owner, filtrer par restaurantId
-    if (userRole === 'restaurant' && req.restaurantId) {
+    if (userRole === 'adminrestaurant' && req.restaurantId) {
       // Un owner ne peut voir QUE les commandes de SON restaurant
       const where = { restaurantId: req.restaurantId };
       
@@ -479,7 +490,7 @@ exports.getAllOrders = async (req, res) => {
           pages: Math.ceil(count / pageSize)
         }
       });
-    } else if (userRole === 'admin') {
+    } else if (userRole === 'superadmin') {
       // Un admin peut voir toutes les commandes
       const { status, restaurantId, page = 1, limit = 50 } = req.query;
       const where = {};

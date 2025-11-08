@@ -28,7 +28,14 @@ const mapOrderStatus = (status) => {
 exports.listOrders = async (req, res) => {
   try {
     const { status, q, page = 1, limit = 20 } = req.query;
+    const userRole = req.user?.role;
     const where = {};
+    
+    // MULTI-TENANT : Filtrer par restaurantId si adminrestaurant
+    if (userRole === 'adminrestaurant' && req.restaurantId) {
+      where.restaurantId = req.restaurantId;
+    }
+    
     const mapped = mapOrderStatus(status);
     if (mapped) where.status = { [Op.in]: mapped };
     if (q && String(q).trim()) {
@@ -71,12 +78,18 @@ exports.updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status, estimatedMinutes } = req.body || {};
+    const userRole = req.user?.role;
     const allowed = ['pending', 'confirmed', 'preparing', 'ready', 'on_delivery', 'completed', 'cancelled', 'rejected'];
     if (!allowed.includes(status)) {
       return res.status(400).json({ success: false, error: 'Statut invalide' });
     }
     const order = await Order.findByPk(id);
     if (!order) return res.status(404).json({ success: false, error: 'Commande introuvable' });
+    
+    // MULTI-TENANT : Vérifier que l'adminrestaurant ne peut modifier que les commandes de son restaurant
+    if (userRole === 'adminrestaurant' && req.restaurantId && order.restaurantId !== req.restaurantId) {
+      return res.status(403).json({ success: false, error: 'Vous ne pouvez modifier que les commandes de votre restaurant' });
+    }
     
     // Si on passe à "preparing" et qu'un temps estimé est fourni, calculer estimatedReadyTime
     const updateData = { status };
@@ -100,7 +113,16 @@ exports.updateOrderStatus = async (req, res) => {
 exports.listReviews = async (req, res) => {
   try {
     const { status = 'pending', q, page = 1, limit = 20 } = req.query;
+    const userRole = req.user?.role;
     const where = {};
+    
+    // MULTI-TENANT : Filtrer par restaurantId si adminrestaurant
+    // Les reviews sont liées aux menuItems qui sont liés aux restaurants
+    if (userRole === 'adminrestaurant' && req.restaurantId) {
+      // Filtrer via la relation menuItem
+      where['$menuItem.restaurantId$'] = req.restaurantId;
+    }
+    
     if (['pending', 'approved', 'rejected'].includes(status)) where.status = status;
     
     // Optimisation : inclure les relations pour éviter les requêtes N+1
@@ -115,7 +137,12 @@ exports.listReviews = async (req, res) => {
       where,
       include: [
         { model: User, as: 'user', attributes: ['id', 'name', 'email'] },
-        { model: MenuItem, as: 'menuItem', attributes: ['id', 'name', 'price'] },
+        { 
+          model: MenuItem, 
+          as: 'menuItem', 
+          attributes: ['id', 'name', 'price', 'restaurantId'],
+          required: userRole === 'adminrestaurant' && req.restaurantId // INNER JOIN si filtre par restaurant
+        },
       ],
       order: [['createdAt', 'DESC']],
       limit: pageSize,
@@ -132,10 +159,18 @@ exports.updateReviewStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body || {};
+    const userRole = req.user?.role;
     const allowed = ['pending', 'approved', 'rejected'];
     if (!allowed.includes(status)) return res.status(400).json({ success: false, error: 'Statut invalide' });
-    const review = await Review.findByPk(id);
+    const review = await Review.findByPk(id, {
+      include: [{ model: MenuItem, as: 'menuItem', attributes: ['id', 'restaurantId'] }]
+    });
     if (!review) return res.status(404).json({ success: false, error: 'Avis introuvable' });
+    
+    // MULTI-TENANT : Vérifier que l'adminrestaurant ne peut modifier que les reviews de son restaurant
+    if (userRole === 'adminrestaurant' && req.restaurantId && review.menuItem && review.menuItem.restaurantId !== req.restaurantId) {
+      return res.status(403).json({ success: false, error: 'Vous ne pouvez modifier que les avis de votre restaurant' });
+    }
     await review.update({ status });
     res.status(200).json({ success: true, data: review });
   } catch (error) {
@@ -147,8 +182,35 @@ exports.updateReviewStatus = async (req, res) => {
 exports.listUsers = async (req, res) => {
   try {
     const { role, q, page = 1, limit = 20 } = req.query;
+    const userRole = req.user?.role;
     const where = {};
-    if (role && ['customer', 'restaurant', 'admin'].includes(role)) where.role = role;
+    
+    // MULTI-TENANT : Filtrer par restaurantId si adminrestaurant
+    // Les adminrestaurant ne peuvent voir que les clients de leur restaurant
+    if (userRole === 'adminrestaurant' && req.restaurantId) {
+      // Filtrer les clients qui ont defaultRestaurantId = req.restaurantId
+      where.defaultRestaurantId = req.restaurantId;
+      // Limiter aux clients uniquement
+      where.role = 'customer';
+    } else {
+      // Mettre à jour les rôles pour utiliser les nouveaux noms (seulement si pas adminrestaurant)
+      if (role) {
+        const roleMap = {
+          'customer': 'customer',
+          'adminrestaurant': 'adminrestaurant',
+          'superadmin': 'superadmin',
+          // Anciens noms pour compatibilité
+          'restaurant': 'adminrestaurant',
+          'admin': 'superadmin'
+        };
+        const mappedRole = roleMap[role] || role;
+        if (['customer', 'adminrestaurant', 'superadmin'].includes(mappedRole)) {
+          where.role = mappedRole;
+        }
+      }
+    }
+    
+    // Recherche par texte
     if (q && String(q).trim()) {
       const like = `%${String(q).trim()}%`;
       where[Op.or] = [

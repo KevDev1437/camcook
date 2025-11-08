@@ -297,7 +297,12 @@ exports.listPayments = async (req, res) => {
       });
     }
 
-    const { status, paymentMethod, page = 1, limit = 20, startDate, endDate, restaurantId } = req.query;
+    const { status, paymentMethod, page = 1, limit = 20, startDate, endDate } = req.query;
+    
+    // MULTI-TENANT : Utiliser req.restaurantId du middleware restaurantContext
+    // Si l'utilisateur est adminrestaurant, req.restaurantId sera automatiquement défini
+    // Si l'utilisateur est superadmin, req.restaurantId peut être null (voir tous les paiements)
+    const restaurantId = req.restaurantId || req.query.restaurantId;
 
     // Construire les paramètres de recherche Stripe
     const listParams = {
@@ -330,7 +335,8 @@ exports.listPayments = async (req, res) => {
       filteredPayments = filteredPayments.filter(p => p.status === status);
     }
 
-    // Filtrer par restaurantId si fourni (depuis les metadata Stripe)
+    // MULTI-TENANT : Filtrer par restaurantId si fourni (depuis les metadata Stripe)
+    // Si l'utilisateur est adminrestaurant, filtrer automatiquement par son restaurant
     if (restaurantId) {
       filteredPayments = filteredPayments.filter(p => 
         p.metadata && p.metadata.restaurantId && p.metadata.restaurantId === restaurantId.toString()
@@ -426,9 +432,9 @@ exports.listPayments = async (req, res) => {
 exports.refundPayment = async (req, res) => {
   try {
     const userId = req.user?.id;
-    const isAdmin = req.user?.role === 'admin';
+    const isSuperAdmin = req.user?.role === 'superadmin';
 
-    if (!userId || !isAdmin) {
+    if (!userId || !isSuperAdmin) {
       return res.status(403).json({ success: false, error: 'Accès refusé' });
     }
 

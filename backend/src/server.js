@@ -22,7 +22,8 @@ connectDB();
 const allowedOrigins = process.env.NODE_ENV === 'production'
   ? (process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['https://votre-domaine.com'])
   : ['*']; // En développement, accepter toutes les origines
-
+// Servir les fichiers statiques du dashboard admin
+app.use('/admin', express.static('public/admin'));
 app.use(cors({
   origin: function (origin, callback) {
     // Permettre les requêtes sans origine (mobile apps, Postman, etc.)
@@ -48,6 +49,14 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Servir les fichiers statiques (dashboard admin)
+app.use(express.static('public'));
+
+// Route pour le dashboard admin
+app.get('/admin', (req, res) => {
+    res.sendFile('admin/index.html', { root: 'public' });
+});
+
 // Rate limiting global (appliqué à toutes les routes)
 app.use('/api', generalLimiter);
 
@@ -70,6 +79,7 @@ app.use('/api/questions', require('./routes/question.routes'));
 app.use('/api/site-info', require('./routes/siteinfo.routes'));
 app.use('/api/contact-messages', require('./routes/contactmessage.routes'));
 app.use('/api/admin', require('./routes/admin.routes'));
+app.use('/api/superadmin', require('./routes/superadmin.routes'));
 app.use('/api/cart', require('./routes/cart.routes'));
 app.use('/api/accompaniments', require('./routes/accompaniment.routes'));
 app.use('/api/drinks', require('./routes/drink.routes'));

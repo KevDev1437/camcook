@@ -14,9 +14,9 @@ const { protect, authorize } = require('../middleware/auth');
 router.get('/', restaurantContext.required, getAllAccompaniments);
 router.get('/:id', restaurantContext.required, getAccompanimentById);
 
-// Routes protégées (admin/owner) - restaurantContext requis + auth
-router.post('/', restaurantContext.required, protect, authorize('restaurant', 'admin'), createAccompaniment);
-router.put('/:id', restaurantContext.required, protect, authorize('restaurant', 'admin'), updateAccompaniment);
-router.delete('/:id', restaurantContext.required, protect, authorize('restaurant', 'admin'), deleteAccompaniment);
+// Routes protégées (adminrestaurant/superadmin) - restaurantContext requis + auth
+router.post('/', restaurantContext.required, protect, authorize('adminrestaurant', 'superadmin'), createAccompaniment);
+router.put('/:id', restaurantContext.required, protect, authorize('adminrestaurant', 'superadmin'), updateAccompaniment);
+router.delete('/:id', restaurantContext.required, protect, authorize('adminrestaurant', 'superadmin'), deleteAccompaniment);
 
 module.exports = router;

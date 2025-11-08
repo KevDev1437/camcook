@@ -30,6 +30,17 @@ const ContactMessage = sequelize.define('ContactMessage', {
     allowNull: false,
     defaultValue: 'new',
   },
+  restaurantId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'restaurants',
+      key: 'id'
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+    comment: 'ID du restaurant concerné par le message',
+  },
 }, {
   tableName: 'contact_messages',
   timestamps: true,

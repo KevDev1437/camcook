@@ -54,13 +54,20 @@ exports.register = async (req, res) => {
       });
     }
 
+    // MULTI-TENANT : Stocker le restaurantId pour isoler les clients par restaurant (White Label)
+    // Si restaurantContext est appliqué et qu'on crée un customer, stocker le restaurantId
+    const defaultRestaurantId = (role === 'customer' || !role) && req.restaurantId 
+      ? req.restaurantId 
+      : null;
+
     // Create user
     const user = await User.create({
       name,
       email,
       phone,
       password,
-      role: role || 'customer'
+      role: role || 'customer',
+      defaultRestaurantId // MULTI-TENANT : Restaurant par défaut pour isolation White Label
     });
 
     // Generate tokens
@@ -133,14 +140,82 @@ exports.login = async (req, res) => {
       });
     }
 
+    // MULTI-TENANT : Vérifier que l'utilisateur peut se connecter à ce restaurant (White Label isolation)
+    // IMPORTANT : Chaque app White Label est isolée - les utilisateurs ne peuvent se connecter que dans leur app
+    
+    if (req.restaurantId) {
+      // Récupérer le restaurantId depuis le header (app White Label)
+      const appRestaurantId = req.restaurantId;
+      
+      if (user.role === 'adminrestaurant') {
+        // MULTI-TENANT : Un adminrestaurant ne peut se connecter QUE dans l'app de SON restaurant
+        // Trouver le restaurant dont l'utilisateur est le propriétaire
+        const { Restaurant } = require('../models');
+        const userRestaurant = await Restaurant.findOne({
+          where: { ownerId: user.id },
+          attributes: ['id', 'name']
+        });
+        
+        if (!userRestaurant) {
+          logFailedLogin(req, `AdminRestaurant ${user.email} n'a pas de restaurant associé`);
+          return res.status(403).json({
+            success: false,
+            message: 'Vous n\'avez pas de restaurant associé. Contactez l\'administrateur.'
+          });
+        }
+        
+        // Vérifier que le restaurant de l'app correspond au restaurant de l'owner
+        if (userRestaurant.id !== appRestaurantId) {
+          logFailedLogin(req, `AdminRestaurant ${user.email} (restaurant: ${userRestaurant.name}, ID: ${userRestaurant.id}) tente de se connecter à l'app du restaurant ${appRestaurantId} mais n'y a pas accès`);
+          return res.status(403).json({
+            success: false,
+            message: `Vous ne pouvez pas vous connecter à cette application. Cette app est configurée pour un autre restaurant. Veuillez utiliser l'application de votre restaurant (${userRestaurant.name}).`
+          });
+        }
+        
+        console.log(`[AUTH] ✅ AdminRestaurant ${user.email} se connecte à son restaurant (${userRestaurant.name}, ID: ${userRestaurant.id})`);
+      } else if (user.role === 'customer') {
+        // MULTI-TENANT : Un customer ne peut se connecter QUE dans l'app de son restaurant par défaut
+        // Vérifier que le client a le droit de se connecter à ce restaurant
+        // Soit c'est son restaurant par défaut, soit il a des commandes dans ce restaurant
+        const { Order } = require('../models');
+        
+        // Vérifier si c'est son restaurant par défaut
+        const isDefaultRestaurant = user.defaultRestaurantId === appRestaurantId;
+        
+        // Vérifier s'il a des commandes dans ce restaurant
+        const hasOrders = await Order.findOne({ 
+          where: { 
+            customerId: user.id, 
+            restaurantId: appRestaurantId 
+          } 
+        });
+
+        const canAccess = isDefaultRestaurant || hasOrders !== null;
+
+        if (!canAccess) {
+          // Logger la tentative de login échouée
+          logFailedLogin(req, `Client ${user.email} tente de se connecter au restaurant ${appRestaurantId} mais n'y a pas accès`);
+          return res.status(403).json({
+            success: false,
+            message: 'Vous ne pouvez pas vous connecter à ce restaurant. Veuillez utiliser l\'application correspondante.'
+          });
+        }
+      }
+      // Les superadmin peuvent se connecter depuis n'importe quelle app
+    }
+
     // Logger la connexion réussie
     logSuccessfulLogin(req, user.id);
+
+    // DEBUG : Log du rôle pour diagnostic
+    console.log(`[AUTH] ✅ Login réussi pour ${user.email} - Rôle: ${user.role}`);
 
     // Generate tokens
     const token = generateToken(user.id);
     const refreshToken = generateRefreshToken(user.id);
 
-    res.status(200).json({
+    const responseData = {
       success: true,
       data: {
         user: {
@@ -148,12 +223,21 @@ exports.login = async (req, res) => {
           name: user.name,
           email: user.email,
           phone: user.phone,
-          role: user.role
+          role: user.role // IMPORTANT : Le rôle doit être inclus pour la navigation
         },
         token,
         refreshToken
       }
-    });
+    };
+
+    // DEBUG : Log de la réponse complète
+    console.log(`[AUTH] 📤 Réponse login pour ${user.email}:`, JSON.stringify({
+      success: responseData.success,
+      user: responseData.data.user,
+      hasToken: !!responseData.data.token
+    }, null, 2));
+
+    res.status(200).json(responseData);
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -219,11 +303,32 @@ exports.refreshToken = async (req, res) => {
 // @access  Private
 exports.getMe = async (req, res) => {
   try {
-    const user = await User.findByPk(req.user.id);
+    const user = await User.findByPk(req.user.id, {
+      attributes: { exclude: ['password'] } // Exclure le mot de passe
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Utilisateur non trouvé'
+      });
+    }
+
+    // IMPORTANT : Retourner un objet simple avec tous les champs nécessaires, y compris le rôle
+    const userData = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      role: user.role, // IMPORTANT : Le rôle doit être inclus
+      defaultRestaurantId: user.defaultRestaurantId,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
+    };
 
     res.status(200).json({
       success: true,
-      data: user
+      data: userData
     });
   } catch (error) {
     res.status(500).json({

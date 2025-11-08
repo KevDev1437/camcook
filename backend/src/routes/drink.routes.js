@@ -14,9 +14,9 @@ const { protect, authorize } = require('../middleware/auth');
 router.get('/', restaurantContext.required, getAllDrinks);
 router.get('/:id', restaurantContext.required, getDrinkById);
 
-// Routes protégées (admin/owner) - restaurantContext requis + auth
-router.post('/', restaurantContext.required, protect, authorize('restaurant', 'admin'), createDrink);
-router.put('/:id', restaurantContext.required, protect, authorize('restaurant', 'admin'), updateDrink);
-router.delete('/:id', restaurantContext.required, protect, authorize('restaurant', 'admin'), deleteDrink);
+// Routes protégées (adminrestaurant/superadmin) - restaurantContext requis + auth
+router.post('/', restaurantContext.required, protect, authorize('adminrestaurant', 'superadmin'), createDrink);
+router.put('/:id', restaurantContext.required, protect, authorize('adminrestaurant', 'superadmin'), updateDrink);
+router.delete('/:id', restaurantContext.required, protect, authorize('adminrestaurant', 'superadmin'), deleteDrink);
 
 module.exports = router;
